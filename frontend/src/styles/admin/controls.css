@@ -1,0 +1,246 @@
+.admin-icon-button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-panel);
+  color: var(--admin-muted);
+  transition: background-color var(--admin-duration), color var(--admin-duration), border-color var(--admin-duration);
+}
+
+.admin-icon-button:hover,
+.admin-icon-button:active {
+  border-color: var(--admin-border-strong);
+  background: var(--admin-active);
+  color: var(--admin-text);
+}
+
+.admin-icon-button:focus-visible,
+.admin-secondary-command:focus-visible {
+  outline: 2px solid var(--admin-focus);
+  outline-offset: 2px;
+}
+
+.admin-icon-button:disabled,
+.admin-secondary-command:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.admin-secondary-command {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--admin-space-2xs);
+  padding-inline: var(--admin-space-sm);
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-panel);
+  color: var(--admin-text);
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.admin-secondary-command:hover,
+.admin-secondary-command:active {
+  background: var(--admin-active);
+}
+
+.admin-spin {
+  animation: admin-spin 900ms linear infinite;
+}
+
+@keyframes admin-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.admin-page .field {
+  display: grid;
+  gap: var(--admin-space-2xs);
+  margin: 0;
+}
+
+.admin-page .field > span,
+.admin-page .field > label {
+  color: var(--admin-text);
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+
+.admin-page .field input,
+.admin-page .field textarea,
+.admin-page .field select {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--admin-space-2xs) var(--admin-space-xs);
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-control);
+  outline: 2px solid transparent;
+  background: var(--admin-panel);
+  box-shadow: none;
+  color: var(--admin-text);
+  font-size: 0.875rem;
+  transition: border-color var(--admin-duration), background-color var(--admin-duration);
+}
+
+.admin-page .field input:hover,
+.admin-page .field textarea:hover,
+.admin-page .field select:hover {
+  border-color: var(--admin-faint);
+  background: var(--admin-subtle);
+}
+
+.admin-page .field input:focus,
+.admin-page .field textarea:focus,
+.admin-page .field select:focus {
+  border-color: var(--admin-focus);
+  outline: 2px solid var(--admin-focus);
+  outline-offset: 1px;
+  background: var(--admin-panel);
+}
+
+.admin-page .field input:disabled,
+.admin-page .field textarea:disabled,
+.admin-page .field select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  background: var(--admin-active);
+}
+
+.admin-page .inline-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--admin-space-2xs);
+}
+
+.admin-page .ui-button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--admin-space-2xs);
+  padding-inline: var(--admin-space-sm);
+  border: 1px solid var(--admin-ink);
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-ink);
+  color: var(--admin-panel);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color var(--admin-duration), border-color var(--admin-duration), color var(--admin-duration);
+}
+
+.admin-page .ui-button:hover:not(:disabled),
+.admin-page .ui-button:active:not(:disabled) {
+  border-color: var(--admin-ink-hover);
+  background: var(--admin-ink-hover);
+}
+
+.admin-page .ui-button:focus-visible {
+  outline: 2px solid var(--admin-focus);
+  outline-offset: 2px;
+}
+
+.admin-page .ui-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.admin-page .ui-button--secondary {
+  border-color: var(--admin-border-strong);
+  background: var(--admin-panel);
+  color: var(--admin-text);
+}
+
+.admin-page .ui-button--secondary:hover:not(:disabled),
+.admin-page .ui-button--secondary:active:not(:disabled) {
+  border-color: var(--admin-border-strong);
+  background: var(--admin-active);
+  color: var(--admin-text);
+}
+
+.admin-page .ui-button--destructive {
+  border-color: var(--admin-danger);
+  background: var(--admin-danger);
+  color: var(--admin-panel);
+}
+
+.admin-page .ui-button--destructive:hover:not(:disabled),
+.admin-page .ui-button--destructive:active:not(:disabled) {
+  border-color: var(--admin-danger);
+  background: var(--admin-danger);
+}
+
+.admin-page .ui-button--sm {
+  min-height: 36px;
+  padding-inline: var(--admin-space-xs);
+  font-size: 0.8125rem;
+}
+
+.admin-page .muted {
+  color: var(--admin-muted);
+  font-size: 0.8125rem;
+}
+
+.admin-page .error-text {
+  margin: 0;
+  padding: var(--admin-space-xs) var(--admin-space-sm);
+  border: 1px solid var(--admin-danger);
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-danger-bg);
+  color: var(--admin-danger);
+  font-size: 0.78rem;
+}
+
+.admin-page .success-text {
+  margin: 0;
+  padding: var(--admin-space-xs) var(--admin-space-sm);
+  border: 1px solid var(--admin-success);
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-success-bg);
+  color: var(--admin-success);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 40rem) {
+  .admin-page .field input,
+  .admin-page .field textarea,
+  .admin-page .field select {
+    font-size: 1rem;
+  }
+
+  .admin-page .ui-button,
+  .admin-page .ui-button--sm {
+    min-height: 44px;
+  }
+
+  .admin-page .inline-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-page .inline-actions .ui-button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-page *,
+  .admin-page *::before,
+  .admin-page *::after {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .admin-spin {
+    animation: none;
+  }
+}

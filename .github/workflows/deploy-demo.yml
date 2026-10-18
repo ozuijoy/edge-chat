@@ -1,0 +1,32 @@
+name: Deploy Demo
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-demo-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Build demo assets
+        run: npm run build:demo
+      - name: Deploy isolated demo worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.DEMO_CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.DEMO_CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler deploy --config wrangler.demo.toml

@@ -1,0 +1,70 @@
+/* 站点预设只定义颜色：不改变布局、字体和交互，也不覆盖个人背景。
+ * 属性选择器比路由按需加载的 :root 更具体，切换页面不会恢复旧色。
+ * default 不覆盖任何变量，完整保留原主题；错误、警告、成功和在线状态不换色。
+ */
+:root[data-color-theme="cream-sakura"] {
+  --site-brand: #9b4567;
+  --site-brand-hover: #803550;
+  --site-button-background: var(--site-brand);
+  --site-brand-rgb: 155, 69, 103;
+  --site-secondary-rgb: 204, 137, 150;
+  --site-background: linear-gradient(160deg, #fff8ef, #faeef0);
+  --site-link: #903d60;
+  --site-selected: #f7e2e8;
+  --site-avatar: linear-gradient(180deg, #f7e2e8, #f6ece0);
+  --bg: #fff8ef;
+  --text: #332d31;
+  --text-soft: #6c6066;
+  --warm: var(--site-brand);
+  --warm-soft: #f7e2e8;
+  --cool: var(--site-brand);
+  --cool-soft: #faeef0;
+
+  --auth-canvas: #fff8ef;
+  --auth-tide: linear-gradient(to bottom, transparent 0%, #f7e9e8 25%, #f6e4e8 100%);
+  --auth-ink: #542c3d;
+  --auth-brand: #9b4567;
+  --auth-muted: #735363;
+  --auth-wave-sky: #fff8ef;
+  --auth-wave-horizon: #f5dfe5;
+  --auth-wave-depth-rgb: 178, 103, 132;
+  --auth-wave-0: #a75b79;
+  --auth-wave-1: #b86d8a;
+  --auth-wave-2: #c77f99;
+  --auth-wave-3: #d592a8;
+  --auth-wave-4: #dfa3b6;
+  --auth-wave-5: #e8b5c4;
+  --auth-wave-6: #efc6d0;
+  --auth-wave-7: #f4d6dc;
+  --auth-wave-8: #f8e4e6;
+  --auth-wave-9: #fbeeed;
+  --auth-wave-10: #fff8ef;
+
+  /* 保留聊天原有 OKLCH 明度、色度和状态阶梯；奶油用于画布，樱花用于交互。 */
+  --chat-canvas: oklch(96% 0.009 85);
+  --chat-rail: oklch(94% 0.012 85);
+  --chat-hover: oklch(96.5% 0.008 355);
+  --chat-selected: oklch(93% 0.03 355);
+  --chat-pressed: oklch(89% 0.035 355);
+  --chat-outgoing: oklch(94% 0.045 355);
+  --chat-ink: oklch(27% 0.024 355);
+  --chat-muted: oklch(49% 0.022 355);
+  --chat-subtle: oklch(53% 0.02 355);
+  --chat-line: oklch(90% 0.012 355);
+  --chat-accent: oklch(49% 0.094 355);
+  --chat-accent-hover: oklch(43% 0.084 355);
+  --chat-accent-pressed: oklch(37% 0.074 355);
+  --chat-disabled: oklch(91% 0.016 355);
+  --chat-scrollbar: oklch(65% 0.02 355 / 0.45);
+
+  --admin-workspace: #fff8ef;
+  --admin-subtle: #fdf9f6;
+  --admin-ink: #542c3d;
+  --admin-ink-hover: #6b344b;
+  --admin-brand: var(--site-brand);
+  --admin-selected: var(--site-selected);
+  --admin-green-bg: #fcf0f3;
+  --admin-green: var(--site-brand);
+  --admin-green-hover: var(--site-brand-hover);
+  --admin-focus: var(--site-brand);
+}

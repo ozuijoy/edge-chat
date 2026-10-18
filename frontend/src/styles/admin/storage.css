@@ -1,0 +1,36 @@
+.admin-page .admin-metric-card .admin-storage-page__refresh-time {
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+
+.admin-page .admin-storage-table {
+  min-width: 54rem;
+}
+
+.admin-storage-table td:not(:first-child) {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.admin-sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--admin-space-3xs);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.admin-sort-button:hover,
+.admin-sort-button:active {
+  color: var(--admin-text);
+}
+
+.admin-sort-button:focus-visible {
+  outline: 2px solid var(--admin-focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}

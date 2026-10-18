@@ -1,0 +1,59 @@
+{
+	"name": "edgechat",
+	"version": "2.17.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"schema:generate": "node .github/scripts/generate-schema-manifest.mjs",
+		"vditor:assets": "node .github/scripts/prepare-vditor-assets.mjs",
+		"pretest": "npm run schema:generate",
+		"prebuild": "npm run schema:generate",
+		"prebuild:frontend": "npm run vditor:assets",
+		"prebuild:demo": "npm run schema:generate && npm run vditor:assets",
+		"prebuild:capacitor:web": "npm run vditor:assets",
+		"predev:frontend": "npm run vditor:assets",
+		"predev:demo": "npm run schema:generate && npm run vditor:assets",
+		"test": "node --test",
+		"check:frontend-size": "npm run vditor:assets && node .github/scripts/check-frontend-size.mjs",
+		"dev:frontend": "vite --config frontend/vite.config.js",
+		"dev:demo": "vite --config frontend/vite.demo.config.js",
+		"build:frontend": "vite build --config frontend/vite.config.js",
+		"build:demo": "vite build --config frontend/vite.demo.config.js",
+		"build:capacitor:web": "vite build --config frontend/vite.capacitor.config.js",
+		"build": "npm run build:frontend",
+		"capacitor:sync": "npm run build:capacitor:web && cd capacitor && npx cap sync android",
+		"build:capacitor": "npm run capacitor:sync && node capacitor/scripts/run-gradle.mjs",
+		"open:capacitor:android": "cd capacitor && npx cap open android",
+		"biome:write": "biome check --write .",
+		"biome:check": "biome check .",
+		"biome:ci": "biome ci .",
+		"check": "npm run biome:ci && npm run build",
+		"deploy": "npm run build && wrangler deploy",
+		"deploy:demo": "npm run build:demo && wrangler deploy --config wrangler.demo.toml",
+		"d1:apply": "wrangler d1 execute cfchat-db --file ./worker/schema.sql",
+		"admin:bootstrap": "node .github/scripts/generate-admin-bootstrap-sql.mjs"
+	},
+	"dependencies": {
+		"@capacitor/android": "^8.5.1",
+		"@capacitor/core": "^8.5.1",
+		"@lucide/vue": "^1.28.0",
+		"bowser": "^2.14.1",
+		"dompurify": "^3.4.15",
+		"hono": "^4.8.3",
+		"markdown-it": "^15.0.2",
+		"vditor": "^4.0.0",
+		"vue": "^3.5.13",
+		"vue-router": "^4.5.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.11",
+		"@capacitor/cli": "^8.5.1",
+		"@vitejs/plugin-vue": "^6.0.8",
+		"sql.js": "1.14.2",
+		"vite": "^8.2.1",
+		"wrangler": "^4.11.1"
+	},
+	"overrides": {
+		"undici": "7.29.0"
+	}
+}

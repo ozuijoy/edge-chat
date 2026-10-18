@@ -1,0 +1,39 @@
+.admin-user-creator__form {
+  display: grid;
+  gap: var(--admin-space-md);
+}
+
+.admin-user-creator__identity-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--admin-space-sm);
+}
+
+.admin-user-creator__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: var(--admin-space-sm);
+}
+
+/* 用户组选择靠左、提交按钮靠右，避免两者挤在一起。 */
+.admin-user-creator__actions .field {
+  margin-right: auto;
+}
+
+.admin-user-creator__actions .ui-button {
+  flex: 0 0 auto;
+  min-width: 132px;
+}
+
+@media (max-width: 40rem) {
+  .admin-user-creator__identity-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-user-creator__actions .ui-button {
+    width: 100%;
+  }
+}

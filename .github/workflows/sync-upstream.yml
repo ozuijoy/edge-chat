@@ -1,0 +1,33 @@
+name: Sync Upstream
+on:
+  schedule:
+    # UTC 01:17/13:17，即北京时间 09:17/21:17，错开整点拥堵。
+    - cron: "17 1,13 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+          token: ${{ secrets.EDGECHAT_SYNC_TOKEN || github.token }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+      - name: Merge marked upstream update and dispatch deployment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EDGECHAT_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          EDGECHAT_HAS_SYNC_TOKEN: ${{ secrets.EDGECHAT_SYNC_TOKEN != '' }}
+        run: node .github/scripts/sync-upstream.mjs

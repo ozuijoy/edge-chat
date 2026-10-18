@@ -1,0 +1,28 @@
+.site-theme { margin-top: 24px; }
+.site-theme h4 { margin: 0 0 8px; color: var(--admin-text); font-size: 14px; }
+.site-theme__description, .site-theme__feedback { margin: 0 0 12px; color: var(--admin-muted); font-size: 13px; line-height: 1.6; }
+.site-theme__options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.site-theme__option {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  min-height: 64px; padding: 14px; text-align: left;
+  border: 1px solid var(--admin-border-strong); border-radius: var(--admin-radius-control);
+  background: var(--admin-panel); color: var(--admin-text);
+  transition: background var(--admin-duration), border-color var(--admin-duration);
+}
+.site-theme__option:hover:not(:disabled) { background: var(--admin-subtle); border-color: var(--admin-brand); }
+.site-theme__option[aria-pressed="true"] { border-color: var(--admin-brand); background: var(--admin-selected); }
+.site-theme__option:focus-visible { outline: 2px solid var(--admin-focus); outline-offset: 3px; }
+.site-theme__option:disabled { cursor: not-allowed; opacity: 0.65; }
+.site-theme__swatches { display: flex; flex-shrink: 0; }
+.site-theme__swatches i { width: 18px; height: 24px; background: #f0f3f8; }
+.site-theme__swatches i:first-child { border-radius: 5px 0 0 5px; }
+.site-theme__swatches i:nth-child(2) { background: #edf4fc; }
+.site-theme__swatches i:last-child { background: #176bc0; border-radius: 0 5px 5px 0; }
+/* 色卡只表示候选配色，不随当前主题变化，否则无法比较与恢复默认主题。 */
+[data-palette="cream-sakura"] .site-theme__swatches i { background: #fff8ef; }
+[data-palette="cream-sakura"] .site-theme__swatches i:nth-child(2) { background: #f7e2e8; }
+[data-palette="cream-sakura"] .site-theme__swatches i:last-child { background: #9b4567; }
+.site-theme__label { font-size: 14px; font-weight: 600; }
+.site-theme__state { margin-left: auto; color: var(--admin-muted); font-size: 12px; }
+.site-theme__feedback { margin: 12px 0 0; }
+@media (max-width: 40rem) { .site-theme__options { grid-template-columns: 1fr; } }

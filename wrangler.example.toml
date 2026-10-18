@@ -1,0 +1,95 @@
+# Legacy Worker service name kept to avoid creating a new production Worker during rename cleanup.
+name = "cfchat"
+main = "worker/src/index.js"
+compatibility_date = "2026-04-05"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+
+[build]
+command = "npm run schema:generate"
+
+[vars]
+ADMIN_USERNAMES = "admin"
+MESSAGE_RETENTION_DAYS = "7"
+SOFT_DELETE_RETENTION_DAYS = "60"
+GC_BATCH_SIZE = "90"
+GC_MAX_BATCHES_PER_RUN = "20"
+# 单次调用的 D1/R2 内部操作合计保留 100 次平台余量；失败写回也计入同一预算。
+GC_INTERNAL_OPERATION_BUDGET = "900"
+GC_D1_STATEMENT_BUDGET = "1200"
+GC_R2_OPERATION_BUDGET = "300"
+# 逗号分隔的本站 origin，用于识别升级前保存的完整 /files/ 图标 URL；自定义域名应全部列出。
+SITE_ORIGINS = ""
+R2_DELETE_MAX_RETRY = "8"
+ORPHAN_UPLOAD_RETENTION_DAYS = "1"
+ALLOWED_FILE_TYPES = "image/,video/,audio/,application/pdf,text/"
+MAX_FILE_SIZE = "20971520"
+
+[[d1_databases]]
+binding = "DB"
+# Legacy D1 resource name kept intentionally; do not rename without a data migration plan.
+database_name = "cfchat-db"
+database_id = "YOUR_D1_DATABASE_ID_HERE"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "YOUR_KV_NAMESPACE_ID_HERE"
+
+[[r2_buckets]]
+binding = "FILES"
+# Legacy R2 bucket name kept intentionally; code/docs use Edgechat branding.
+bucket_name = "cfchat-files"
+
+[[durable_objects.bindings]]
+name = "CHANNEL_ROOM"
+class_name = "ChannelRoom"
+
+[[durable_objects.bindings]]
+name = "SCHEDULER"
+class_name = "Scheduler"
+
+[[durable_objects.bindings]]
+name = "USER_INBOX"
+class_name = "UserInbox"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ChannelRoom", "Scheduler"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["UserInbox"]
+
+[[durable_objects.bindings]]
+name = "INSTANCE_BRIDGE"
+class_name = "InstanceBridge"
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["InstanceBridge"]
+
+[[durable_objects.bindings]]
+name = "VOICE_CALL"
+class_name = "VoiceCall"
+
+[[migrations]]
+tag = "v4"
+new_sqlite_classes = ["VoiceCall"]
+
+[[durable_objects.bindings]]
+name = "TELEGRAM_NOTIFICATIONS"
+class_name = "TelegramNotifications"
+
+[[migrations]]
+tag = "v5"
+new_sqlite_classes = ["TelegramNotifications"]
+
+[assets]
+directory = "./frontend/dist"
+not_found_handling = "single-page-application"
+binding = "ASSETS"
+# 全量先经过 Worker，隐身模式才能在资产命中与 SPA fallback 之前鉴权。
+run_worker_first = true
+
+[triggers]
+# 单一 15 分钟触发器救援实例桥接；Worker 在 UTC 19:00 的轮次同时执行每日 GC，节省账户级 cron 配额。
+crons = ["*/15 * * * *"]

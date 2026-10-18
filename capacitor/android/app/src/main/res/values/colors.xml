@@ -1,0 +1,6 @@
+<resources>
+    <color name="colorPrimary">#008069</color>
+    <color name="colorPrimaryDark">#005C4B</color>
+    <color name="colorAccent">#25A36F</color>
+    <color name="edgechat_notification">#008069</color>
+</resources>

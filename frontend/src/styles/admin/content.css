@@ -1,0 +1,204 @@
+.admin-panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-panel);
+  background: var(--admin-panel);
+  box-shadow: var(--admin-shadow);
+}
+
+.admin-panel__header {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: var(--admin-space-sm) var(--admin-space-md);
+  border-block-end: 1px solid var(--admin-border);
+}
+
+.admin-panel__header--actions {
+  justify-content: space-between;
+  gap: var(--admin-space-sm);
+}
+
+.admin-panel__header > div {
+  min-width: 0;
+}
+
+.admin-panel__header h2,
+.admin-panel__header p {
+  margin: 0;
+}
+
+.admin-panel__header h2 {
+  color: var(--admin-text);
+  font-size: 0.98rem;
+  font-weight: 650;
+}
+
+.admin-panel__header p {
+  margin-block-start: var(--admin-space-3xs);
+  color: var(--admin-muted);
+  font-size: 0.8125rem;
+}
+
+.admin-icon-tile {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-green-bg);
+  color: var(--admin-green);
+}
+
+.admin-icon-tile--neutral {
+  border-radius: var(--admin-radius-pill);
+  background: var(--admin-active);
+  color: var(--admin-muted);
+}
+
+/* 内容页只共享版式骨架，具体业务继续由各自组件负责。 */
+.admin-page .admin-section {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-space-md);
+}
+
+.admin-page .admin-section__header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--admin-space-sm);
+  padding: var(--admin-space-2xs) 0;
+}
+
+.admin-page .admin-section__heading {
+  min-width: 0;
+}
+
+.admin-page .admin-section__heading h1,
+.admin-page .admin-section__heading h2 {
+  min-width: 0;
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 1.5rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.admin-page .admin-section__heading p {
+  max-width: 70ch;
+  margin: var(--admin-space-2xs) 0 0;
+  color: var(--admin-muted);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.admin-page .admin-section__body,
+.admin-page .admin-stack {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-space-sm);
+}
+
+.admin-page .admin-anchor-section {
+  min-width: 0;
+  scroll-margin-block-start: var(--admin-space-sm);
+}
+
+.admin-page .admin-metric-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--admin-space-sm);
+}
+
+.admin-page .admin-metric-grid--compact {
+  grid-template-columns: repeat(2, minmax(8rem, 1fr));
+}
+
+.admin-page .admin-metric-card.ui-surface {
+  min-width: 0;
+  display: grid;
+  gap: var(--admin-space-3xs);
+  padding: var(--admin-space-sm) var(--admin-space-md);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-panel);
+  background: var(--admin-panel);
+  box-shadow: var(--admin-shadow);
+}
+
+.admin-page .admin-metric-card strong {
+  color: var(--admin-text);
+  font-size: 1.55rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-page .admin-metric-card span {
+  color: var(--admin-muted);
+  font-size: 0.8125rem;
+}
+
+.admin-page .panel.ui-surface,
+.admin-page .admin-update-panel.ui-surface,
+.admin-page .registration-invite-manager.ui-surface {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-space-sm);
+  padding: var(--admin-space-md);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-panel);
+  background: var(--admin-panel);
+  box-shadow: var(--admin-shadow);
+}
+
+.admin-page .panel--table.ui-surface {
+  min-height: 0;
+}
+
+.admin-page .panel-title {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 0.94rem;
+  font-weight: 750;
+}
+
+@media (max-width: 75rem) {
+  .admin-page .admin-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 40rem) {
+  .admin-page .admin-section__header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--admin-space-2xs) 0;
+  }
+
+  .admin-page .admin-section__header > .ui-button {
+    width: 100%;
+  }
+
+  .admin-page .admin-metric-grid,
+  .admin-page .admin-metric-grid--compact {
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .admin-page .panel.ui-surface,
+  .admin-page .admin-update-panel.ui-surface,
+  .admin-page .registration-invite-manager.ui-surface {
+    padding: var(--admin-space-sm);
+  }
+}

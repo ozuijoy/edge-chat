@@ -1,0 +1,9 @@
+{
+  "appId": "com.aozorae.edgechat.web",
+  "appName": "EdgeChat Web",
+  "webDir": "../frontend/dist",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#ffffff"
+  }
+}

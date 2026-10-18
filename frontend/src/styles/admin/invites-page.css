@@ -1,0 +1,32 @@
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4
+ * genre: modern-minimal · macrostructure: Index-First · theme: studied-DNA · designed-as-app
+ * 这里沿用后台既有令牌，把视觉重点留给操作层级与独立邀请卡片，避免页面再次变成装饰性面板堆叠。
+ */
+
+.admin-invites-page {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  gap: var(--admin-space-md);
+}
+
+.admin-invites-page__intro {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.admin-invites-page .admin-section__body {
+  gap: var(--admin-space-lg);
+}
+
+@media (max-width: 40rem) {
+  .admin-invites-page {
+    gap: var(--admin-space-sm);
+  }
+
+  .admin-invites-page .admin-section__body {
+    gap: var(--admin-space-md);
+  }
+}

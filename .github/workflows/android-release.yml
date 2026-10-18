@@ -1,0 +1,132 @@
+name: Android Release
+on:
+  push:
+    tags:
+      - "android-v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version without the android-v prefix; defaults to package.json
+        required: false
+        type: string
+      prerelease:
+        description: Publish as a prerelease
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android SDK 36
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Resolve release version
+        id: version
+        shell: bash
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#android-v}"
+            tag="$GITHUB_REF_NAME"
+          else
+            version="${INPUT_VERSION:-$(node -p "require('./package.json').version")}"
+            tag="android-v${version}"
+          fi
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - name: Configure release signing
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            test -n "${!name}"
+          done
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > capacitor/android/release.keystore
+          cat > capacitor/android/signing.properties <<EOF
+          storeFile=release.keystore
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
+          EOF
+      - name: Install dependencies
+        run: npm ci
+      - name: Run Node tests
+        run: npm test
+      - name: Build and sync bundled Web UI
+        run: npm run capacitor:sync
+      - name: Test, lint and build signed artifacts
+        run: >-
+          node capacitor/scripts/run-gradle.mjs
+          :app:testDebugUnitTest :app:assembleDebugAndroidTest
+          :app:lintRelease :app:assembleRelease :app:bundleRelease
+          -PedgechatVersionName=${{ steps.version.outputs.version }}
+          -PedgechatVersionCode=${{ github.run_number }}
+          --stacktrace
+      - name: Prepare checksums
+        shell: bash
+        run: |
+          mkdir -p capacitor/release-artifacts
+          cp capacitor/android/app/build/outputs/apk/release/app-release.apk capacitor/release-artifacts/edgechat-${{ steps.version.outputs.version }}.apk
+          cp capacitor/android/app/build/outputs/bundle/release/app-release.aab capacitor/release-artifacts/edgechat-${{ steps.version.outputs.version }}.aab
+          cd capacitor/release-artifacts
+          sha256sum *.apk *.aab > SHA256SUMS.txt
+      - name: Verify APK signature
+        shell: bash
+        run: |
+          apksigner_path="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          test -n "$apksigner_path"
+          "$apksigner_path" verify --verbose --print-certs capacitor/release-artifacts/*.apk
+          # AAB 使用 JAR 签名格式；这里只校验签名完整性，不把 ZIP 结构警告升级为失败。
+          jarsigner -verify -verbose -certs capacitor/release-artifacts/*.aab
+      - name: Publish GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+          PRERELEASE: ${{ github.event_name == 'workflow_dispatch' && inputs.prerelease || contains(steps.version.outputs.version, '-') }}
+        run: |
+          prerelease_flag=""
+          if [[ "$PRERELEASE" == "true" ]]; then prerelease_flag="--prerelease"; fi
+          if ! git rev-parse "$RELEASE_TAG" >/dev/null 2>&1; then
+            git tag "$RELEASE_TAG" "$GITHUB_SHA"
+            git push origin "$RELEASE_TAG"
+          fi
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" capacitor/release-artifacts/* --clobber
+          else
+            gh release create "$RELEASE_TAG" capacitor/release-artifacts/* \
+              --title "EdgeChat Android ${{ steps.version.outputs.version }}" \
+              --generate-notes $prerelease_flag
+          fi
+      - name: Remove signing material
+        if: always()
+        run: rm -f capacitor/android/release.keystore capacitor/android/signing.properties

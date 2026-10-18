@@ -1,0 +1,180 @@
+name: Deploy Worker
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - "worker/**"
+      - "frontend/**"
+      - "shared/**"
+      - "test/**"
+      - ".github/scripts/**"
+      - ".github/workflows/deploy-worker.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "biome.json"
+      - "wrangler.example.toml"
+  workflow_dispatch:
+    inputs:
+      apply_encryption_keyring:
+        description: Apply EDGECHAT_ENCRYPTION_KEYRING, retaining every old key ID during rotation
+        required: false
+        default: false
+        type: boolean
+      rotate_encryption_key:
+        description: Add a new automatic key and make it active while retaining every old key
+        required: false
+        default: false
+        type: boolean
+concurrency:
+  group: deploy-worker-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Build frontend assets
+        run: npm run build
+      - name: Validate message retention
+        env:
+          MESSAGE_RETENTION_DAYS: ${{ vars.MESSAGE_RETENTION_DAYS || '7' }}
+        shell: bash
+        run: |
+          if [[ ! "$MESSAGE_RETENTION_DAYS" =~ ^[1-9][0-9]*$ ]]; then
+            echo "MESSAGE_RETENTION_DAYS must be a positive integer (days)."
+            exit 1
+          fi
+      - name: Ensure Cloudflare resources
+        id: ensure_resources
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          EDGECHAT_KV_NAMESPACE_TITLE: ${{ vars.EDGECHAT_KV_NAMESPACE_TITLE || 'cfchat-sessions' }}
+        run: node .github/scripts/ensure-cloudflare-resources.mjs
+      - name: Generate wrangler config for CI
+        shell: bash
+        env:
+          R2_AVAILABLE: ${{ steps.ensure_resources.outputs.r2_available }}
+          R2_BUCKET_NAME: ${{ steps.ensure_resources.outputs.r2_bucket_name }}
+          MESSAGE_RETENTION_DAYS: ${{ vars.MESSAGE_RETENTION_DAYS || '7' }}
+        run: |
+          cp wrangler.example.toml wrangler.ci.toml
+          sed -i "s|^MESSAGE_RETENTION_DAYS = .*|MESSAGE_RETENTION_DAYS = \"${MESSAGE_RETENTION_DAYS}\"|" wrangler.ci.toml
+          sed -i "s|YOUR_D1_DATABASE_ID_HERE|${{ steps.ensure_resources.outputs.d1_database_id }}|g" wrangler.ci.toml
+          sed -i "s|YOUR_KV_NAMESPACE_ID_HERE|${{ steps.ensure_resources.outputs.kv_namespace_id }}|g" wrangler.ci.toml
+          if [[ "$R2_AVAILABLE" == "true" ]]; then
+            sed -i "/^\[\[r2_buckets\]\]$/,/^$/ s|^bucket_name = \".*\"$|bucket_name = \"${R2_BUCKET_NAME}\"|" wrangler.ci.toml
+          else
+            sed -i '/^\[\[r2_buckets\]\]$/,/^$/d' wrangler.ci.toml
+          fi
+      - name: Initialize D1 schema (first creation only)
+        if: steps.ensure_resources.outputs.d1_created == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler d1 execute ${{ steps.ensure_resources.outputs.d1_database_name }} --remote --file worker/schema.sql --config wrangler.ci.toml
+      - name: Prepare D1 migrations
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          EDGECHAT_D1_DATABASE_ID: ${{ steps.ensure_resources.outputs.d1_database_id }}
+        run: node .github/scripts/prepare-d1-migrations.mjs
+      - name: Apply D1 migrations
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler d1 execute ${{ steps.ensure_resources.outputs.d1_database_name }} --remote --file .tmp/edgechat-d1-migrations.sql --config wrangler.ci.toml
+      - name: Verify D1 schema contract
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          EDGECHAT_D1_DATABASE_ID: ${{ steps.ensure_resources.outputs.d1_database_id }}
+        run: node .github/scripts/prepare-d1-migrations.mjs --verify
+      - name: Generate admin bootstrap SQL (optional)
+        env:
+          EDGECHAT_ADMIN_USERNAME: ${{ secrets.EDGECHAT_ADMIN_USERNAME || secrets.CFCHAT_ADMIN_USERNAME }}
+          EDGECHAT_ADMIN_PASSWORD: ${{ secrets.EDGECHAT_ADMIN_PASSWORD || secrets.CFCHAT_ADMIN_PASSWORD }}
+          EDGECHAT_ADMIN_DISPLAY_NAME: ${{ secrets.EDGECHAT_ADMIN_DISPLAY_NAME || secrets.CFCHAT_ADMIN_DISPLAY_NAME }}
+        shell: bash
+        run: |
+          if [[ -n "$EDGECHAT_ADMIN_USERNAME" && -n "$EDGECHAT_ADMIN_PASSWORD" ]]; then
+            node .github/scripts/generate-admin-bootstrap-sql.mjs
+          elif [[ -n "$EDGECHAT_ADMIN_USERNAME" || -n "$EDGECHAT_ADMIN_PASSWORD" ]]; then
+            echo "Configure both EDGECHAT_ADMIN_USERNAME and EDGECHAT_ADMIN_PASSWORD Repository Secrets."
+            exit 1
+          else
+            echo "Skipping admin bootstrap SQL generation; admin credentials were not provided."
+          fi
+      - name: Ensure admin user (optional)
+        if: hashFiles('.tmp/edgechat-admin-upsert.sql') != ''
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler d1 execute ${{ steps.ensure_resources.outputs.d1_database_name }} --remote --file .tmp/edgechat-admin-upsert.sql --config wrangler.ci.toml
+      - name: Verify login administrator
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          EDGECHAT_D1_DATABASE_ID: ${{ steps.ensure_resources.outputs.d1_database_id }}
+        run: node .github/scripts/prepare-d1-migrations.mjs --verify-admin
+      - name: Prepare Worker encryption secret
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          EDGECHAT_WORKER_NAME: cfchat
+          EDGECHAT_SECRETS_FILE: .tmp/worker-secrets.json
+          EDGECHAT_ENCRYPTION_KEYRING: ${{ secrets.EDGECHAT_ENCRYPTION_KEYRING }}
+          EDGECHAT_APPLY_ENCRYPTION_KEYRING: ${{ github.event_name == 'workflow_dispatch' && inputs.apply_encryption_keyring || false }}
+          EDGECHAT_ROTATE_ENCRYPTION_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.rotate_encryption_key || false }}
+        run: node .github/scripts/prepare-worker-encryption-secret.mjs
+      - name: Validate optional TURN configuration
+        env:
+          EDGECHAT_TURN_KEY_ID: ${{ secrets.EDGECHAT_TURN_KEY_ID }}
+          EDGECHAT_TURN_API_TOKEN: ${{ secrets.EDGECHAT_TURN_API_TOKEN }}
+        shell: bash
+        run: |
+          if [[ -n "$EDGECHAT_TURN_KEY_ID" || -n "$EDGECHAT_TURN_API_TOKEN" ]]; then
+            test -n "$EDGECHAT_TURN_KEY_ID" && test -n "$EDGECHAT_TURN_API_TOKEN"
+          fi
+      - name: Deploy worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          if [[ -f .tmp/worker-secrets.json ]]; then
+            npx wrangler deploy --config wrangler.ci.toml --secrets-file .tmp/worker-secrets.json
+          else
+            npx wrangler deploy --config wrangler.ci.toml
+          fi
+      - name: Configure TURN secrets (optional)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          EDGECHAT_TURN_KEY_ID: ${{ secrets.EDGECHAT_TURN_KEY_ID }}
+          EDGECHAT_TURN_API_TOKEN: ${{ secrets.EDGECHAT_TURN_API_TOKEN }}
+        shell: bash
+        run: |
+          if [[ -n "$EDGECHAT_TURN_KEY_ID" || -n "$EDGECHAT_TURN_API_TOKEN" ]]; then
+            test -n "$EDGECHAT_TURN_KEY_ID" && test -n "$EDGECHAT_TURN_API_TOKEN"
+            printf '%s' "$EDGECHAT_TURN_KEY_ID" | npx wrangler secret put EDGECHAT_TURN_KEY_ID --config wrangler.ci.toml
+            printf '%s' "$EDGECHAT_TURN_API_TOKEN" | npx wrangler secret put EDGECHAT_TURN_API_TOKEN --config wrangler.ci.toml
+          fi
+      - name: Remove temporary secret files
+        if: always()
+        shell: bash
+        run: rm -f .tmp/worker-secrets.json

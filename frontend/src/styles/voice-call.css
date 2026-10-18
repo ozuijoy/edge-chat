@@ -1,0 +1,15 @@
+.chat-call-controls { display: flex; align-items: center; gap: 2px; }
+.chat-call-mode { width: 66px; min-width: 0; height: 36px; padding: 0 2px; border: 1px solid var(--chat-line); border-radius: 4px; background: var(--chat-paper); color: var(--chat-ink); font: 12px var(--chat-font); cursor: pointer; }
+.chat-call-mode:focus-visible { outline: 2px solid var(--chat-accent); outline-offset: 2px; }
+.chat-call-controls .chat-header__button { width: 36px; min-width: 36px; padding: 0; }
+@media (max-width: 600px) {
+  .chat-header--dm .chat-header__language-switch { display: none; }
+  .chat-header__actions .chat-header__status { display: none; }
+  .chat-header__actions { gap: 2px; }
+  .chat-call-mode { width: 58px; height: 40px; }
+  .chat-call-controls .chat-header__button { width: 32px; min-width: 32px; }
+  .chat-header__identity { min-width: 0; }
+}
+@media (max-width: 380px) {
+  .chat-header--dm .profile-avatar-trigger { display: none; }
+}

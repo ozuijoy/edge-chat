@@ -1,0 +1,176 @@
+.admin-update-panel {
+  min-width: 0;
+}
+
+.admin-update-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--admin-space-xs);
+}
+
+.admin-update-panel__repository {
+  margin: var(--admin-space-3xs) 0 0;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.admin-update-panel__repository a,
+.admin-update-panel__latest a {
+  color: var(--admin-green-hover);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.admin-update-panel__repository a:hover,
+.admin-update-panel__latest a:hover {
+  text-decoration: underline;
+}
+
+.admin-update-panel__repository a:focus-visible,
+.admin-update-panel__latest a:focus-visible {
+  outline: 2px solid var(--admin-focus);
+  outline-offset: 2px;
+}
+
+.admin-update-panel__status {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--admin-space-xs);
+  padding: var(--admin-space-xs);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-subtle);
+}
+
+.admin-update-panel__status > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-space-3xs);
+}
+
+.admin-update-panel__status strong {
+  color: var(--admin-text);
+  font-size: 0.78rem;
+}
+
+.admin-update-panel__status span:not(.admin-update-panel__indicator) {
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.admin-update-panel__indicator {
+  width: 8px;
+  height: 8px;
+  margin-block-start: var(--admin-space-3xs);
+  flex: 0 0 auto;
+  border-radius: var(--admin-radius-pill);
+  background: var(--admin-faint);
+}
+
+.admin-update-panel__status--success {
+  border-color: var(--admin-success);
+  background: var(--admin-success-bg);
+}
+
+.admin-update-panel__status--success .admin-update-panel__indicator {
+  background: var(--admin-success);
+}
+
+.admin-update-panel__status--warning {
+  border-color: var(--admin-warning);
+  background: var(--admin-warning-bg);
+}
+
+.admin-update-panel__status--warning .admin-update-panel__indicator {
+  background: var(--admin-warning);
+}
+
+.admin-update-panel__status--error {
+  border-color: var(--admin-danger);
+  background: var(--admin-danger-bg);
+}
+
+.admin-update-panel__status--error .admin-update-panel__indicator {
+  background: var(--admin-danger);
+}
+
+.admin-update-panel__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--admin-space-2xs);
+}
+
+.admin-update-panel__meta > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-space-3xs);
+  padding: var(--admin-space-xs);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-subtle);
+}
+
+.admin-update-panel__meta span,
+.admin-update-panel__latest span,
+.admin-update-panel__latest small {
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+}
+
+.admin-update-panel__meta strong,
+.admin-update-panel__meta code {
+  min-width: 0;
+  color: var(--admin-text);
+  font-size: 0.76rem;
+  overflow-wrap: anywhere;
+}
+
+.admin-update-panel__meta code {
+  font-family: var(--admin-font-mono);
+}
+
+.admin-update-panel__latest {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--admin-space-xs);
+}
+
+.admin-update-panel__latest > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-space-3xs);
+}
+
+.admin-update-panel__latest strong {
+  color: var(--admin-text);
+  font-size: 0.76rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.admin-update-panel__latest a {
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 40rem) {
+  .admin-update-panel__header,
+  .admin-update-panel__latest {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-update-panel__meta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

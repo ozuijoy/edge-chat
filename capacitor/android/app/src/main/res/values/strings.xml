@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EdgeChat Web</string>
+    <string name="title_activity_main">EdgeChat Web</string>
+    <string name="package_name">com.aozorae.edgechat.web</string>
+    <string name="custom_url_scheme">com.aozorae.edgechat.web</string>
+    <string name="notification_channel_name">聊天消息</string>
+    <string name="notification_channel_description">EdgeChat 新消息与提及通知</string>
+</resources>

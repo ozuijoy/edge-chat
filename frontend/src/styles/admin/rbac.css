@@ -1,0 +1,66 @@
+.rbac-page { min-width: 0; }
+.rbac-page h3 { margin: 0; font-size: 17px; }
+.rbac-page .inline-actions { flex-wrap: wrap; }
+.rbac-description { max-width: 320px; white-space: normal; overflow-wrap: anywhere; margin: 4px 0; }
+/* 当前正在编辑或查看成员的用户组在表格中高亮，便于对应下方面板。 */
+.rbac-row--active td { background: var(--admin-green-bg); }
+.rbac-row--active td:first-child { box-shadow: inset 3px 0 0 var(--admin-green); }
+.rbac-pager { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.rbac-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* 管理工具统一为卡片面板：标题栏 + 内容 + 底部操作，替代原先用分隔线堆叠的散乱区块。 */
+.rbac-workspace { scroll-margin-top: calc(var(--admin-topbar-height) + 16px); }
+.rbac-panel { margin-top: 24px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-panel); background: var(--admin-panel); box-shadow: var(--admin-shadow); overflow: clip; } /* clip 不创建滚动容器，底部操作栏的 sticky 才能相对视口生效 */
+.rbac-panel__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--admin-border); background: var(--admin-subtle); }
+.rbac-panel__header p { margin: 2px 0 0; font-size: 13px; }
+.rbac-panel__body { display: grid; gap: 18px; padding: 18px; }
+.rbac-panel__footer { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--admin-border); background: var(--admin-panel); }
+.rbac-panel__footer p { flex: 1 1 280px; margin: 0; font-size: 12px; line-height: 1.5; }
+.rbac-panel > .rbac-pager { margin: 0; padding: 12px 18px; border-top: 1px solid var(--admin-border); }
+.rbac-empty { margin: 0; padding: 28px 18px; text-align: center; color: var(--admin-muted); font-size: 14px; }
+
+.rbac-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.rbac-switch { display: inline-flex; align-items: center; gap: 10px; justify-self: start; min-height: 40px; padding: 0 14px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-pill); cursor: pointer; font-weight: 600; font-size: 14px; }
+.rbac-switch input { width: 18px; height: 18px; accent-color: var(--admin-green); }
+.rbac-subhead { display: flex; align-items: baseline; gap: 10px; border-top: 1px dashed var(--admin-border); padding-top: 16px; }
+
+.rbac-permissions { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.rbac-permissions fieldset { min-width: 0; margin: 0; padding: 0; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-panel); background: var(--admin-panel); }
+.rbac-module__head { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--admin-border); background: var(--admin-subtle); }
+.rbac-module__head strong { font-size: 14px; }
+.rbac-module__count { padding: 1px 8px; border-radius: var(--admin-radius-pill); background: var(--admin-active); color: var(--admin-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.rbac-module__toggle { margin-left: auto; padding: 4px 8px; border: 0; border-radius: var(--admin-radius-control); background: transparent; color: var(--admin-brand); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.rbac-module__toggle:hover { background: var(--admin-active); }
+.rbac-module__toggle:focus-visible { outline: 2px solid var(--admin-focus); outline-offset: 1px; }
+.rbac-permission { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; cursor: pointer; }
+.rbac-permission + .rbac-permission { border-top: 1px solid var(--admin-border); }
+.rbac-permission:hover { background: var(--admin-subtle); }
+.rbac-permission input { width: 17px; height: 17px; margin-top: 2px; flex-shrink: 0; accent-color: var(--admin-green); }
+.rbac-permission span { min-width: 0; overflow-wrap: anywhere; }
+.rbac-permission strong { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; }
+.rbac-permission small { display: block; margin-top: 2px; color: var(--admin-muted); font-size: 12px; line-height: 1.5; }
+.rbac-risk { padding: 0 6px; border-radius: var(--admin-radius-pill); font-size: 11px; font-style: normal; font-weight: 600; line-height: 18px; }
+.rbac-risk--high { background: var(--admin-danger-bg); color: var(--admin-danger); }
+.rbac-risk--sensitive { background: var(--admin-warning-bg); color: var(--admin-warning); }
+
+.rbac-member-list { margin: 0; padding: 0; list-style: none; }
+.rbac-member { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 18px; }
+.rbac-member + .rbac-member { border-top: 1px solid var(--admin-border); }
+.rbac-member__avatar { display: grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; background: var(--admin-green-bg); color: var(--admin-green-hover); font-weight: 700; }
+.rbac-member__info { display: grid; flex: 1 1 160px; min-width: 0; }
+.rbac-member__info strong, .rbac-member__info span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rbac-member__info span { font-size: 13px; }
+.rbac-member .group-assignment { margin-top: 0; }
+
+.rbac-audit__title { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.rbac-audit__title > svg { flex-shrink: 0; color: var(--admin-muted); }
+.rbac-audit .admin-table-wrap { border: 0; border-radius: 0; box-shadow: none; }
+.rbac-action { padding: 1px 6px; border-radius: 4px; background: var(--admin-active); font-family: var(--admin-font-mono); font-size: 12px; }
+
+@media (max-width: 600px) {
+  .rbac-fields { grid-template-columns: minmax(0, 1fr); }
+  .rbac-permissions { grid-template-columns: minmax(0, 1fr); }
+  .rbac-panel__header, .rbac-panel__body, .rbac-member { padding-inline: 14px; }
+  .rbac-panel__footer .inline-actions { width: 100%; }
+  .rbac-panel__footer .inline-actions > * { flex: 1; }
+}

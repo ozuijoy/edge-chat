@@ -1,0 +1,86 @@
+.admin-topbar {
+  min-height: var(--admin-topbar-height);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--admin-space-sm);
+  padding-inline: var(--admin-space-lg);
+  background: var(--admin-panel);
+  border-block-end: 1px solid var(--admin-border);
+}
+
+.admin-topbar__title {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-xs);
+  color: var(--admin-text);
+}
+
+.admin-topbar__title h1 {
+  min-width: 0;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.admin-topbar__actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-xs);
+}
+
+.admin-topbar__settings {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--admin-space-xs);
+  padding-inline: var(--admin-space-xs);
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-panel);
+  color: var(--admin-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color var(--admin-duration), border-color var(--admin-duration);
+}
+
+.admin-topbar__settings:hover,
+.admin-topbar__settings:active {
+  border-color: var(--admin-border-strong);
+  background: var(--admin-active);
+}
+
+.admin-topbar__settings:focus-visible {
+  outline: 2px solid var(--admin-focus);
+  outline-offset: 2px;
+}
+
+.admin-topbar__settings:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 40rem) {
+  .admin-topbar {
+    min-height: 58px;
+    padding-inline: var(--admin-space-sm);
+  }
+
+  .admin-topbar__settings {
+    width: 44px;
+    min-height: 44px;
+    padding: 0;
+  }
+
+  .admin-topbar__settings span {
+    display: none;
+  }
+}

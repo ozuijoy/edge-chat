@@ -1,0 +1,725 @@
+openapi: 3.1.0
+info:
+  title: EdgeChat Mobile API
+  version: 1.0.0
+  description: Stable HTTP contract shared by native clients and EdgeChat servers.
+servers:
+  - url: https://chat.example.com/api/v1
+security:
+  - bearerAuth: []
+paths:
+  /capabilities:
+    get:
+      security: []
+      operationId: getCapabilities
+      responses:
+        "200":
+          description: Server capabilities
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Capabilities"
+  /auth/login:
+    post:
+      security: []
+      operationId: loginDevice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Device session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MobileAuth"
+        "401":
+          $ref: "#/components/responses/ApiError"
+  /auth/refresh:
+    post:
+      security: []
+      operationId: refreshDeviceSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken, installationId]
+              properties:
+                refreshToken: { type: string }
+                installationId: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Rotated device tokens
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MobileAuth"
+        "401":
+          $ref: "#/components/responses/ApiError"
+  /auth/logout:
+    post:
+      operationId: logoutDevice
+      responses:
+        "200": { $ref: "#/components/responses/Ok" }
+        "401": { $ref: "#/components/responses/ApiError" }
+  /auth/session:
+    get:
+      operationId: getSession
+      responses:
+        "200":
+          description: Current session
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [session]
+                properties:
+                  session: { $ref: "#/components/schemas/Session" }
+        "401": { $ref: "#/components/responses/ApiError" }
+  /auth/change-password:
+    post:
+      operationId: changePassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword: { type: string }
+                newPassword: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/Ok" }
+        "400": { $ref: "#/components/responses/ApiError" }
+  /bootstrap:
+    get:
+      operationId: bootstrap
+      responses:
+        "200":
+          description: Current users and conversations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bootstrap"
+  /channels:
+    get:
+      operationId: listChannels
+      responses:
+        "200":
+          description: Visible channels
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [channels, publicChannels, privateChannels]
+                properties:
+                  channels: { type: array, items: { $ref: "#/components/schemas/Channel" } }
+                  publicChannels: { type: array, items: { $ref: "#/components/schemas/Channel" } }
+                  privateChannels: { type: array, items: { $ref: "#/components/schemas/Channel" } }
+    post:
+      operationId: createChannel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, kind]
+              properties:
+                name: { type: string }
+                description: { type: string }
+                kind: { type: string, enum: [public, private] }
+                memberUserIds: { type: array, items: { type: integer } }
+      responses:
+        "200":
+          description: Created channel
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [channel]
+                properties:
+                  channel: { $ref: "#/components/schemas/Channel" }
+  /channels/{channelId}/join:
+    post:
+      operationId: joinPublicChannel
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+      responses:
+        "200": { $ref: "#/components/responses/Ok" }
+  /channels/{channelId}/members:
+    get:
+      operationId: listChannelMembers
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+      responses:
+        "200":
+          description: Channel members
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [room, members]
+                properties:
+                  room: { $ref: "#/components/schemas/Channel" }
+                  members: { type: array, items: { $ref: "#/components/schemas/Member" } }
+  /channels/{channelId}/invite:
+    post:
+      operationId: inviteChannelMembers
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userIds]
+              properties:
+                userIds: { type: array, items: { type: integer } }
+      responses:
+        "200": { $ref: "#/components/responses/MembersMutation" }
+  /channels/{channelId}/members/{userId}:
+    delete:
+      operationId: removeChannelMember
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+        - name: userId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { $ref: "#/components/responses/MembersMutation" }
+  /channels/{channelId}:
+    patch:
+      operationId: updateChannel
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                avatarKey: { type: [string, "null"] }
+      responses:
+        "200":
+          description: Updated channel or no-op result
+    delete:
+      operationId: deleteChannel
+      parameters:
+        - $ref: "#/components/parameters/ChannelId"
+      responses:
+        "200": { $ref: "#/components/responses/Ok" }
+  /dm/open:
+    post:
+      operationId: openDirectMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId: { type: integer }
+      responses:
+        "200":
+          description: Direct conversation
+  /me/profile:
+    patch:
+      operationId: updateProfile
+      description: |
+        Updates only explicitly supplied fields of the authenticated user.
+        Omitted bio/displayName/avatarKey fields keep their existing values.
+        bio is plain text: normalize CRLF/CR to LF, trim surrounding whitespace,
+        then validate at most 200 Unicode code points. Empty or whitespace-only
+        bio clears it. Non-string or over-limit bio is rejected without truncation.
+        avatarKey null clears the avatar. A client-supplied target user ID is ignored.
+        The same business logic is available at PATCH /api/me/profile.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName: { type: string }
+                bio:
+                  type: string
+                  description: Optional site-visible bio, at most 200 Unicode code points after normalization.
+                avatarKey: { type: [string, "null"] }
+      responses:
+        "200":
+          description: Updated session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session: { $ref: "#/components/schemas/Session" }
+        "400":
+          description: Invalid profile input
+        "401":
+          description: Authentication required
+  /users/{userId}/profile:
+    get:
+      operationId: getUserProfile
+      description: |
+        Reads the current public profile of one local account. Requires authentication;
+        all signed-in site users have the same visibility as the user directory.
+        Deleted, disabled and nonexistent accounts all return the same unavailable response.
+        External identities (including numeric Telegram IDs) must not use this endpoint.
+        Bio is site-visible plain text, not end-to-end encrypted, and is not included in
+        message, reply, member, DM or bootstrap user summaries.
+        Also available at GET /api/users/{userId}/profile through the shared v1 proxy.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1, maximum: 9007199254740991 }
+      responses:
+        "200":
+          description: Explicit public-field whitelist
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [profile]
+                properties:
+                  profile: { $ref: "#/components/schemas/UserProfile" }
+        "400":
+          description: Invalid local user ID
+        "401":
+          description: Authentication required
+        "404":
+          description: User profile unavailable
+  /rooms/{kind}/{roomId}/messages:
+    get:
+      operationId: listRoomMessages
+      parameters:
+        - $ref: "#/components/parameters/RoomKind"
+        - $ref: "#/components/parameters/RoomId"
+        - name: before
+          in: query
+          schema: { type: integer }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 30 }
+      responses:
+        "200":
+          description: Canonical message page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomMessages"
+    post:
+      operationId: sendRoomMessage
+      parameters:
+        - $ref: "#/components/parameters/RoomKind"
+        - $ref: "#/components/parameters/RoomId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [clientMessageId, content]
+              properties:
+                clientMessageId: { type: string, format: uuid }
+                content: { type: string }
+                attachment: { oneOf: [{ $ref: "#/components/schemas/Attachment" }, { type: "null" }] }
+                mentionUserIds:
+                  type: array
+                  items: { type: integer }
+                replyMessageId: { type: [integer, "null"], minimum: 1 }
+      responses:
+        "200": { $ref: "#/components/responses/MessageSubmission" }
+        "201": { $ref: "#/components/responses/MessageSubmission" }
+  /rooms/{kind}/{roomId}/messages/{messageId}:
+    delete:
+      operationId: deleteRoomMessage
+      parameters:
+        - $ref: "#/components/parameters/RoomKind"
+        - $ref: "#/components/parameters/RoomId"
+        - name: messageId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { $ref: "#/components/responses/Ok" }
+  /rooms/{kind}/{roomId}/sync:
+    get:
+      operationId: syncRoom
+      parameters:
+        - $ref: "#/components/parameters/RoomKind"
+        - $ref: "#/components/parameters/RoomId"
+        - name: cursor
+          in: query
+          required: true
+          schema: { type: integer, minimum: 0 }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 100 }
+      responses:
+        "200":
+          description: Ordered message and deletion events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomSync"
+        "409":
+          description: Cursor expired; reload the current room snapshot
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+  /rooms/{kind}/{roomId}/read:
+    post:
+      operationId: markRoomRead
+      parameters:
+        - $ref: "#/components/parameters/RoomKind"
+        - $ref: "#/components/parameters/RoomId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messageId: { type: [integer, "null"] }
+      responses:
+        "200":
+          description: Read cursor
+  /uploads:
+    post:
+      operationId: uploadAttachment
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, clientUploadId]
+              properties:
+                file: { type: string, format: binary }
+                clientUploadId: { type: string, format: uuid }
+      responses:
+        "200": { $ref: "#/components/responses/Upload" }
+        "201": { $ref: "#/components/responses/Upload" }
+  /realtime/tickets:
+    post:
+      operationId: createRealtimeTicket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scope]
+              properties:
+                scope: { type: string, enum: [inbox, room] }
+                roomKind: { type: string, enum: [public, private, dm] }
+                roomId: { type: integer }
+      responses:
+        "200":
+          description: Single-use ticket valid for 60 seconds
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ticket, expiresAt]
+                properties:
+                  ticket: { type: string }
+                  expiresAt: { type: string, format: date-time }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    ChannelId:
+      name: channelId
+      in: path
+      required: true
+      schema: { type: integer }
+    RoomKind:
+      name: kind
+      in: path
+      required: true
+      schema: { type: string, enum: [public, private, dm] }
+    RoomId:
+      name: roomId
+      in: path
+      required: true
+      schema: { type: integer }
+  responses:
+    ApiError:
+      description: Stable client-visible error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    Ok:
+      description: Successful command
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [ok]
+            properties:
+              ok: { type: boolean, const: true }
+    MessageSubmission:
+      description: Canonical message; created is false for an idempotent replay
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [created, message]
+            properties:
+              created: { type: boolean }
+              message: { $ref: "#/components/schemas/Message" }
+    Upload:
+      description: Canonical uploaded file; created is false for an idempotent replay
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [created, file]
+            properties:
+              created: { type: boolean }
+              file: { $ref: "#/components/schemas/Attachment" }
+    MembersMutation:
+      description: Updated member list
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [ok, members]
+            properties:
+              ok: { type: boolean }
+              members: { type: array, items: { $ref: "#/components/schemas/Member" } }
+  schemas:
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+    Capabilities:
+      type: object
+      required: [apiVersion, site, limits, features]
+      properties:
+        apiVersion: { type: integer, const: 1 }
+        site:
+          type: object
+          required: [siteName, siteIconUrl]
+          properties:
+            siteName: { type: string }
+            siteIconUrl: { type: string }
+        limits:
+          type: object
+          required: [maxUploadBytes, messageRetentionDays]
+          properties:
+            maxUploadBytes: { type: integer }
+            messageRetentionDays: { type: integer }
+        features:
+          type: object
+          required: [deviceSessions, realtimeTickets, idempotentMessages, idempotentUploads, roomSync, backgroundPush]
+          properties:
+            deviceSessions: { type: boolean }
+            realtimeTickets: { type: boolean }
+            idempotentMessages: { type: boolean }
+            idempotentUploads: { type: boolean }
+            roomSync: { type: boolean }
+            backgroundPush: { type: boolean, const: false }
+    LoginRequest:
+      type: object
+      required: [username, password, device]
+      properties:
+        username: { type: string }
+        password: { type: string }
+        device:
+          type: object
+          required: [installationId, name, appVersion]
+          properties:
+            installationId: { type: string, format: uuid }
+            name: { type: string }
+            appVersion: { type: string }
+    MobileAuth:
+      type: object
+      required: [accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, session]
+      properties:
+        accessToken: { type: string }
+        accessTokenExpiresAt: { type: string }
+        refreshToken: { type: string }
+        refreshTokenExpiresAt: { type: string }
+        session: { $ref: "#/components/schemas/Session" }
+    Session:
+      type: object
+      required: [userId, username, displayName, avatarUrl, isAdmin, sessionVersion]
+      properties:
+        userId: { type: integer }
+        username: { type: string }
+        displayName: { type: string }
+        avatarUrl: { type: string }
+        bio:
+          type: string
+          description: Present on Web login, profile update and session restore; omitted by older/device session producers.
+        isAdmin: { type: boolean }
+        sessionVersion: { type: integer }
+        deviceSessionId: { type: string }
+    User:
+      type: object
+      required: [id, username, displayName, avatarUrl]
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        displayName: { type: string }
+        avatarUrl: { type: string }
+    UserProfile:
+      type: object
+      additionalProperties: false
+      required: [id, username, displayName, avatarUrl, bio]
+      properties:
+        id: { type: integer, minimum: 1, maximum: 9007199254740991 }
+        username: { type: string }
+        displayName: { type: string }
+        avatarUrl: { type: string }
+        bio: { type: string, maxLength: 200, default: "" }
+    Channel:
+      type: object
+      required: [id, name, kind]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        avatarKey: { type: string }
+        avatarUrl: { type: string }
+        kind: { type: string, enum: [public, private, dm] }
+        isGeneral: { type: boolean }
+        ownerDisplayName: { type: string }
+        isMember: { type: boolean }
+        myRole: { type: string }
+        canManage: { type: boolean }
+        memberCount: { type: integer }
+        lastMessageAt: { type: [string, "null"] }
+        unreadCount: { type: integer }
+        mentionUnreadCount:
+          type: integer
+          description: Legacy field name for Telegram-style direct attention unread messages, including mentions and replies.
+    Member:
+      type: object
+      required: [id, username, displayName, avatarUrl, role]
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        displayName: { type: string }
+        avatarUrl: { type: string }
+        role: { type: string, enum: [owner, member] }
+        joinedAt: { type: string }
+    Attachment:
+      type: object
+      required: [key, name, type, size, url]
+      properties:
+        key: { type: string }
+        name: { type: string }
+        type: { type: string }
+        size: { type: integer }
+        url: { type: string }
+        kind: { type: string, enum: [voice, audio] }
+        durationMs: { type: integer, minimum: 0 }
+        waveform:
+          type: array
+          maxItems: 64
+          items: { type: integer, minimum: 0, maximum: 100 }
+    Sender:
+      type: object
+      required: [kind, id, username, displayName, avatarUrl, source]
+      properties:
+        kind: { type: string, enum: [local, external] }
+        id: { oneOf: [{ type: integer }, { type: string }] }
+        username: { type: string }
+        displayName: { type: string }
+        avatarUrl: { type: string }
+        source: { type: string }
+    Mention:
+      type: object
+      required: [userId, username, displayName]
+      properties:
+        userId: { type: integer }
+        username: { type: string }
+        displayName: { type: string }
+    ReplyPreview:
+      type: object
+      required: [id, deleted]
+      properties:
+        id: { type: integer }
+        deleted: { type: boolean }
+        content: { type: string }
+        sender: { $ref: "#/components/schemas/Sender" }
+        attachment: { oneOf: [{ $ref: "#/components/schemas/Attachment" }, { type: "null" }] }
+    Message:
+      type: object
+      required: [id, content, createdAt, source, sender, attachment]
+      properties:
+        id: { type: integer }
+        clientMessageId: { type: string, format: uuid }
+        content: { type: string }
+        createdAt: { type: string }
+        source: { type: string }
+        sender: { $ref: "#/components/schemas/Sender" }
+        attachment: { oneOf: [{ $ref: "#/components/schemas/Attachment" }, { type: "null" }] }
+        mentionUserIds: { type: array, items: { type: integer } }
+        mentions: { type: array, items: { $ref: "#/components/schemas/Mention" } }
+        replyToMessageId: { type: integer }
+        replyTo: { $ref: "#/components/schemas/ReplyPreview" }
+    Bootstrap:
+      type: object
+      required: [users, channels, dms]
+      properties:
+        users: { type: array, items: { $ref: "#/components/schemas/User" } }
+        channels: { type: array, items: { $ref: "#/components/schemas/Channel" } }
+        dms: { type: array, items: { type: object } }
+    RoomMessages:
+      type: object
+      required: [room, messages, syncCursor]
+      properties:
+        room:
+          type: object
+          required: [id, kind, name, description]
+          properties:
+            id: { type: integer }
+            kind: { type: string }
+            name: { type: string }
+            description: { type: string }
+        messages: { type: array, items: { $ref: "#/components/schemas/Message" } }
+        syncCursor: { type: integer }
+    RoomSync:
+      type: object
+      required: [events, nextCursor, hasMore]
+      properties:
+        events:
+          type: array
+          items:
+            type: object
+            required: [sequence, type]
+            properties:
+              sequence: { type: integer }
+              type: { type: string, enum: [message, message_deleted] }
+              messageId: { type: integer }
+              message: { $ref: "#/components/schemas/Message" }
+              createdAt: { type: string }
+        nextCursor: { type: integer }
+        hasMore: { type: boolean }

@@ -1,0 +1,49 @@
+.maintenance-page { max-width: 1200px; }
+.maintenance-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.maintenance-body { display: grid; gap: 24px; }
+.maintenance-empty { padding: 40px 24px; text-align: center; color: var(--admin-muted); border: 1px dashed var(--admin-border-strong); border-radius: var(--admin-radius-panel); }
+.maintenance-empty h3 { color: var(--admin-text); margin: 16px 0 8px; }
+.maintenance-empty p { margin: 0 auto; max-width: 620px; line-height: 1.7; }
+.maintenance-summary { display: flex; align-items: center; gap: 16px; padding: 20px; border-radius: var(--admin-radius-panel); background: var(--admin-success-bg); color: var(--admin-success); }
+.maintenance-summary[data-status="error"] { background: var(--admin-danger-bg); color: var(--admin-danger); }
+.maintenance-summary[data-status="warning"], .maintenance-demo { background: var(--admin-warning-bg); color: var(--admin-warning); }
+.maintenance-summary svg { flex-shrink: 0; }
+.maintenance-summary h3 { margin: 0 0 6px; font-size: 1rem; }
+.maintenance-summary p { margin: 0; font-size: 0.8rem; }
+.maintenance-demo { padding: 12px 16px; margin: 0; border-radius: var(--admin-radius-control); }
+.maintenance-versions { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(0, 2fr); gap: 24px; margin: 0; padding: 0 0 24px; border-bottom: 1px solid var(--admin-border); }
+.maintenance-versions dt { color: var(--admin-muted); font-size: 0.85rem; margin-bottom: 10px; }
+.maintenance-versions dd { margin: 0; font-family: var(--admin-font-mono); font-weight: 650; overflow-wrap: anywhere; }
+.maintenance-versions p { color: var(--admin-muted); font-size: 0.78rem; margin: 8px 0 0; overflow-wrap: anywhere; }
+.maintenance-checks { border: 1px solid var(--admin-border); border-radius: var(--admin-radius-panel); overflow: hidden; }
+.maintenance-checks__head, .maintenance-check { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(0, 2fr) minmax(150px, 1fr); gap: 20px; padding: 16px 20px; align-items: center; }
+.maintenance-checks__head { background: var(--admin-subtle); color: var(--admin-muted); font-size: 0.8rem; }
+.maintenance-check { border-top: 1px solid var(--admin-border); font-size: 0.85rem; line-height: 1.6; }
+.maintenance-method { color: var(--admin-muted); overflow-wrap: anywhere; }
+.maintenance-status { display: inline-flex; align-items: center; gap: 6px; color: var(--admin-danger); font-weight: 650; }
+.maintenance-status[data-status="ok"] { color: var(--admin-success); }
+.maintenance-status[data-status="disabled"], .maintenance-status[data-status="blocked"] { color: var(--admin-warning); }
+.maintenance-check-note { margin: 4px 0 0; color: var(--admin-muted); font-size: 0.78rem; }
+.maintenance-details { border: 1px solid var(--admin-border); border-radius: var(--admin-radius-panel); padding: 0 20px; }
+.maintenance-details summary { cursor: pointer; padding: 16px 0; font-weight: 650; }
+.maintenance-details summary:focus-visible { outline: 2px solid var(--admin-focus); outline-offset: 2px; }
+.maintenance-detail { padding: 0 0 20px; }
+.maintenance-detail h4 { margin: 4px 0 12px; font-size: 0.85rem; }
+.maintenance-detail ul { padding-left: 20px; margin: 0; }
+.maintenance-detail code { font-family: var(--admin-font-mono); font-size: 0.78rem; overflow-wrap: anywhere; }
+.maintenance-env { display: grid; gap: 12px; }
+.maintenance-env li span { display: block; color: var(--admin-muted); font-size: 0.8rem; margin-top: 4px; }
+.maintenance-guide { color: var(--admin-muted); line-height: 1.8; font-size: 0.82rem; }
+.maintenance-guide h3 { color: var(--admin-text); margin: 0 0 12px; font-size: 0.92rem; }
+.maintenance-guide ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.maintenance-guide > p { border-top: 1px solid var(--admin-border); padding-top: 16px; margin: 20px 0 0; }
+@media (max-width: 700px) {
+  .maintenance-versions { grid-template-columns: 1fr; }
+  .maintenance-checks__head { display: none; }
+  .maintenance-check { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; padding: 16px; }
+  .maintenance-check:first-of-type { border-top: 0; }
+  .maintenance-method { grid-column: 1 / -1; grid-row: 2; }
+  .maintenance-check > div { max-width: 160px; }
+  .maintenance-actions { width: 100%; }
+  .maintenance-actions > * { flex: 1; }
+}
