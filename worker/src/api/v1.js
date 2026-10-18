@@ -26,6 +26,7 @@ import { markRoomRead } from '../data/unread.js';
 import { isUserDisabled } from '../user-status.js';
 import {
   errorCodeForStatus,
+  MAX_FILE_SIZE_DEFAULT,
   parseJsonRequest,
   requestBodyTooLarge,
   sanitizeLimit,
@@ -87,14 +88,14 @@ export function registerV1Routes(app) {
       apiVersion: 1,
       site,
       limits: {
-        maxUploadBytes: Number(c.env.MAX_FILE_SIZE || 20971520),
+        maxUploadBytes: Number(c.env.MAX_FILE_SIZE || MAX_FILE_SIZE_DEFAULT),
         messageRetentionDays: Number(c.env.MESSAGE_RETENTION_DAYS || 7)
       },
       features: {
         deviceSessions: true,
         realtimeTickets: true,
         idempotentMessages: true,
-        idempotentUploads: Boolean(c.env.FILES),
+        idempotentUploads: true,
         roomSync: true,
         backgroundPush: false
       }
@@ -264,10 +265,7 @@ export function registerV1Routes(app) {
   });
 
   app.post('/api/v1/uploads', authMiddleware, async (c) => {
-    if (!c.env.FILES) {
-      return v1ErrorResponse('attachments_unavailable', '當前部署沒有綁定 R2，無法上傳附件', 503);
-    }
-    const maxFileSize = Number(c.env.MAX_FILE_SIZE || 20971520);
+    const maxFileSize = Number(c.env.MAX_FILE_SIZE || MAX_FILE_SIZE_DEFAULT);
     if (requestBodyTooLarge(c.req.raw, maxFileSize + 1024 * 1024)) {
       return v1ErrorResponse(
         'payload_too_large',

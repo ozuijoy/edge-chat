@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-
+import initSqlJs from 'sql.js';
+import { readFileSync } from 'node:fs';
 import {
   buildStorageRows,
   formatByteSize,
@@ -12,20 +13,9 @@ import {
   summarizeR2Objects
 } from '../worker/src/storage-statistics.js';
 import { registerStorageRoutes } from '../worker/src/api/storage.ts';
+import { createD1Adapter } from './support/d1.js';
 
-function storageScanHandler() {
-  let handler;
-  const app = {
-    get() {},
-    post(path, candidate) {
-      if (path === '/api/admin/storage/scan') handler = candidate;
-    },
-    patch() {},
-    delete() {}
-  };
-  registerStorageRoutes(app);
-  return handler;
-}
+const schema = readFileSync(new URL('../worker/schema.sql', import.meta.url), 'utf8');
 
 test('R2 object keys resolve to users, Telegram, and unknown owners', () => {
   assert.deepEqual(storageOwnerFromObjectKey('12/file.png'), {
@@ -73,11 +63,41 @@ test('one R2 page is aggregated without exposing object keys', () => {
   assert.equal('key' in items[0], false);
 });
 
-test('storage scan returns a structured 503 response when R2 is unavailable', async () => {
-  await assert.rejects(() => storageScanHandler()({
-    env: {},
-    req: { url: 'https://edgechat.example/api/admin/storage/scan' }
-  }), (error) => error.status === 503 && error.message === '當前部署沒有綁定 R2，無法統計存儲空間');
+test('storage scan reads uploaded_files from D1 without requiring an R2 bucket', async () => {
+  const SQL = await initSqlJs();
+  const database = new SQL.Database();
+  database.exec(schema);
+  database.run("INSERT INTO users (id, username, display_name, password_hash, password_salt, is_super_admin) VALUES (1, 'admin', 'Admin', 'h', 's', 1)");
+  database.run("INSERT INTO users (id, username, display_name, password_hash, password_salt) VALUES (3, 'u3', 'U3', 'h', 's')");
+  const db = createD1Adapter(database);
+  db.prepare(`INSERT INTO uploaded_files (object_key, owner_user_id, filename, content_type, size, data)
+    VALUES ('3/file.bin', 3, 'file.bin', 'application/octet-stream', 100, ?),
+           ('telegram/1/bot.txt', NULL, 'bot.txt', 'text/plain', 40, ?)`).bind(Buffer.from([1,2,3]), Buffer.from([4,5])).run();
+
+  let handler;
+  const app = { get() {}, post(path, candidate) { if (path === '/api/admin/storage/scan') handler = candidate; }, patch() {}, delete() {} };
+  registerStorageRoutes(app);
+
+  const c = {
+    get(name) {
+      if (name === 'authorizationDatabase') return db;
+      if (name === 'authorizationContext') {
+        return {
+          policy: { id: 'storage.scan', superOnly: false, permissions: ['storage.scan'], scope: undefined },
+          session: { userId: 1, sessionVersion: 0 },
+          target: ''
+        };
+      }
+      if (name === 'session') return { userId: 1 };
+      return undefined;
+    },
+    json(value) { return value; }
+  };
+   const result = await handler(c);
+   assert.deepEqual(result.items.map((item) => item.ownerKey), ['user:3', 'system:telegram']);
+   assert.equal(result.items.find((item) => item.ownerKey === 'user:3').ownerType, 'user');
+   assert.equal(result.items.find((item) => item.ownerKey === 'user:3').bytes, 100);
+   assert.equal(result.items.find((item) => item.ownerKey === 'system:telegram').bytes, 40);
 });
 
 test('paged summaries merge and include active zero-usage users', () => {

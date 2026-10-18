@@ -80,7 +80,7 @@ export default {
   "rbac.permission.storage.read": "查看儲存統計",
   "rbac.scope.storage.read": "僅統計快照，不含檔案內容",
   "rbac.permission.storage.scan": "啟動儲存掃描",
-  "rbac.scope.storage.scan": "每分鐘一次，每頁最多 1000 項",
+  "rbac.scope.storage.scan": "每分鐘一次，單次 D1 聚合查詢",
   "rbac.permission.site.read": "查看網站外觀",
   "rbac.scope.site.read": "公開名稱與圖示",
   "rbac.permission.site.appearance.update": "修改網站外觀",

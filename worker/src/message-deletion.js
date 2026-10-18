@@ -31,11 +31,8 @@ export function createMessageDeletion({
 			throw new MessageDeletionError("無權刪除該消息");
 		}
 
-		let attachmentKey = null;
-		if (env.FILES) {
-			const target = await getDeletionTarget(env.DB, messageId);
-			attachmentKey = target?.attachment_key || null;
-		}
+		const target = await getDeletionTarget(env.DB, messageId);
+		const attachmentKey = target?.attachment_key || null;
 
 		const deleted = await persistDeletion(env.DB, {
 			channelId: meta.room.id,

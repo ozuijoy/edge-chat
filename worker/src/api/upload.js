@@ -1,13 +1,13 @@
 import {
   canAccessFile,
+  getFileRecord,
   getUploadedFileByClientId,
-  getUploadedFileMetadata,
   recordUploadedFile
 } from '../data/uploaded-files.js';
 import { decryptAttachment, encryptAttachment } from '../encryption.js';
 import { normalizeContentType, sanitizeFilename } from '../attachment-metadata.js';
 import { validateSession } from '../session.js';
-import { errorResponse, requestBodyTooLarge } from '../utils.js';
+import { errorResponse, MAX_FILE_SIZE_DEFAULT, requestBodyTooLarge } from '../utils.js';
 
 const FILE_RESPONSE_CACHE_CONTROL = 'private, no-store';
 const UPLOAD_BODY_OVERHEAD_BYTES = 1024 * 1024;
@@ -51,7 +51,7 @@ function contentDispositionValue(kind, filename) {
 }
 
 function validateUpload(env, file) {
-  const maxFileSize = Number(env.MAX_FILE_SIZE || 20971520);
+  const maxFileSize = Number(env.MAX_FILE_SIZE || MAX_FILE_SIZE_DEFAULT);
   if (file.size > maxFileSize) {
     throw new Error(`文件大小不能超過 ${Math.round(maxFileSize / 1024 / 1024)}MB`);
   }
@@ -73,14 +73,13 @@ function validateUpload(env, file) {
 
 export function registerUploadRoutes(app) {
   app.post('/api/upload', async (c) => {
-    if (!c.env.FILES) {
-      return errorResponse('當前部署沒有綁定 R2，無法上傳附件', 503);
-    }
-
     const session = c.get('session');
-    const maxFileSize = Number(c.env.MAX_FILE_SIZE || 20971520);
+    const maxFileSize = Number(c.env.MAX_FILE_SIZE || MAX_FILE_SIZE_DEFAULT);
     if (requestBodyTooLarge(c.req.raw, maxFileSize + UPLOAD_BODY_OVERHEAD_BYTES)) {
       return errorResponse(`文件大小不能超過 ${Math.round(maxFileSize / 1024 / 1024)}MB`, 413);
+    }
+    if (!c.env.DB) {
+      return errorResponse('當前部署缺少 D1 資料庫，無法上傳附件', 503);
     }
     const formData = await c.req.formData();
     const file = formData.get('file');
@@ -101,6 +100,9 @@ export function registerUploadRoutes(app) {
   });
 
   app.get('/files/:key{.+}', async (c) => {
+    if (!c.env.DB) {
+      return c.json({ error: '當前部署缺少 D1 資料庫，無法讀取附件' }, { status: 503 });
+    }
     const key = decodeURIComponent(c.req.param('key'));
     const authorization = c.req.header('authorization') || '';
     const token = authorization.startsWith('Bearer ')
@@ -111,33 +113,43 @@ export function registerUploadRoutes(app) {
     if (!canRead) {
       return new Response('Forbidden', { status: 403 });
     }
-    if (!c.env.FILES) {
-      return errorResponse('當前部署沒有綁定 R2，無法讀取附件', 503);
-    }
 
-    const [object, fileMetadata] = await Promise.all([
-      c.env.FILES.get(key),
-      getUploadedFileMetadata(c.env.DB, key)
-    ]);
-    if (!object) {
-      return new Response('Not Found', { status: 404 });
+    // 優先讀 D1 內嵌數據；R2 時期未回填的舊記錄回落到 FILES 桶。
+    const record = await getFileRecord(c.env.DB, key);
+    const headers = new Headers();
+    let rawBytes = null;
+    let legacyCustomMetadata = null;
+    if (record?.data) {
+      rawBytes = record.data;
+      const parsed = Date.parse(`${String(record.createdAt || '').replace(' ', 'T')}Z`);
+      if (Number.isFinite(parsed)) {
+        headers.set('last-modified', new Date(parsed).toUTCString());
+      }
+    } else {
+      if (!c.env.FILES) {
+        return new Response('Not Found', { status: 404 });
+      }
+      const object = await c.env.FILES.get(key);
+      if (!object) {
+        return new Response('Not Found', { status: 404 });
+      }
+      rawBytes = new Uint8Array(await object.arrayBuffer());
+      object.writeHttpMetadata(headers);
+      if (object.uploaded) {
+        headers.set('last-modified', object.uploaded.toUTCString());
+      }
+      legacyCustomMetadata = object.customMetadata || null;
     }
 
     let decrypted;
     try {
-      decrypted = await decryptAttachment(c.env, await object.arrayBuffer(), key);
+      decrypted = await decryptAttachment(c.env, rawBytes, key);
     } catch (error) {
       console.error('Failed to decrypt attachment', { key, error });
       throw error;
     }
 
-    const headers = new Headers();
-    object.writeHttpMetadata(headers);
     headers.set('cache-control', FILE_RESPONSE_CACHE_CONTROL);
-    if (object.uploaded) {
-      headers.set('last-modified', object.uploaded.toUTCString());
-    }
-
     headers.set('x-content-type-options', 'nosniff');
     headers.set('referrer-policy', 'no-referrer');
     headers.set(
@@ -146,7 +158,7 @@ export function registerUploadRoutes(app) {
     );
 
     const contentType =
-      normalizeContentType(fileMetadata?.contentType) ||
+      (record ? normalizeContentType(record.contentType) : '') ||
       normalizeContentType(headers.get('content-type')) ||
       'application/octet-stream';
     headers.set('content-type', contentType);
@@ -154,7 +166,7 @@ export function registerUploadRoutes(app) {
     const dispositionKind =
       inlineAllowed && !contentType.startsWith('text/') ? 'inline' : 'attachment';
     const filename =
-      fileMetadata?.filename || object.customMetadata?.filename || key.split('/').pop() || 'file';
+      record?.filename || legacyCustomMetadata?.filename || key.split('/').pop() || 'file';
     headers.set('content-disposition', contentDispositionValue(dispositionKind, filename));
 
     return new Response(decrypted.bytes, { headers });
@@ -173,27 +185,18 @@ export async function saveUploadedFile(env, session, file, { clientUploadId = nu
   const filename = sanitizeFilename(file.name);
   const contentType = normalizeContentType(file.type) || 'application/octet-stream';
   const encryptedFile = await encryptAttachment(env, await file.arrayBuffer(), key);
-  await env.FILES.put(key, encryptedFile, {
-    httpMetadata: { contentType, cacheControl: FILE_RESPONSE_CACHE_CONTROL },
-    customMetadata: { filename, edgechatEncryption: 'v1' }
-  });
 
+  // 檔案內容內嵌寫入 D1，單條語句即完成落盤與元數據登記，不再需要外部桶補償刪除。
   try {
     await recordUploadedFile(env.DB, {
       key,
       ownerUserId: session.userId,
-      filename,
-      contentType,
+      filename, contentType,
       size: file.size,
+      data: encryptedFile,
       clientUploadId
     });
   } catch (error) {
-    // 元數據失敗或冪等鍵競爭時移除本次新對象，避免 R2 留下沒有穩定引用的副本。
-    try {
-      await env.FILES.delete(key);
-    } catch (deleteError) {
-      console.warn('Failed to delete orphaned upload after metadata error', deleteError);
-    }
     if (clientUploadId && String(error?.message || error).includes('UNIQUE')) {
       const existing = await getUploadedFileByClientId(env.DB, session.userId, clientUploadId);
       if (existing) return { file: existing, created: false };

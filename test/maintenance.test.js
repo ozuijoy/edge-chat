@@ -31,7 +31,7 @@ test("system check isolates errors, timeouts, optional R2, and missing bindings"
   assert.equal(result.checks.find((x) => x.id === "scheduler").status, "missing");
   assert.equal(JSON.stringify(result).includes("token leak"), false);
   const missing = await runSystemCheck({ DB: okDb }, { timeoutMs: 1 });
-  assert.equal(missing.checks.find((x) => x.id === "files").status, "disabled");
+  assert.equal(missing.checks.some((x) => x.id === "files"), false);
 });
 
 test("DO health requires verified GET and has no storage/alarm side effects", () => {
@@ -75,16 +75,15 @@ test("system check times out a never-resolving probe and isolates it", async () 
   assert.equal(result.checks.find((x) => x.id === "d1").status, "ok");
 });
 
-test("system probes use fixed KV key, R2 limit one, and do not read payloads", async () => {
-  let key; let options; let read = false;
+test("system probes use a fixed KV key and do not read payloads", async () => {
+  let key; let read = false;
   const result = await runSystemCheck({
     DB: okDb,
-    SESSIONS: { get: async (value) => { key = value; return { secret: "must-not-be-read" }; } },
-    FILES: { list: async (value) => { options = value; return { objects: [], truncated: false }; } }
+    SESSIONS: { get: async (value) => { key = value; return { secret: "must-not-be-read" }; } }
   }, { timeoutMs: 10 });
   read = JSON.stringify(result).includes("must-not-be-read");
   assert.equal(key, "__edgechat_health__");
-  assert.deepEqual(options, { limit: 1 });
+  assert.equal(result.checks.some((x) => x.id === "files"), false);
   assert.equal(read, false);
 });
 
@@ -109,5 +108,5 @@ test("real auth and admin middleware return 401, 403, and allow admins", async (
   const response = await app.request("/api/admin/maintenance", { headers: { Authorization: "Bearer token" } }, adminEnv);
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("cache-control"), "private, no-store");
-  assert.equal((await response.json()).checks.length, 11);
+  assert.equal((await response.json()).checks.length, 10);
 });

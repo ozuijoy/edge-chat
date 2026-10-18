@@ -1,18 +1,27 @@
+import { MAX_FILE_SIZE_DEFAULT } from "../../utils.js";
 import {
 	normalizeContentType,
 	safeFilenameExtension,
 	sanitizeFilename,
 } from "../../attachment-metadata.js";
 import { decryptAttachment, encryptAttachment } from "../../encryption.js";
+import { deleteFileObject, getFileRecord, recordUploadedFile } from "../../data/uploaded-files.js";
 import { downloadTelegramFile, getTelegramFile } from "./client.js";
 
-export const TELEGRAM_BRIDGE_FILE_LIMIT = 16 * 1024 * 1024;
-export const TELEGRAM_FILE_SKIP_REASON = Object.freeze({
+// D1 單列內嵌檔案的存储上限；環境變量可進一步收窄。
+export const TELEGRAM_BRIDGE_FILE_LIMIT = MAX_FILE_SIZE_DEFAULT;
+  export const TELEGRAM_FILE_SKIP_REASON = Object.freeze({
 	TOO_LARGE: "too_large",
-	STORAGE_UNAVAILABLE: "storage_unavailable",
 	NOT_FOUND: "not_found",
-});
-const FILE_RESPONSE_CACHE_CONTROL = "private, no-store";
+	STORAGE_UNAVAILABLE: "storage_unavailable",
+  });
+
+function fileLimitFor(env) {
+	const configured = Number(env?.MAX_FILE_SIZE);
+	return Number.isFinite(configured) && configured > 0
+		? Math.min(TELEGRAM_BRIDGE_FILE_LIMIT, configured)
+		: TELEGRAM_BRIDGE_FILE_LIMIT;
+}
 
 function telegramObjectKey({ telegramChatId, telegramMessageId, filename }) {
 	const extension = safeFilenameExtension(filename);
@@ -25,35 +34,33 @@ export async function importTelegramAttachment(env, {
 	telegramMessageId,
 	attachment,
 }) {
-	if (!attachment) return { attachment: null, skipReason: null };
-	if (!env.FILES) {
-		return {
-			attachment: null,
-			skipReason: TELEGRAM_FILE_SKIP_REASON.STORAGE_UNAVAILABLE,
-		};
-	}
-	if (attachment.fileSize > TELEGRAM_BRIDGE_FILE_LIMIT) {
+  if (!attachment) return { attachment: null, skipReason: null };
+  if (!env?.DB) {
+    return { attachment: null, skipReason: TELEGRAM_FILE_SKIP_REASON.STORAGE_UNAVAILABLE };
+  }
+  const limit = fileLimitFor(env);
+	if (attachment.fileSize > limit) {
 		return { attachment: null, skipReason: TELEGRAM_FILE_SKIP_REASON.TOO_LARGE };
 	}
 
 	const telegramFile = await getTelegramFile(botToken, attachment.fileId);
 	const resolvedSize = Number(telegramFile.file_size || attachment.fileSize || 0);
-	if (resolvedSize > TELEGRAM_BRIDGE_FILE_LIMIT) {
+	if (resolvedSize > limit) {
 		return { attachment: null, skipReason: TELEGRAM_FILE_SKIP_REASON.TOO_LARGE };
 	}
-	const bytes = await downloadTelegramFile(
-		botToken,
-		telegramFile.file_path,
-		TELEGRAM_BRIDGE_FILE_LIMIT,
-	);
+	const bytes = await downloadTelegramFile(botToken, telegramFile.file_path, limit);
 	const name = sanitizeFilename(attachment.fileName);
 	const type = normalizeContentType(attachment.mimeType) || "application/octet-stream";
 	const key = telegramObjectKey({ telegramChatId, telegramMessageId, filename: name });
-	// Telegram 只負責傳輸，正式附件在進入消息前即轉換為 EdgeChat 自有加密 R2 對象。
+	// Telegram 只負責傳輸，正式附件在進入消息前即轉換為 EdgeChat 自有加密 D1 對象（系統歸屬）。
 	const encrypted = await encryptAttachment(env, bytes, key);
-	await env.FILES.put(key, encrypted, {
-		httpMetadata: { contentType: type, cacheControl: FILE_RESPONSE_CACHE_CONTROL },
-		customMetadata: { filename: name, edgechatEncryption: "v1", source: "telegram" },
+	await recordUploadedFile(env.DB, {
+		key,
+		ownerUserId: null,
+		filename: name,
+		contentType: type,
+		size: bytes.byteLength,
+		data: encrypted,
 	});
 	return {
 		attachment: {
@@ -73,25 +80,30 @@ export async function importTelegramAttachment(env, {
 	};
 }
 
-export async function loadEdgeChatAttachment(env, attachment) {
+  export async function loadEdgeChatAttachment(env, attachment) {
 	if (!attachment) {
 		return { file: null, skipReason: TELEGRAM_FILE_SKIP_REASON.NOT_FOUND };
 	}
-	if (Number(attachment.size) > TELEGRAM_BRIDGE_FILE_LIMIT) {
+	if (!env?.DB) {
+		return { file: null, skipReason: TELEGRAM_FILE_SKIP_REASON.STORAGE_UNAVAILABLE };
+	}
+	const limit = fileLimitFor(env);
+	if (Number(attachment.size) > limit) {
 		return { file: null, skipReason: TELEGRAM_FILE_SKIP_REASON.TOO_LARGE };
 	}
-	if (!env.FILES) {
-		return {
-			file: null,
-			skipReason: TELEGRAM_FILE_SKIP_REASON.STORAGE_UNAVAILABLE,
-		};
+	const record = await getFileRecord(env.DB, attachment.key);
+	let raw = null;
+	if (record?.data) {
+		raw = record.data;
+	} else if (env.FILES) {
+		const object = await env.FILES.get(attachment.key);
+		if (object) raw = new Uint8Array(await object.arrayBuffer());
 	}
-	const object = await env.FILES.get(attachment.key);
-	if (!object) {
+	if (!raw) {
 		return { file: null, skipReason: TELEGRAM_FILE_SKIP_REASON.NOT_FOUND };
 	}
-	const decrypted = await decryptAttachment(env, await object.arrayBuffer(), attachment.key);
-	if (decrypted.bytes.byteLength > TELEGRAM_BRIDGE_FILE_LIMIT) {
+	const decrypted = await decryptAttachment(env, raw, attachment.key);
+	if (decrypted.bytes.byteLength > limit) {
 		return { file: null, skipReason: TELEGRAM_FILE_SKIP_REASON.TOO_LARGE };
 	}
 	return {
@@ -102,15 +114,20 @@ export async function loadEdgeChatAttachment(env, attachment) {
 				size: decrypted.bytes.byteLength,
 				kind: attachment.kind,
 				durationMs: Number(attachment.durationMs || 0),
-			},
+		},
 		skipReason: null,
 	};
 }
 
 export async function deleteImportedTelegramAttachment(env, attachment) {
-	if (!attachment?.key || !env.FILES) return;
+	if (!attachment?.key) return;
 	try {
-		await env.FILES.delete(attachment.key);
+		const record = await getFileRecord(env.DB, attachment.key);
+		// 未回填的舊對象仍在 R2 桶；已內嵌 D1 的記錄只需移除行。
+		if (record?.data == null && env.FILES) {
+			await env.FILES.delete(attachment.key);
+		}
+		await deleteFileObject(env.DB, attachment.key);
 	} catch (error) {
 		console.warn(JSON.stringify({
 			message: "telegram orphan attachment delete failed",

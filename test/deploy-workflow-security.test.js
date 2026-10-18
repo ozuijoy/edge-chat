@@ -120,17 +120,14 @@ test("資源確認腳本僅複用配置的 KV 標題，避免隱式共享會話�
 	);
 });
 
-test("R2 未開通時工作流移除 FILES binding，已開通時保留目標 bucket", () => {
+test("工作流不再建立或配置 R2 bucket，文件存儲完全依賴 D1", () => {
+	const script = readFileSync(
+		new URL("../.github/scripts/ensure-cloudflare-resources.mjs", import.meta.url),
+		"utf8",
+	).replaceAll("\r\n", "\n");
 	const configStep = getStep("Generate wrangler config for CI");
-	assert.match(
-		configStep,
-		/R2_AVAILABLE: \$\{\{ steps\.ensure_resources\.outputs\.r2_available \}\}/,
-	);
-	assert.match(
-		configStep,
-		/R2_BUCKET_NAME: \$\{\{ steps\.ensure_resources\.outputs\.r2_bucket_name \}\}/,
-	);
-	assert.match(configStep, /if \[\[ "\$R2_AVAILABLE" == "true" \]\]/);
-	assert.match(configStep, /bucket_name = \\"\$\{R2_BUCKET_NAME\}\\"/);
-	assert.match(configStep, /\^\\\[\\\[r2_buckets\\\]\\\]\$\/,\/\^\$\/d/);
+	assert.doesNotMatch(configStep, /R2_AVAILABLE|R2_BUCKET_NAME|r2_buckets|bucket_name/);
+	assert.doesNotMatch(script, /ensureR2Bucket|r2_bucket_name|r2_available|LEGACY_R2_BUCKET_NAME/);
+	const resourceStep = getStep("Ensure Cloudflare resources");
+	assert.doesNotMatch(resourceStep, /EDGECHAT_R2_BUCKET_NAME|CFCHAT_R2_BUCKET_NAME/);
 });

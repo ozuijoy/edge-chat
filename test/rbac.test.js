@@ -227,19 +227,17 @@ test('RBAC：橋接候選、映射 ID 與寫事務採用同一群主範圍', asy
 
 test('RBAC：存儲只讀快照、掃描限速與撤權後繼續掃描拒絕', async () => {
   const h = await harness(); const role = await h.grant(['storage.read', 'storage.scan']);
-  let lists = 0;
-  h.env.FILES = { list: async () => { lists++; return { objects: [{ key: '3/secret.txt', size: 20, uploaded: new Date() }], truncated: false }; } };
+  h.database.run("INSERT INTO uploaded_files (object_key, owner_user_id, filename, content_type, size, data) VALUES ('3/secret.txt', 3, 'secret.txt', 'text/plain', 20, X'010203')");
   const delegate = { token: h.delegate.token };
   assert.equal((await h.request('/admin/storage/scan', null, delegate)).status, 403);
   const first = await h.request('/admin/storage/scan', {}, delegate);
   assert.equal(first.status, 200); assert.equal(JSON.stringify(first.body).includes('secret.txt'), false);
+  assert.deepEqual(first.body.items.map((item) => item.ownerKey), ['user:3']);
   assert.equal((await h.request('/admin/storage/scan', {}, delegate)).status, 409);
-  assert.equal(lists, 1);
   const snapshot = await h.request('/admin/storage', null, delegate);
   assert.ok(snapshot.body.scannedAt); assert.equal(JSON.stringify(snapshot.body).includes('secret.txt'), false);
   h.database.run('UPDATE rbac_roles SET enabled = 0 WHERE id = ?', [role.id]);
   assert.equal((await h.request('/admin/storage/scan?cursor=old', {}, delegate)).status, 403);
-  assert.equal(lists, 1);
 });
 
 test('RBAC：顯式恢復使舊會話失效並保留普通組，審計漸進限量清理', async () => {

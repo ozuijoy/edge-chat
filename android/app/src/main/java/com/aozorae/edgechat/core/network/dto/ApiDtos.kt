@@ -22,7 +22,7 @@ data class CapabilitiesResponse(
 )
 
 @Serializable
-data class LimitsDto(val maxUploadBytes: Long = 20L * 1024 * 1024, val messageRetentionDays: Int = 7)
+data class LimitsDto(val maxUploadBytes: Long = 1999000L, val messageRetentionDays: Int = 7)
 
 @Serializable
 data class FeaturesDto(

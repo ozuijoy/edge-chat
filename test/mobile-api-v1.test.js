@@ -181,7 +181,11 @@ test('客戶端消息和附件重試複用同一服務端記錄', async () => {
   assert.equal(firstUpload.created, true);
   assert.equal(retryUpload.created, false);
 	assert.equal(retryUpload.file.key, firstUpload.file.key);
-	assert.equal(env.FILES.files.size, 1);
+	assert.equal(env.FILES.files.size, 0);
+	const embedded = Number(
+		database.exec('SELECT COUNT(*) FROM uploaded_files WHERE data IS NOT NULL')[0].values[0][0]
+	);
+	assert.equal(embedded, 1);
 	const voiceUpload = await saveUploadedFile(
 		env,
 		{ userId: user.id },

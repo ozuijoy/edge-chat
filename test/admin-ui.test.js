@@ -163,11 +163,12 @@ test('存儲統計由按鈕手動刷新且四個統計列均可排序', () => {
   assert.match(apiSource, /adminStorageScan/);
   const storageApi = readFileSync(new URL('../worker/src/api/storage.ts', import.meta.url), 'utf8');
   assert.match(storageApi, /\/api\/admin\/storage\/scan/);
-  assert.match(storageApi, /FILES\.list/);
-  assert.match(storageApi, /沒有綁定 R2，無法統計存儲空間/);
+  assert.match(storageApi, /\/api\/admin\/files\/backfill/);
+  assert.match(storageApi, /%Y-%m-%dT%H:%M:%SZ.*MAX\(created_at\)/);
+  assert.match(storageApi, /FROM uploaded_files/);
   assert.match(storageSource, /@click="refreshStorage"/);
-  assert.doesNotMatch(storageSource, /onMounted\(refreshStorage\)/);
-  assert.doesNotMatch(storageSource, /尚未統計|10 GB|免費存儲/);
+  assert.doesNotMatch(storageSource, /onMounted(refreshStorage)/);
+  assert.doesNotMatch(storageSource, /尚未統計|10 GB|免費存儠|R2/);
   for (const key of ['objectCount', 'bytes', 'share', 'latestUploadedAt']) {
     assert.match(storageSource, new RegExp(`key: '${key}'`));
   }

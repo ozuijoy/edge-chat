@@ -52,7 +52,7 @@
 
 演示站複用正式項目的 Vue 頁面、路由、狀態管理和實時消息邏輯，但 API、WebSocket、文件上傳與 Telegram 迴流均在瀏覽器內存中模擬，不是連接真實後端的多人聊天室。
 
-刷新頁面或點擊右上角「重置演示數據」即可恢復初始狀態。演示操作不會訪問正式 Worker，也不會寫入 D1、KV 或 R2。
+ 刷新頁面或點擊右上角「重置演示數據」即可恢復初始狀態。演示操作不會訪問正式 Worker，也不會寫入 D1 或 KV。
 
 <table>
   <tr>
@@ -174,10 +174,16 @@ GitHub Actions 會管理服務端加密 Worker Secrets。首次部署時，如�
 | 實時通信 | Durable Objects、WebSocket Hibernation |
 | 數據庫 | Cloudflare D1 |
 | 會話存儲 | Cloudflare KV |
-| 文件存儲 | Cloudflare R2 |
+| 文件存儲 | Cloudflare D1 (BLOB)、備用 R2 |
 | 構建與部署 | Wrangler、GitHub Actions |
 
 更多實現說明見 [TECHNICAL.md](TECHNICAL.md)。
+
+## 文件存儲
+
+附件內容與元數據一并存入 Cloudflare D1 的 `uploaded_files` 表（內嵌 BLOB），單文件上限為 **2 MB**，由 `MAX_FILE_SIZE` 控制。D1 寫入為唯一新路徑；刪除即時生效，無需依賴外部桶的補償清理。
+
+如從 R2 遷移而來的歷史對象，其 `data` 列為空、數據仍留在 R2 桶內，服務會在首次下載時從 R2 回退讀取。如需完整遷移這些歷史對象到 D1，可在管理後臺的「存儲統計」中執行掃描，確認無錯誤後向 `/api/admin/files/backfill?cursor=<cursor>` 回填（需 `storage.scan` 授限，限流 10 秒/次）。回填完成後可從 `wrangler.toml` 移除 `[[r2_buckets]]` binding，R2 桶將不再被訪問。
 
 ## 部署
 

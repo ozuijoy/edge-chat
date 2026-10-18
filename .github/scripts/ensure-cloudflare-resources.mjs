@@ -8,8 +8,6 @@ const API_BASE_URL = "https://api.cloudflare.com/client/v4";
 
 const LEGACY_D1_DATABASE_NAME = "cfchat-db";
 const LEGACY_KV_NAMESPACE_TITLE = "cfchat-sessions";
-const LEGACY_R2_BUCKET_NAME = "cfchat-files";
-const R2_NOT_ENABLED_ERROR_CODE = 10042;
 
 function requireEnv(name) {
   const value = process.env[name];
@@ -38,9 +36,6 @@ function resourceNames(env) {
     kvNamespaceTitle:
       readEnv(env, "EDGECHAT_KV_NAMESPACE_TITLE", "CFCHAT_KV_NAMESPACE_TITLE") ??
       LEGACY_KV_NAMESPACE_TITLE,
-    r2BucketName:
-      readEnv(env, "EDGECHAT_R2_BUCKET_NAME", "CFCHAT_R2_BUCKET_NAME") ??
-      LEGACY_R2_BUCKET_NAME,
   };
 }
 
@@ -138,12 +133,6 @@ function normalizeKvRecord(item) {
   };
 }
 
-function normalizeR2Record(item) {
-  return {
-    name: item.name ?? item.bucket_name ?? "",
-  };
-}
-
 async function listD1Databases(context) {
   const all = [];
   let page = 1;
@@ -197,45 +186,6 @@ async function listKvNamespaces(context) {
   return all;
 }
 
-async function listR2Buckets(context) {
-  const payload = await cloudflareRequest(
-    context,
-    "GET",
-    `/accounts/${context.accountId}/r2/buckets`,
-  );
-  const raw = payload.result;
-  const buckets = Array.isArray(raw) ? raw : Array.isArray(raw?.buckets) ? raw.buckets : [];
-  return buckets.map(normalizeR2Record);
-}
-
-function isR2NotEnabledError(error) {
-  return (
-    error instanceof CloudflareApiError &&
-    error.errors.length === 1 &&
-    Number(error.errors[0]?.code) === R2_NOT_ENABLED_ERROR_CODE
-  );
-}
-
-async function hasR2Access(context) {
-  try {
-    await cloudflareRequest(
-      context,
-      "GET",
-      `/accounts/${context.accountId}/r2/buckets`,
-      { query: { per_page: 1 } },
-    );
-    return true;
-  } catch (error) {
-    if (!isR2NotEnabledError(error)) {
-      throw error;
-    }
-
-    // 10042 明確表示賬戶尚未開通 R2；只有這種情況允許部署降級，權限或憑據錯誤仍應中止。
-    console.warn("R2 is not enabled for this Cloudflare account; deploying without FILES binding.");
-    return false;
-  }
-}
-
 async function ensureD1Database(context, d1DatabaseName) {
   const databases = await listD1Databases(context);
   const existing = databases.find((database) => database.name === d1DatabaseName && database.id);
@@ -287,25 +237,6 @@ export async function ensureKvNamespace(
   return { id, title: kvNamespaceTitle, created: true };
 }
 
-export async function ensureR2Bucket(context, r2BucketName = LEGACY_R2_BUCKET_NAME) {
-  if (!(await hasR2Access(context))) {
-    return { available: false, created: false };
-  }
-
-  const buckets = await listR2Buckets(context);
-  const existing = buckets.find((bucket) => bucket.name === r2BucketName);
-  if (existing) {
-    console.log(`R2 bucket already exists: ${r2BucketName}`);
-    return { available: true, created: false };
-  }
-
-  console.log(`Creating R2 bucket: ${r2BucketName}`);
-  await cloudflareRequest(context, "POST", `/accounts/${context.accountId}/r2/buckets`, {
-    body: { name: r2BucketName },
-  });
-  return { available: true, created: true };
-}
-
 export async function ensureCloudflareResources({
   accountId,
   apiToken,
@@ -323,7 +254,6 @@ export async function ensureCloudflareResources({
 
   const d1 = await ensureD1Database(context, names.d1DatabaseName);
   const kv = await ensureKvNamespace(context, names.kvNamespaceTitle);
-  const r2 = await ensureR2Bucket(context, names.r2BucketName);
 
   setOutput("d1_database_name", names.d1DatabaseName);
   setOutput("d1_database_id", d1.id);
@@ -331,11 +261,8 @@ export async function ensureCloudflareResources({
   setOutput("kv_namespace_title", kv.title);
   setOutput("kv_namespace_id", kv.id);
   setOutput("kv_created", kv.created);
-  setOutput("r2_available", r2.available);
-  setOutput("r2_bucket_name", names.r2BucketName);
-  setOutput("r2_created", r2.created);
 
-  return { d1, kv, r2 };
+  return { d1, kv };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {

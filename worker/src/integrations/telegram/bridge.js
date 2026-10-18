@@ -15,6 +15,7 @@ import {
 	deleteImportedTelegramAttachment,
 	importTelegramAttachment,
 	loadEdgeChatAttachment,
+	TELEGRAM_BRIDGE_FILE_LIMIT,
 	TELEGRAM_FILE_SKIP_REASON,
 } from "./files.js";
 
@@ -209,10 +210,8 @@ export async function ingestTelegramMessage(env, { mapping, telegramMessage, bot
 
 	const attachmentNotice =
 		imported.skipReason === TELEGRAM_FILE_SKIP_REASON.TOO_LARGE
-			? "附件超過 16 MB，未同步"
-			: imported.skipReason === TELEGRAM_FILE_SKIP_REASON.STORAGE_UNAVAILABLE
-				? "當前部署未啟用文件存儲，附件未同步"
-				: "";
+			? `附件超過 ${Math.round(TELEGRAM_BRIDGE_FILE_LIMIT / 1024 / 1024)} MB，未同步`
+			: "";
 	const content = [telegramMessage.content, attachmentNotice].filter(Boolean).join("\n\n");
 	try {
 		const response = await submitExternalRoomMessage(env, {

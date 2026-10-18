@@ -322,15 +322,18 @@ BEGIN
   WHERE id = NEW.invite_id;
 END;
 
+-- 檔案內嵌 BLOB 存於 D1；owner 可空代表系統檔案（如 Telegram 橋接導入），
+-- data 為空的列是 R2 時期的舊記錄，待回填前可讀舊桶或等待 GC 清除。
 CREATE TABLE IF NOT EXISTS uploaded_files (
   object_key TEXT PRIMARY KEY,
-  owner_user_id INTEGER NOT NULL,
+  owner_user_id INTEGER,
   filename TEXT NOT NULL DEFAULT '',
   content_type TEXT NOT NULL DEFAULT '',
   size INTEGER NOT NULL DEFAULT 0,
+  data BLOB,
   client_upload_id TEXT,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (owner_user_id) REFERENCES users(id)
+  FOREIGN KEY (owner_user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS device_sessions (

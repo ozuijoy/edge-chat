@@ -12,7 +12,6 @@ interface Namespace {
 interface MaintenanceEnv {
   DB?: Database;
   SESSIONS?: { get(key: string): Promise<unknown> };
-  FILES?: { list(options: { limit: number }): Promise<unknown> };
   CHANNEL_ROOM?: Namespace;
   USER_INBOX?: Namespace;
   SCHEDULER?: Namespace;
@@ -92,10 +91,9 @@ export async function runSystemCheck(env: MaintenanceEnv, { timeoutMs = 8000 } =
     }, timeoutMs);
     return [connectivity, schema];
   };
-  const [dbChecks, kv, r2, room, inbox, scheduler, bridge, call, notifications] = await Promise.all([
+  const [dbChecks, kv, room, inbox, scheduler, bridge, call, notifications] = await Promise.all([
     database(),
     env.SESSIONS ? probe('sessions', async () => { await env.SESSIONS?.get('__edgechat_health__'); return {}; }, timeoutMs) : absent('sessions'),
-    env.FILES ? probe('files', async () => { await env.FILES?.list({ limit: 1 }); return {}; }, timeoutMs) : absent('files', true),
     checkObject('channelRoom', env.CHANNEL_ROOM, 'ChannelRoom', timeoutMs),
     checkObject('userInbox', env.USER_INBOX, 'UserInbox', timeoutMs),
     checkObject('scheduler', env.SCHEDULER, 'Scheduler', timeoutMs),
@@ -104,7 +102,7 @@ export async function runSystemCheck(env: MaintenanceEnv, { timeoutMs = 8000 } =
     checkObject('telegramNotifications', env.TELEGRAM_NOTIFICATIONS, 'TelegramNotifications', timeoutMs)
   ]);
   const environment = inspectEnvironment(env);
-  const checks: Check[] = [...dbChecks, kv, r2, room, inbox, scheduler, bridge, call, notifications, {
+  const checks: Check[] = [...dbChecks, kv, room, inbox, scheduler, bridge, call, notifications, {
     id: 'environment', status: environment.some((item) => item.required && !item.present) ? 'missing' : 'ok',
     code: 'presence_only', durationMs: 0
   }];

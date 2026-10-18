@@ -48,6 +48,9 @@ test("消息刪除統一完成權限校驗、持久化與實時刪除 packet", a
 			calls.push({ type: "persist", db, args });
 			return true;
 		},
+		async getDeletionTarget() {
+			return null;
+		},
 	});
 	const db = {};
 	const result = await remove(
@@ -122,6 +125,9 @@ test("消息刪除向客戶端收斂無權限、無效參數與重複刪除錯�
 		},
 		async persistDeletion() {
 			return false;
+		},
+		async getDeletionTarget() {
+			return null;
 		},
 	});
 	await assert.rejects(

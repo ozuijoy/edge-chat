@@ -1,4 +1,5 @@
 import { hardDeleteChannels } from "./data/channel-deletion.ts";
+import { findD1OwnedFileKeys } from "./data/uploaded-files.js";
 import { classifyStoredSiteIcon } from "./site-icon.js";
 
 const DEFAULT_MESSAGE_RETENTION_DAYS = 7;
@@ -316,10 +317,37 @@ async function processR2Rows(env, config, summary, rows, siteIconKey, budget) {
 		summary.r2SkippedReferenced += removed;
 	}
 
+	const pending = rows.filter((row) => {
+		const key = String(row.object_key || '');
+		return key && !referenced.has(key);
+	});
 	let progressed = referenced.size > 0;
-	for (const row of rows) {
-		const key = String(row.object_key || "");
-		if (!key || referenced.has(key)) continue;
+	if (!pending.length) return progressed;
+
+	// 一次查詢批內哪些對象已內嵌 D1 數據；這些只刪行即可，不再消耗外部桶預算。
+	if (!budget.spend({ d1ApiCalls: 1, d1Statements: 1 })) {
+		budget.markExhausted();
+		return progressed;
+	}
+	const d1Owned = await findD1OwnedFileKeys(
+		env.DB,
+		pending.map((row) => row.object_key),
+	);
+
+	for (const row of pending) {
+		const key = String(row.object_key || '');
+		if (d1Owned.has(key) || !env.FILES) {
+			const completed = await completeR2Delete(env.DB, key, budget);
+			if (!completed) {
+				budget.markExhausted();
+				break;
+			}
+			summary.retryQueueDeleted += 1;
+			summary.r2Deleted += 1;
+			progressed = true;
+			continue;
+		}
+
 		// R2 成功後若 D1 完成批次失敗，還要保留一次寫回退避狀態的餘量。
 		const worstCaseCost = { d1ApiCalls: 2, d1Statements: 3, r2Operations: 1 };
 		if (!budget.canSpend(worstCaseCost)) {
@@ -363,8 +391,8 @@ async function runRetryQueueStep(env, config, summary, siteIconKey, budget) {
 	const capacity = Math.min(
 		config.batchSize,
 		budget.remainingR2Operations(),
-		Math.floor((budget.remainingInternalOperations() - 3) / 3),
-		Math.floor((budget.remainingD1Statements() - 3) / 3),
+		Math.floor((budget.remainingInternalOperations() - 4) / 3),
+		Math.floor((budget.remainingD1Statements() - 4) / 3),
 	);
 	if (capacity <= 0) {
 		budget.markExhausted();

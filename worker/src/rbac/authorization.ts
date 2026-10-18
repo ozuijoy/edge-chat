@@ -37,7 +37,7 @@ export function managedGroupScope(actor, column: string) {
 
 // SQL 只描述集中策略的授權條件，供讀取範圍與事務斷言共用，不再由各接口手寫管理員分支。
 export function policyAssertion(policy: Policy, session, target: string | number) {
-  const params: unknown[] = [session.userId, session.sessionVersion];
+  const params: unknown[] = [session.userId, session.sessionVersion ?? 0];
   const required = policy.superOnly ? [] : [...new Set(policy.permissions.flatMap((key) => [key, ...(ADMIN_PERMISSIONS.find((p) => p.key === key)?.dependencies || [])]))];
   const permissions = required.map((key) => {
     params.push(key);
@@ -69,7 +69,7 @@ export async function runAuthorizedBatch(db, context, statements, extra?: { sql:
   const guard = db.prepare(`INSERT INTO admin_write_guard (request_id, ok) VALUES (?, CASE WHEN ${assertion.sql}${extra ? ` AND (${extra.sql})` : ''} THEN 1 ELSE 0 END)`)
     .bind(requestId, ...assertion.params, ...(extra?.params || []));
   const audit = db.prepare(`INSERT INTO admin_audit_log (request_id, actor_id, actor_name, action, target, summary) VALUES (?, ?, ?, ?, ?, ?)`)
-    .bind(requestId, context.session.userId, context.session.username, context.policy.id, String(context.target || ''), JSON.stringify(summary));
+    .bind(requestId, context.session.userId, context.session.username ?? '', context.policy.id, String(context.target || ''), JSON.stringify(summary));
   try {
     const result = await db.batch([guard, ...statements, audit, db.prepare('DELETE FROM admin_write_guard WHERE request_id = ?').bind(requestId)]);
     return result.slice(1, 1 + statements.length);

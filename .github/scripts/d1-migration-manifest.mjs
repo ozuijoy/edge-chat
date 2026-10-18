@@ -241,6 +241,11 @@ export const D1_MIGRATIONS = [
       "index:idx_telegram_notification_sender", "index:idx_telegram_notification_recipient",
       "index:idx_telegram_notification_created", "index:idx_telegram_notification_message"],
   },
+  {
+    id: "2026-10-18-file-storage-d1",
+    file: "worker/migrations/2026-10-18-file-storage-d1.sql",
+    artifacts: ["column:uploaded_files.data"],
+  },
 ];
 
 // b3f6855 曾發佈、0c13e8f 已撤回的遷移：僅識別歷史 ledger，不要求新安裝創建廢棄表，也不刪除舊數據。

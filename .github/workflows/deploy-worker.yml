@@ -68,19 +68,12 @@ jobs:
       - name: Generate wrangler config for CI
         shell: bash
         env:
-          R2_AVAILABLE: ${{ steps.ensure_resources.outputs.r2_available }}
-          R2_BUCKET_NAME: ${{ steps.ensure_resources.outputs.r2_bucket_name }}
           MESSAGE_RETENTION_DAYS: ${{ vars.MESSAGE_RETENTION_DAYS || '7' }}
         run: |
           cp wrangler.example.toml wrangler.ci.toml
           sed -i "s|^MESSAGE_RETENTION_DAYS = .*|MESSAGE_RETENTION_DAYS = \"${MESSAGE_RETENTION_DAYS}\"|" wrangler.ci.toml
           sed -i "s|YOUR_D1_DATABASE_ID_HERE|${{ steps.ensure_resources.outputs.d1_database_id }}|g" wrangler.ci.toml
           sed -i "s|YOUR_KV_NAMESPACE_ID_HERE|${{ steps.ensure_resources.outputs.kv_namespace_id }}|g" wrangler.ci.toml
-          if [[ "$R2_AVAILABLE" == "true" ]]; then
-            sed -i "/^\[\[r2_buckets\]\]$/,/^$/ s|^bucket_name = \".*\"$|bucket_name = \"${R2_BUCKET_NAME}\"|" wrangler.ci.toml
-          else
-            sed -i '/^\[\[r2_buckets\]\]$/,/^$/d' wrangler.ci.toml
-          fi
       - name: Initialize D1 schema (first creation only)
         if: steps.ensure_resources.outputs.d1_created == 'true'
         env:

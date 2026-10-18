@@ -22,7 +22,7 @@ SITE_ORIGINS = ""
 R2_DELETE_MAX_RETRY = "8"
 ORPHAN_UPLOAD_RETENTION_DAYS = "1"
 ALLOWED_FILE_TYPES = "image/,video/,audio/,application/pdf,text/"
-MAX_FILE_SIZE = "20971520"
+MAX_FILE_SIZE = "1999000"
 
 [[d1_databases]]
 binding = "DB"
@@ -33,11 +33,6 @@ database_id = "YOUR_D1_DATABASE_ID_HERE"
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "YOUR_KV_NAMESPACE_ID_HERE"
-
-[[r2_buckets]]
-binding = "FILES"
-# Legacy R2 bucket name kept intentionally; code/docs use Edgechat branding.
-bucket_name = "cfchat-files"
 
 [[durable_objects.bindings]]
 name = "CHANNEL_ROOM"

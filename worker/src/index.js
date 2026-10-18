@@ -57,6 +57,7 @@ import { updateCurrentDeviceSessionVersion } from './mobile-session.js';
 import {
   errorCodeForStatus,
   errorResponse,
+  MAX_FILE_SIZE_DEFAULT,
   parseJsonRequest,
   requestBodyTooLarge,
   v1ErrorResponse
@@ -66,7 +67,7 @@ const app = new Hono();
 
 app.use('/api/*', async (c, next) => {
   const path = new URL(c.req.url).pathname;
-  const uploadLimit = Number(c.env.MAX_FILE_SIZE || 20971520) + 1024 * 1024;
+  const uploadLimit = Number(c.env.MAX_FILE_SIZE || MAX_FILE_SIZE_DEFAULT) + 1024 * 1024;
   const maxBytes = ['/api/upload', '/api/v1/uploads'].includes(path) ? uploadLimit : undefined;
   if (requestBodyTooLarge(c.req.raw, maxBytes)) {
     // 提前拒絕超大請求體，避免 Worker 在 JSON 解析前消耗過多內存。

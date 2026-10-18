@@ -30,6 +30,10 @@ export function errorCodeForStatus(status) {
 
 export const MAX_JSON_BODY_SIZE = 10 * 1024 * 1024;
 
+// 檔案內嵌存於 D1 單列（上限 2,000,000 bytes）；加密信託額外約 100 bytes 加欄位開銷，
+// 明文上限取略低於硬限制的值，確保最壞情況下加密後仍放得進單列。
+export const MAX_FILE_SIZE_DEFAULT = 1_999_000;
+
 export function requestBodyTooLarge(request, maxBytes = MAX_JSON_BODY_SIZE) {
   const contentLength = Number(request.headers.get('content-length') || 0);
   return Number.isFinite(contentLength) && contentLength > maxBytes;

@@ -233,7 +233,7 @@ test("Telegram 文字回覆使用 reply_parameters 指向同群原消息", async
 	assert.deepEqual(JSON.parse(captured.init.body).reply_parameters, { message_id: 2 });
 });
 
-test("Telegram 入站附件下載後加密寫入 R2，超限時不下載", async () => {
+  test("Telegram 入站附件下載後加密寫入 D1，超限時不下載", async () => {
 	const originalFetch = globalThis.fetch;
 	const writes = [];
 	let fetchCount = 0;
@@ -252,6 +252,23 @@ test("Telegram 入站附件下載後加密寫入 R2，超限時不下載", async
 			async put(key, value, options) {
 				writes.push({ key, value, options });
 			},
+		},
+		DB: {
+			prepare(sql) {
+				return {
+					bind(...params) {
+						return {
+							run() {
+								writes.push({ sql, params });
+								return { meta: { changes: 1, last_row_id: 1 } };
+							},
+							async all() {
+								return { results: [] };
+							}
+						};
+					}
+				};
+			}
 		},
 	};
 	let imported;
@@ -292,9 +309,10 @@ test("Telegram 入站附件下載後加密寫入 R2，超限時不下載", async
 	assert.equal(imported.attachment.durationMs, 4200);
 	assert.equal(importedAudio.attachment.kind, "audio");
 	assert.equal(importedAudio.attachment.durationMs, 12_000);
-	assert.equal(writes.length, 2);
+	const dbWrites = writes.filter((w) => w.sql?.startsWith("INSERT INTO uploaded_files"));
+	assert.equal(dbWrites.length, 2);
 	assert.deepEqual(
-		(await decryptAttachment(env, writes[0].value, writes[0].key)).bytes,
+		(await decryptAttachment(env, dbWrites[0].params[5], dbWrites[0].params[0])).bytes,
 		Uint8Array.from([1, 2, 3, 4]),
 	);
 	const oversized = await importTelegramAttachment(env, {
@@ -325,7 +343,7 @@ test("Telegram 入站附件下載後加密寫入 R2，超限時不下載", async
 			skipReason: TELEGRAM_FILE_SKIP_REASON.STORAGE_UNAVAILABLE,
 		},
 	);
-});
+  });
 
 test("可信 Telegram 外部消息可以直接引用 Bridge 創建的 R2 附件", async () => {
 	let insertBinds;

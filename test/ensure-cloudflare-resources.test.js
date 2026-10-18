@@ -1,9 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  ensureKvNamespace,
-  ensureR2Bucket,
-} from "../.github/scripts/ensure-cloudflare-resources.mjs";
+import { ensureCloudflareResources, ensureKvNamespace } from "../.github/scripts/ensure-cloudflare-resources.mjs";
 
 function jsonResponse(payload, status = 200) {
   return new Response(JSON.stringify(payload), {
@@ -73,88 +70,32 @@ test("KV defaults to the isolated legacy title instead of generic SESSIONS", asy
   });
 });
 
-test("R2 error 10042 disables attachment storage without failing deployment", async () => {
-  const requests = [];
-  const result = await ensureR2Bucket({
-    accountId: "account",
-    apiToken: "token",
-    async fetchImpl(url, init) {
-      requests.push({ url: String(url), method: init.method });
-      return jsonResponse(
-        {
-          success: false,
-          errors: [{ code: 10042, message: "Please enable R2 in the Cloudflare dashboard." }],
-        },
-        400,
-      );
-    },
-  });
-
-  assert.deepEqual(result, { available: false, created: false });
-  assert.equal(requests.length, 1);
-  assert.equal(requests[0].method, "GET");
-  assert.match(requests[0].url, /\/r2\/buckets\?per_page=1$/);
-});
-
-test("R2 access keeps the existing bucket flow", async () => {
+test("resource provisioning only creates D1 and KV, never an R2 bucket", async () => {
   const requests = [];
   const responses = [
-    jsonResponse({ success: true, result: { buckets: [] } }),
-    jsonResponse({ success: true, result: { buckets: [{ name: "cfchat-files" }] } }),
+    jsonResponse({ success: true, result: [{ uuid: "d1-id", name: "cfchat-db" }] }),
+    jsonResponse({ success: true, result: [{ id: "kv-id", title: "cfchat-sessions" }] }),
   ];
-  const result = await ensureR2Bucket({
-    accountId: "account",
-    apiToken: "token",
-    async fetchImpl(url, init) {
-      requests.push({ url: String(url), method: init.method });
-      return responses.shift();
-    },
-  });
-
-  assert.deepEqual(result, { available: true, created: false });
-  assert.deepEqual(
-    requests.map((request) => request.method),
-    ["GET", "GET"],
-  );
-});
-
-test("R2 permission and credential errors still stop deployment", async () => {
-  await assert.rejects(
-    ensureR2Bucket({
+  const outputFile = "/tmp/edgechat-ensure-resources-output";
+  const originalOutput = process.env.GITHUB_OUTPUT;
+  process.env.GITHUB_OUTPUT = outputFile;
+  try {
+    const result = await ensureCloudflareResources({
       accountId: "account",
       apiToken: "token",
-      async fetchImpl() {
-        return jsonResponse(
-          {
-            success: false,
-            errors: [{ code: 10000, message: "Authentication error" }],
-          },
-          403,
-        );
+      env: {},
+      async fetchImpl(url, init) {
+        requests.push({ url: String(url), method: init.method });
+        return responses.shift();
       },
-    }),
-    /10000: Authentication error/,
-  );
-});
+    });
 
-test("R2 error 10042 does not hide additional Cloudflare errors", async () => {
-  await assert.rejects(
-    ensureR2Bucket({
-      accountId: "account",
-      apiToken: "token",
-      async fetchImpl() {
-        return jsonResponse(
-          {
-            success: false,
-            errors: [
-              { code: 10042, message: "Please enable R2 in the Cloudflare dashboard." },
-              { code: 10000, message: "Authentication error" },
-            ],
-          },
-          403,
-        );
-      },
-    }),
-    /10042: .*; 10000: Authentication error/,
-  );
+    assert.equal(result.d1.id, "d1-id");
+    assert.equal(result.kv.id, "kv-id");
+    assert.equal(result.r2, undefined);
+    assert.ok(requests.every((request) => !/\/r2\//.test(request.url)));
+  } finally {
+    if (originalOutput === undefined) delete process.env.GITHUB_OUTPUT;
+    else process.env.GITHUB_OUTPUT = originalOutput;
+  }
 });
