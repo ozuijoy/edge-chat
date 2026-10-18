@@ -41,10 +41,10 @@ export function registerAdminRoutes(app) {
     const colorTheme = payload.colorTheme;
 
     if (siteName === '') {
-      return errorResponse('站点名称不能为空');
+      return errorResponse('站點名稱不能為空');
     }
     if (colorTheme !== undefined && !isSiteColorTheme(colorTheme)) {
-      return errorResponse('不支持的站点配色');
+      return errorResponse('不支持的站點配色');
     }
 
     try {
@@ -57,7 +57,7 @@ export function registerAdminRoutes(app) {
       return c.json({ site });
     } catch (error) {
       if (isR2ObjectUnavailableError(error)) {
-        return errorResponse('站点图标文件不存在或正在清理，请重新上传');
+        return errorResponse('站點圖標文件不存在或正在清理，請重新上傳');
       }
       throw error;
     }
@@ -78,7 +78,7 @@ export function registerAdminRoutes(app) {
     const maxUses = Number(payload.maxUses ?? 1);
 
     if (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > MAX_INVITE_USES) {
-      return errorResponse(`可使用次数必须是 1 到 ${MAX_INVITE_USES} 之间的整数`);
+      return errorResponse(`可使用次數必須是 1 到 ${MAX_INVITE_USES} 之間的整數`);
     }
 
     const token = randomToken(24);
@@ -98,7 +98,7 @@ export function registerAdminRoutes(app) {
   app.delete('/api/admin/register-links/:inviteId', async (c) => {
     const inviteId = Number(c.req.param('inviteId'));
     if (!Number.isFinite(inviteId)) {
-      return errorResponse('注册链接不存在', 404);
+      return errorResponse('註冊鏈接不存在', 404);
     }
 
     await revokeRegistrationInvite(c.env.DB, inviteId);
@@ -108,7 +108,7 @@ export function registerAdminRoutes(app) {
 
   app.get('/api/admin/users', async (c) => {
     const offset = Number(c.req.query('offset') || 0);
-    if (!Number.isSafeInteger(offset) || offset < 0) return errorResponse('分页参数无效');
+    if (!Number.isSafeInteger(offset) || offset < 0) return errorResponse('分頁參數無效');
     const users = await listAdminUsers(c.env.DB, offset, c.get('session'));
     return c.json({ users });
   });
@@ -117,10 +117,10 @@ export function registerAdminRoutes(app) {
     const rawId = c.req.param('userId');
     const userId = Number(rawId);
     if (!/^[1-9]\d*$/.test(rawId) || !Number.isSafeInteger(userId)) {
-      return errorResponse('用户不存在', 404);
+      return errorResponse('用戶不存在', 404);
     }
     const user = await getAdminUserDetails(c.env.DB, userId, c.get('session'));
-    if (!user) return errorResponse('用户不存在', 404);
+    if (!user) return errorResponse('用戶不存在', 404);
     c.header('Cache-Control', 'private, no-store');
     return c.json({ user });
   });
@@ -132,7 +132,7 @@ export function registerAdminRoutes(app) {
     const displayName = String(payload.displayName || username).trim();
 
     if (!username || !password) {
-      return errorResponse('用户名和密码不能为空');
+      return errorResponse('用戶名和密碼不能為空');
     }
 
     const hashed = await hashPassword(password);
@@ -147,13 +147,13 @@ export function registerAdminRoutes(app) {
     ).bind(username, displayName, hashed.hash, hashed.salt)];
     if ('roleId' in payload) {
       const roleId = Number(payload.roleId);
-      if (!Number.isSafeInteger(roleId) || roleId < 1) return errorResponse('用户组无效');
+      if (!Number.isSafeInteger(roleId) || roleId < 1) return errorResponse('用戶組無效');
       statements.push(db.prepare('UPDATE rbac_user_roles SET role_id = ?, assigned_by = ? WHERE user_id = (SELECT id FROM users WHERE username = ?)').bind(roleId, c.get('session').userId, username));
       statements.push(db.prepare('UPDATE users SET management_protected = CASE WHEN ? != 1 THEN 1 ELSE 0 END WHERE username = ?').bind(roleId, username));
     }
     const [result] = await runAuthorizedBatch(db, c.get('authorizationContext'), statements, undefined, { username, roleId: payload.roleId || 1 }).catch((error) => {
         if (String(error.message).includes('UNIQUE')) {
-          throw new ApiError('用户名已存在');
+          throw new ApiError('用戶名已存在');
         }
         throw error;
       });
@@ -183,7 +183,7 @@ export function registerAdminRoutes(app) {
         : Number(payload.banDurationMinutes);
       if (payload.isDisabled && durationMinutes !== null
         && (!Number.isInteger(durationMinutes) || durationMinutes < 1)) {
-        return errorResponse('封禁时长必须是正整数分钟');
+        return errorResponse('封禁時長必須是正整數分鐘');
       }
 
       const isPermanentlyDisabled = payload.isDisabled && durationMinutes === null;
@@ -222,7 +222,7 @@ export function registerAdminRoutes(app) {
     const payload = await parseJsonRequest(c.req.raw);
     const password = String(payload.password || '');
     if (!password) {
-      return errorResponse('新密码不能为空');
+      return errorResponse('新密碼不能為空');
     }
 
     const hashed = await hashPassword(password);

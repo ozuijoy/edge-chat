@@ -27,7 +27,7 @@ async function load() {
 }
 
 async function toggle(event: Event) {
-  // 开关只反映服务器已确认的值；保存失败时不留下浏览器默认切换后的假状态。
+  // 開關只反映服務器已確認的值；保存失敗時不留下瀏覽器默認切換後的假狀態。
   (event.target as HTMLInputElement).checked = enabled.value;
   busy.value = true;
   error.value = '';
@@ -36,7 +36,7 @@ async function toggle(event: Event) {
     const state = await api.saveAdminStealth(!enabled.value);
     enabled.value = state.enabled;
     saved.value = true;
-    // 重新获取服务器注入的路径与 Cookie 状态，避免切换后继续使用旧运行时元数据。
+    // 重新獲取服務器注入的路徑與 Cookie 狀態，避免切換後繼續使用舊運行時元數據。
     if (!isDemoMode) window.location.reload();
   } catch {
     error.value = t('stealth.saveFailed');

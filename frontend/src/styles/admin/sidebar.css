@@ -175,7 +175,7 @@
   letter-spacing: 0;
 }
 
-/* 系统入口作为整体分隔，搜索或权限过滤后仍保留清晰的业务边界。 */
+/* 系統入口作為整體分隔，搜索或權限過濾後仍保留清晰的業務邊界。 */
 .admin-nav-section--separated {
   padding-block-start: var(--admin-space-sm);
   border-block-start: 1px solid var(--admin-border);

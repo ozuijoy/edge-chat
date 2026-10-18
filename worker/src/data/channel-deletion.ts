@@ -11,7 +11,7 @@ function placeholders(length: number) {
 	return Array.from({ length }, () => "?").join(", ");
 }
 
-// API 和历史群组 GC 共用这一事务，避免不同入口遗漏关联记录或继续占用群名。
+// API 和歷史群組 GC 共用這一事務，避免不同入口遺漏關聯記錄或繼續佔用群名。
 export async function hardDeleteChannel(db: Database, channelId: number) {
 	return hardDeleteChannels(db, [channelId]);
 }
@@ -30,7 +30,7 @@ export async function hardDeleteChannels(db: Database, channelIds: number[]) {
 			WHERE id IN (${placeholders(ids.length)})
 			  AND kind IN ('public', 'private') AND name != 'general'`;
 	const [queued, messages, members, , channel] = await db.batch([
-		// 文件键先持久化再删消息；R2 由已有队列分批清理，失败或进程中断也不会丢失任务。
+		// 文件鍵先持久化再刪消息；R2 由已有隊列分批清理，失敗或進程中斷也不會丟失任務。
 		db.prepare(
 			`INSERT OR IGNORE INTO pending_r2_delete (object_key)
 			 SELECT attachment_key FROM messages
@@ -41,7 +41,7 @@ export async function hardDeleteChannels(db: Database, channelIds: number[]) {
 			).bind(...ids, ...ids),
 		db.prepare(`DELETE FROM messages WHERE channel_id IN (${target})`).bind(...ids),
 		db.prepare(`DELETE FROM channel_members WHERE channel_id IN (${target})`).bind(...ids),
-		// 已读游标没有级联外键，必须先显式删除；置顶、同步事件和 Telegram 映射由外键级联。
+		// 已讀游標沒有級聯外鍵，必須先顯式刪除；置頂、同步事件和 Telegram 映射由外鍵級聯。
 		db.prepare(`DELETE FROM message_reads WHERE channel_id IN (${target})`).bind(...ids),
 		db.prepare(`DELETE FROM channels WHERE id IN (${target})`).bind(...ids),
 	]);

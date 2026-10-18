@@ -56,7 +56,7 @@ function resetDemo() {
     <button type="button" :title="t('demo.reset')" :aria-label="t('demo.reset')" @click="resetDemo">
       <RotateCcw :size="16" aria-hidden="true" />
     </button>
-    <!-- 演示站访客刚体验完产品，是最可能点 Star 的人群；生产构建会静态删除整个 DemoNavigator。 -->
+    <!-- 演示站訪客剛體驗完產品，是最可能點 Star 的人群；生產構建會靜態刪除整個 DemoNavigator。 -->
     <a
       class="demo-navigator__star"
       href="https://github.com/aozorae/Edgechat"
@@ -194,13 +194,13 @@ function resetDemo() {
 
 <style>
 @media (max-width: 640px) {
-  /* 聊天页出现置顶条时把演示导航移到输入区上方，避免遮挡真实功能文案。 */
+  /* 聊天頁出現置頂條時把演示導航移到輸入區上方，避免遮擋真實功能文案。 */
   body:has(.pinned-message-bar) .demo-navigator:not(.demo-navigator--admin) {
     top: auto;
     bottom: calc(116px + env(safe-area-inset-bottom));
   }
 
-	/* 窄屏演示导航悬浮在输入区上方，因此给消息流留出同等空间，保证最新回复不会被遮住。 */
+	/* 窄屏演示導航懸浮在輸入區上方，因此給消息流留出同等空間，保證最新回覆不會被遮住。 */
 		body:has(.pinned-message-bar) .chat-messages {
 			padding-bottom: calc(72px + env(safe-area-inset-bottom));
 		}
@@ -209,7 +209,7 @@ function resetDemo() {
     padding-bottom: calc(64px + env(safe-area-inset-bottom));
   }
 
-  /* 成员管理使用整屏覆盖层，演示导航不能浮在其上方抢占触控区域。 */
+  /* 成員管理使用整屏覆蓋層，演示導航不能浮在其上方搶佔觸控區域。 */
   body:has(.room-management-layer) .demo-navigator,
   body:has(.composer-rich-editor) .demo-navigator,
   body:has(.composer-attachment) .demo-navigator,

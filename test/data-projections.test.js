@@ -33,7 +33,7 @@ function createQueryDb(results) {
 	};
 }
 
-test("可见频道查询保持十二个数值身份绑定与直接关注 projection", async () => {
+test("可見頻道查詢保持十二個數值身份綁定與直接關注 projection", async () => {
 	const { db, capture } = createQueryDb([
 			{
 				id: "9",
@@ -76,7 +76,7 @@ test("可见频道查询保持十二个数值身份绑定与直接关注 project
 	assert.match(capture.sql, /CASE WHEN c\.name = 'general' THEN 0 ELSE 1 END/);
 });
 
-	test("overview 频道 projection 不额外暴露头像字段", async () => {
+	test("overview 頻道 projection 不額外暴露頭像字段", async () => {
 		const { db, capture } = createQueryDb([
 			{
 				id: 1,
@@ -100,13 +100,13 @@ test("可见频道查询保持十二个数值身份绑定与直接关注 project
 	assert.match(capture.sql, /CASE WHEN c\.name = 'general' THEN 0 ELSE 1 END/);
 });
 
-test("DM 查询保持拉黑状态与回复关注计数所需的八个数值身份绑定", async () => {
+test("DM 查詢保持拉黑狀態與回覆關注計數所需的八個數值身份綁定", async () => {
 	const { db, capture } = createQueryDb([]);
 	await listUserDms(db, "12");
 	assert.deepEqual(capture.binds, [12, 12, 12, 12, 12, 12, 12, 12]);
 });
 
-test("后台 DM projection 保持参与者、计数与时间字段", async () => {
+test("後臺 DM projection 保持參與者、計數與時間字段", async () => {
 	const { db } = createQueryDb([
 		{
 			id: "8",
@@ -127,7 +127,7 @@ test("后台 DM projection 保持参与者、计数与时间字段", async () =>
 	]);
 });
 
-test("后台用户与频道成员 projection 保持稳定字段", async () => {
+test("後臺用戶與頻道成員 projection 保持穩定字段", async () => {
 	const adminUsers = createQueryDb([
 		{
 			id: "2",
@@ -178,7 +178,7 @@ test("后台用户与频道成员 projection 保持稳定字段", async () => {
 	assert.deepEqual(members.capture.binds, [6]);
 });
 
-test("消息查询保持倒序 SQL、绑定顺序与升序 projection", async () => {
+test("消息查詢保持倒序 SQL、綁定順序與升序 projection", async () => {
 	const { db, capture } = createQueryDb([
 		{
 			id: "5",
@@ -203,7 +203,7 @@ test("消息查询保持倒序 SQL、绑定顺序与升序 projection", async ()
 	assert.deepEqual(messages.map((message) => message.id), [4, 5]);
 });
 
-test("未读查询绑定稳定，成员 projection 排除禁用和删除用户", async () => {
+test("未讀查詢綁定穩定，成員 projection 排除禁用和刪除用戶", async () => {
 	const unread = createQueryDb([{ unread_count: "7" }]);
 	assert.equal(await countUnreadMessages(unread.db, { channelId: "3", userId: "2" }), 7);
 	assert.deepEqual(unread.capture.binds, [3, 2, 3, 2]);
@@ -215,7 +215,7 @@ test("未读查询绑定稳定，成员 projection 排除禁用和删除用户",
 	assert.match(members.capture.sql, /u\.is_disabled = 0/);
 });
 
-test("站点设置 projection 使用稳定默认值", async () => {
+test("站點設置 projection 使用穩定默認值", async () => {
 	const configured = createQueryDb([
 		{ setting_key: "site_name", setting_value: "CFChat" },
 		{ setting_key: "site_icon_url", setting_value: "/icon.png" },
@@ -233,7 +233,7 @@ test("站点设置 projection 使用稳定默认值", async () => {
 	});
 });
 
-test("消息 projection 保持附件和发送者字段", () => {
+test("消息 projection 保持附件和發送者字段", () => {
 	assert.deepEqual(
 		mapMessage({
 			id: "5",
@@ -285,7 +285,7 @@ test("消息 projection 保持附件和发送者字段", () => {
 	);
 });
 
-test("语音消息 projection 保留时长与压缩波形", () => {
+test("語音消息 projection 保留時長與壓縮波形", () => {
 	const message = mapMessage({
 		id: 6,
 		content: "",

@@ -46,12 +46,12 @@ async function requireRoom(c) {
   const kind = String(c.req.param('kind') || '');
   const roomId = Number(c.req.param('id'));
   if (!validRoomRequest(kind, roomId)) {
-    throw new ApiError('会话参数无效', 400, 'invalid_room');
+    throw new ApiError('會話參數無效', 400, 'invalid_room');
   }
   const session = c.get('session');
   const access = await authorizeRoom(c.env.DB, session, kind, roomId);
   if (!access.ok) {
-    throw new ApiError('无权访问该会话', 403, 'forbidden');
+    throw new ApiError('無權訪問該會話', 403, 'forbidden');
   }
   return { session, kind, roomId, room: access.room };
 }
@@ -61,7 +61,7 @@ async function legacyProxyRequest(request, pathname) {
   url.pathname = pathname;
   const init = { method: request.method, headers: request.headers };
   if (!['GET', 'HEAD'].includes(request.method)) {
-    // 内部复用旧路由时固化请求体，避免跨运行时传递 ReadableStream 时需要 Node duplex 扩展。
+    // 內部複用舊路由時固化請求體，避免跨運行時傳遞 ReadableStream 時需要 Node duplex 擴展。
     init.body = await request.arrayBuffer();
   }
   return new Request(url.toString(), init);
@@ -106,7 +106,7 @@ export function registerV1Routes(app) {
     const username = String(payload.username || '').trim();
     const password = String(payload.password || '');
     if (!username || !password) {
-      return v1ErrorResponse('invalid_credentials', '请输入用户名和密码', 400);
+      return v1ErrorResponse('invalid_credentials', '請輸入用戶名和密碼', 400);
     }
     const user = await getUserByUsername(c.env.DB, username);
     if (
@@ -114,7 +114,7 @@ export function registerV1Routes(app) {
       isUserDisabled(user) ||
       !(await verifyPassword(password, user.password_hash, user.password_salt))
     ) {
-      return v1ErrorResponse('invalid_credentials', '账号或密码错误', 401);
+      return v1ErrorResponse('invalid_credentials', '賬號或密碼錯誤', 401);
     }
     const result = await createMobileDeviceSession(c.env, user, payload.device);
     await recordLoginInfo(c.env.DB, user.id, c.req.raw);
@@ -146,22 +146,22 @@ export function registerV1Routes(app) {
     const roomKind = String(payload.roomKind || '');
     const roomId = Number(payload.roomId);
     if (scope !== 'room' || !validRoomRequest(roomKind, roomId)) {
-      return v1ErrorResponse('invalid_realtime_scope', '实时连接目标无效');
+      return v1ErrorResponse('invalid_realtime_scope', '實時連接目標無效');
     }
     const access = await authorizeRoom(c.env.DB, session, roomKind, roomId);
     if (!access.ok) {
-      return v1ErrorResponse('forbidden', '无权访问该会话', 403);
+      return v1ErrorResponse('forbidden', '無權訪問該會話', 403);
     }
     return c.json(await issueRealtimeTicket(c.env, session, { scope, roomKind, roomId }));
   });
 
   app.get('/api/v1/realtime/ws', async (c) => {
     if (c.req.header('upgrade')?.toLowerCase() !== 'websocket') {
-      return v1ErrorResponse('websocket_required', '需要 WebSocket 连接', 426);
+      return v1ErrorResponse('websocket_required', '需要 WebSocket 連接', 426);
     }
     const redeemed = await consumeRealtimeTicket(c.env, c.req.query('ticket'));
     if (!redeemed) {
-      return v1ErrorResponse('realtime_ticket_invalid', '实时票据无效或已过期', 401);
+      return v1ErrorResponse('realtime_ticket_invalid', '實時票據無效或已過期', 401);
     }
     const url = new URL(c.req.url);
     url.search = '';
@@ -212,7 +212,7 @@ export function registerV1Routes(app) {
       sanitizeLimit(c.req.query('limit'), 100, 100)
     ).catch((error) => {
       if (error?.code === 'sync_cursor_expired') {
-        throw new ApiError('同步游标已过期，请重新加载会话', 409, error.code);
+        throw new ApiError('同步游標已過期，請重新加載會話', 409, error.code);
       }
       throw error;
     });
@@ -223,7 +223,7 @@ export function registerV1Routes(app) {
     const { session, room } = await requireRoom(c);
     const payload = await parseJsonRequest(c.req.raw);
     if (!isUuid(payload.clientMessageId)) {
-      return v1ErrorResponse('client_message_id_invalid', 'clientMessageId 必须是 UUID');
+      return v1ErrorResponse('client_message_id_invalid', 'clientMessageId 必須是 UUID');
     }
     return submitClientRoomAction(c.env, {
       room,
@@ -253,7 +253,7 @@ export function registerV1Routes(app) {
     const payload = await parseJsonRequest(c.req.raw);
     const messageId = payload.messageId === undefined ? null : Number(payload.messageId);
     if (messageId !== null && (!Number.isInteger(messageId) || messageId <= 0)) {
-      return v1ErrorResponse('message_id_invalid', '消息 ID 无效');
+      return v1ErrorResponse('message_id_invalid', '消息 ID 無效');
     }
     const lastReadMessageId = await markRoomRead(c.env.DB, {
       channelId: roomId,
@@ -265,13 +265,13 @@ export function registerV1Routes(app) {
 
   app.post('/api/v1/uploads', authMiddleware, async (c) => {
     if (!c.env.FILES) {
-      return v1ErrorResponse('attachments_unavailable', '当前部署没有绑定 R2，无法上传附件', 503);
+      return v1ErrorResponse('attachments_unavailable', '當前部署沒有綁定 R2，無法上傳附件', 503);
     }
     const maxFileSize = Number(c.env.MAX_FILE_SIZE || 20971520);
     if (requestBodyTooLarge(c.req.raw, maxFileSize + 1024 * 1024)) {
       return v1ErrorResponse(
         'payload_too_large',
-        `文件大小不能超过 ${Math.round(maxFileSize / 1024 / 1024)}MB`,
+        `文件大小不能超過 ${Math.round(maxFileSize / 1024 / 1024)}MB`,
         413
       );
     }
@@ -279,17 +279,17 @@ export function registerV1Routes(app) {
     const file = formData.get('file');
     const clientUploadId = String(formData.get('clientUploadId') || '');
     if (!(file instanceof File)) {
-      return v1ErrorResponse('file_required', '请选择文件');
+      return v1ErrorResponse('file_required', '請選擇文件');
     }
     if (!isUuid(clientUploadId)) {
-      return v1ErrorResponse('client_upload_id_invalid', 'clientUploadId 必须是 UUID');
+      return v1ErrorResponse('client_upload_id_invalid', 'clientUploadId 必須是 UUID');
     }
     try {
       const result = await saveUploadedFile(c.env, c.get('session'), file, { clientUploadId });
       return c.json(result, result.created ? 201 : 200);
     } catch (error) {
-      const message = String(error?.message || '上传失败');
-      if (message.startsWith('文件大小不能超过') || message === '该文件类型不允许上传') {
+      const message = String(error?.message || '上傳失敗');
+      if (message.startsWith('文件大小不能超過') || message === '該文件類型不允許上傳') {
         return v1ErrorResponse('upload_rejected', message);
       }
       throw error;

@@ -220,7 +220,7 @@ function createGroup(body) {
 function createAdminUser(body, allowRole = false) {
   const username = String(body.username || '').trim();
   const displayName = String(body.displayName || username).trim();
-  if (!username || !body.password) fail('请填写用户名和密码');
+  if (!username || !body.password) fail('請填寫用戶名和密碼');
   const user = {
     id: demoState.nextUserId++,
     username,
@@ -266,10 +266,10 @@ async function handleDemoRequest(path, options = {}) {
   }
   if (method === 'POST' && pathname === '/auth/login') {
     if (!String(body.username || '').trim() || !String(body.password || '')) {
-      fail('请输入账号和密码');
+      fail('請輸入賬號和密碼');
     }
     const user = demoState.users.find((item) => item.username === body.username) || demoState.users[0];
-    if (projectDemoUser(user).isDisabled) fail('账号或密码错误', 401);
+    if (projectDemoUser(user).isDisabled) fail('賬號或密碼錯誤', 401);
     demoState.session = sessionForUser(user);
     return { token: demoState.session.token, session: cloneDemo(demoState.session) };
   }
@@ -277,13 +277,13 @@ async function handleDemoRequest(path, options = {}) {
     return { ok: true };
   }
   if (method === 'POST' && pathname === '/auth/change-password') {
-    if (!body.currentPassword || !body.newPassword) fail('请填写完整密码');
+    if (!body.currentPassword || !body.newPassword) fail('請填寫完整密碼');
     return { ok: true };
   }
   if (method === 'PATCH' && pathname === '/me/profile') {
     const user = findDemoUser(demoState.session.userId);
     if (Object.hasOwn(body, 'displayName') && (typeof body.displayName !== 'string' || !body.displayName.trim())) {
-      fail('显示名称不能为空');
+      fail('顯示名稱不能為空');
     }
     let bio;
     if (Object.hasOwn(body, 'bio')) {
@@ -311,9 +311,9 @@ async function handleDemoRequest(path, options = {}) {
   let match = pathname.match(/^\/users\/([^/]+)\/profile$/);
   if (method === 'GET' && match) {
     const id = parseLocalUserId(match[1]);
-    if (id === null) fail('用户 ID 无效');
+    if (id === null) fail('用戶 ID 無效');
     const user = findDemoUser(id);
-    if (!user || user.deletedAt || projectDemoUser(user).isDisabled) fail('用户资料不可用', 404);
+    if (!user || user.deletedAt || projectDemoUser(user).isDisabled) fail('用戶資料不可用', 404);
     const { username, displayName, avatarUrl } = user;
     return { profile: { id, username, displayName, avatarUrl, bio: user.bio ?? '' } };
   }
@@ -321,7 +321,7 @@ async function handleDemoRequest(path, options = {}) {
   if ((method === 'PUT' || method === 'DELETE') && match) {
     const userId = Number(match[1]);
     if (userId === Number(demoState.session.userId) || !findDemoUser(userId)) {
-      fail('请选择有效用户');
+      fail('請選擇有效用戶');
     }
     const blockedByMe = method === 'PUT';
     setDemoUserBlocked(demoState.session.userId, userId, blockedByMe);
@@ -334,15 +334,15 @@ async function handleDemoRequest(path, options = {}) {
     return { channels: demoState.channels.map(projectDemoChannel) };
   }
   if (method === 'POST' && pathname === '/channels') {
-    if (!String(body.name || '').trim()) fail('请输入群组名称');
-    if (!['public', 'private'].includes(String(body.kind || 'public').trim())) fail('群组类型无效');
+    if (!String(body.name || '').trim()) fail('請輸入群組名稱');
+    if (!['public', 'private'].includes(String(body.kind || 'public').trim())) fail('群組類型無效');
     return { channel: createGroup(body) };
   }
 
   match = pathname.match(/^\/channels\/(\d+)\/join$/);
   if (method === 'POST' && match) {
     const channel = findDemoChannel(match[1]);
-    if (!channel || channel.kind !== 'public') fail('公开群组不存在', 404);
+    if (!channel || channel.kind !== 'public') fail('公開群組不存在', 404);
     if (!channel.memberIds.includes(demoState.session.userId)) {
       channel.memberIds.push(demoState.session.userId);
       channel.memberCount = channel.memberIds.length;
@@ -354,7 +354,7 @@ async function handleDemoRequest(path, options = {}) {
   match = pathname.match(/^\/channels\/(\d+)\/members$/);
   if (method === 'GET' && match) {
     const channel = findDemoChannel(match[1]);
-    if (!channel) fail('群组不存在', 404);
+    if (!channel) fail('群組不存在', 404);
     return { members: getDemoMembers(channel), room: getChannelRoom(channel) };
   }
 
@@ -379,7 +379,7 @@ async function handleDemoRequest(path, options = {}) {
   match = pathname.match(/^\/channels\/(\d+)$/);
   if (method === 'PATCH' && match) {
     const channel = findDemoChannel(match[1]);
-    if (!channel) fail('群组不存在', 404);
+    if (!channel) fail('群組不存在', 404);
     channel.name = String(body.name || channel.name).trim();
     channel.avatarKey = body.avatarKey || '';
     channel.avatarUrl = channel.avatarKey ? demoState.files.get(channel.avatarKey) || '' : '';
@@ -421,7 +421,7 @@ async function handleDemoRequest(path, options = {}) {
   }
   if (method === 'POST' && pathname === '/dm/open') {
     const user = findDemoUser(body.userId);
-    if (!user) fail('用户不存在', 404);
+    if (!user) fail('用戶不存在', 404);
     let dm = demoState.dms.find(
       (item) => item.participantIds.includes(Number(demoState.session.userId))
         && item.participantIds.includes(Number(user.id))
@@ -446,7 +446,7 @@ async function handleDemoRequest(path, options = {}) {
   }
   if (method === 'POST' && pathname === '/upload') {
     const file = body.get('file');
-    if (!file) fail('请选择文件');
+    if (!file) fail('請選擇文件');
     return { file: storeDemoFile(file) };
   }
 
@@ -478,8 +478,8 @@ async function handleDemoRequest(path, options = {}) {
   match = pathname.match(/^\/admin\/users\/(\d+)\/details$/);
   if (method === 'GET' && match) {
     const user = findDemoUser(match[1]);
-    if (!user) fail('用户不存在', 404);
-    // 演示使用文档保留地址，不采集访客网络或设备信息。
+    if (!user) fail('用戶不存在', 404);
+    // 演示使用文檔保留地址，不採集訪客網絡或設備信息。
     return { user: { ...cloneDemo(projectDemoUser(user)), isAdmin: Boolean(user.isAdmin), bio: user.bio || '', loginHistory: [
       { id: 3, ip: '2001:db8::10', loginAt: '2026-10-05 08:00:00', webrtcIps: ['192.0.2.10'], webrtcCheckedAt: '2026-10-05 08:00:01',
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36' },
@@ -491,20 +491,20 @@ async function handleDemoRequest(path, options = {}) {
 
   match = pathname.match(/^\/admin\/users\/(\d+)\/reset-password$/);
   if (method === 'POST' && match) {
-    if (!body.password) fail('请输入新密码');
+    if (!body.password) fail('請輸入新密碼');
     return { ok: true };
   }
 
   match = pathname.match(/^\/admin\/users\/(\d+)$/);
   if (method === 'PATCH' && match) {
     const user = findDemoUser(match[1]);
-    if (!user) fail('用户不存在', 404);
+    if (!user) fail('用戶不存在', 404);
     user.displayName = String(body.displayName || user.displayName);
     if (typeof body.isDisabled === 'boolean') {
       const durationMinutes = body.banDurationMinutes == null ? null : Number(body.banDurationMinutes);
       if (body.isDisabled && durationMinutes !== null
         && (!Number.isInteger(durationMinutes) || durationMinutes < 1)) {
-        fail('封禁时长必须是正整数分钟');
+        fail('封禁時長必須是正整數分鐘');
       }
       user.isPermanentlyDisabled = body.isDisabled && durationMinutes === null;
       user.disabledUntil = body.isDisabled && durationMinutes !== null
@@ -540,7 +540,7 @@ async function handleDemoRequest(path, options = {}) {
     return telegramPayload();
   }
   if (method === 'PUT' && pathname === '/admin/telegram/config') {
-    if (!body.botToken) fail('请输入 Bot Token');
+    if (!body.botToken) fail('請輸入 Bot Token');
     demoState.telegram.config = {
       configured: true,
       botUsername: 'edgechat_demo_bot',
@@ -551,7 +551,7 @@ async function handleDemoRequest(path, options = {}) {
   if (method === 'POST' && pathname === '/admin/telegram/mappings') {
     const channel = findDemoChannel(body.channelId);
     if (!channel || !isGroupChannelKind(channel.kind) || !/^-\d+$/.test(String(body.telegramChatId || ''))) {
-      fail('请选择群组并填写有效的 Telegram 群 ID');
+      fail('請選擇群組並填寫有效的 Telegram 群 ID');
     }
     demoState.telegram.mappings.push({
       id: demoState.nextMappingId++,
@@ -582,8 +582,8 @@ async function handleDemoRequest(path, options = {}) {
     return { site: cloneDemo(demoState.site) };
   }
   if (method === 'PATCH' && pathname === '/admin/site-settings') {
-    if (body.colorTheme !== undefined && !isSiteColorTheme(body.colorTheme)) fail('不支持的站点配色', 400);
-    if (body.siteName !== undefined && !String(body.siteName || '').trim()) fail('站点名称不能为空', 400);
+    if (body.colorTheme !== undefined && !isSiteColorTheme(body.colorTheme)) fail('不支持的站點配色', 400);
+    if (body.siteName !== undefined && !String(body.siteName || '').trim()) fail('站點名稱不能為空', 400);
     demoState.site = {
       ...demoState.site,
       ...(body.siteName === undefined ? {} : { siteName: String(body.siteName).trim() }),
@@ -602,7 +602,7 @@ async function handleDemoRequest(path, options = {}) {
   match = pathname.match(/^\/register-links\/([^/]+)$/);
   if (method === 'GET' && match) {
     const invite = demoState.invites.find((item) => item.token === decodeURIComponent(match[1]));
-    if (!invite?.isAvailable) fail('注册链接已失效', 404);
+    if (!invite?.isAvailable) fail('註冊鏈接已失效', 404);
     return {
       site: cloneDemo(demoState.site),
       invite: {
@@ -616,8 +616,8 @@ async function handleDemoRequest(path, options = {}) {
   match = pathname.match(/^\/register-links\/([^/]+)\/register$/);
   if (method === 'POST' && match) {
     const invite = demoState.invites.find((item) => item.token === decodeURIComponent(match[1]));
-    if (!invite?.isAvailable) fail('注册链接已失效', 404);
-    if (Object.keys(body).some((k) => !['username', 'displayName', 'password'].includes(k))) fail('请求包含不允许修改的字段');
+    if (!invite?.isAvailable) fail('註冊鏈接已失效', 404);
+    if (Object.keys(body).some((k) => !['username', 'displayName', 'password'].includes(k))) fail('請求包含不允許修改的字段');
     createAdminUser(body);
     invite.usedCount += 1;
     invite.remainingUses = Math.max(0, invite.maxUses - invite.usedCount);
@@ -626,7 +626,7 @@ async function handleDemoRequest(path, options = {}) {
     return { ok: true };
   }
 
-  fail(`演示接口未实现：${method} ${pathname}`, 404);
+  fail(`演示接口未實現：${method} ${pathname}`, 404);
 }
 
 export async function requestDemo(path, options = {}) {

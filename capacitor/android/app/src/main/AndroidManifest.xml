@@ -40,7 +40,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <!-- Capacitor 的 WebView 同时检查这项普通权限；缺失时即使录音已授权也会拒绝音频流。 -->
+    <!-- Capacitor 的 WebView 同時檢查這項普通權限；缺失時即使錄音已授權也會拒絕音頻流。 -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>

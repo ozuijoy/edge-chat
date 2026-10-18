@@ -54,7 +54,7 @@ export function normalizeSiteIconForStorage(value, trustedOrigins = []) {
 		return raw;
 	}
 
-	// 历史版本允许直接保存 object key；非 / 开头的相对值继续按该兼容语义处理。
+	// 歷史版本允許直接保存 object key；非 / 開頭的相對值繼續按該兼容語義處理。
 	return raw.startsWith("/") ? raw : `${R2_SITE_ICON_PREFIX}${raw}`;
 }
 

@@ -1,7 +1,7 @@
 name: Sync Upstream
 on:
   schedule:
-    # UTC 01:17/13:17，即北京时间 09:17/21:17，错开整点拥堵。
+    # UTC 01:17/13:17，即北京時間 09:17/21:17，錯開整點擁堵。
     - cron: "17 1,13 * * *"
   workflow_dispatch:
 permissions:

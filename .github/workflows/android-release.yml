@@ -105,7 +105,7 @@ jobs:
           apksigner_path="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
           test -n "$apksigner_path"
           "$apksigner_path" verify --verbose --print-certs capacitor/release-artifacts/*.apk
-          # AAB 使用 JAR 签名格式；这里只校验签名完整性，不把 ZIP 结构警告升级为失败。
+          # AAB 使用 JAR 簽名格式；這裡只校驗簽名完整性，不把 ZIP 結構警告升級為失敗。
           jarsigner -verify -verbose -certs capacitor/release-artifacts/*.aab
       - name: Publish GitHub Release
         shell: bash

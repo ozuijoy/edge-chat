@@ -63,7 +63,7 @@ CREATE INDEX IF NOT EXISTS idx_realtime_tickets_expiry
 CREATE INDEX IF NOT EXISTS idx_message_events_channel_sequence
   ON message_events(channel_id, sequence);
 
--- 触发器让所有现有提交路径自动进入同一个同步事件流，不要求调用者额外记账。
+-- 觸發器讓所有現有提交路徑自動進入同一個同步事件流，不要求調用者額外記賬。
 CREATE TRIGGER IF NOT EXISTS record_message_created_event
 AFTER INSERT ON messages
 BEGIN

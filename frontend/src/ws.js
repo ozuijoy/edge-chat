@@ -27,7 +27,7 @@ function openSocket(url, { onMessage, onStatus }) {
 	});
 
 	socket.addEventListener("message", (event) => {
-		// transport 只转交原始 frame；协议解析由 realtime session 统一拥有，避免 room/inbox adapter 漂移。
+		// transport 只轉交原始 frame；協議解析由 realtime session 統一擁有，避免 room/inbox adapter 漂移。
 		onMessage?.(event.data, socket);
 	});
 

@@ -22,7 +22,7 @@ export function extractSessionToken(request: Request) {
 }
 
 export function cookieRequestAllowed(request: Request) {
-  // Bearer 调用仍兼容客户端；浏览器自动携带的 Cookie 必须单独防跨站写入和 WebSocket 劫持。
+  // Bearer 調用仍兼容客戶端；瀏覽器自動攜帶的 Cookie 必須單獨防跨站寫入和 WebSocket 劫持。
   if (request.headers.get('authorization')?.startsWith('Bearer ')
     || new URL(request.url).searchParams.get('token') || !cookieToken(request)) return true;
   if (['GET', 'HEAD', 'OPTIONS'].includes(request.method)

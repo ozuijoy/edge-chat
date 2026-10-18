@@ -54,7 +54,7 @@ function createBrowser(width, height = 760) {
 	return { listeners, viewportListeners, properties };
 }
 
-test("移动端首次进入只显示会话列表，选择后可进入并返回", () => {
+test("移動端首次進入只顯示會話列表，選擇後可進入並返回", () => {
 	const browser = createBrowser(375, 740);
 	const activeRoom = ref(null);
 	const viewport = useChatViewport({ activeRoom });
@@ -87,7 +87,7 @@ test("移动端首次进入只显示会话列表，选择后可进入并返回",
 	assert.equal(browser.properties.has("--chat-viewport-offset-top"), false);
 });
 
-test("桌面端保持聊天视图并在缩窄后保留已选会话", () => {
+test("桌面端保持聊天視圖並在縮窄後保留已選會話", () => {
 	const browser = createBrowser(1280);
 	const activeRoom = ref({ kind: "public", id: 1 });
 	const viewport = useChatViewport({ activeRoom });

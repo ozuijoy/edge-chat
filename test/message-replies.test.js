@@ -61,7 +61,7 @@ function createRoom(database, { kind, name, userIds, dmKey = null }) {
 	return channelId;
 }
 
-test("回复关系只接受同房间存活消息，并返回可点击的解密引用预览", async () => {
+test("回覆關係只接受同房間存活消息，並返回可點擊的解密引用預覽", async () => {
 	const { database, env } = createEnvironment();
 	const aliceId = insertUser(database, "alice", "Alice");
 	const bobId = insertUser(database, "bob", "Bob");
@@ -74,24 +74,24 @@ test("回复关系只接受同房间存活消息，并返回可点击的解密�
 	const original = await insertMessage(env, {
 		channelId: generalId,
 		senderId: aliceId,
-		content: "需要确认的原消息",
+		content: "需要確認的原消息",
 	});
 	const otherMessage = await insertMessage(env, {
 		channelId: otherRoomId,
 		senderId: aliceId,
-		content: "另一个房间",
+		content: "另一個房間",
 	});
 
 	const result = await submitRoomMessage(
 		env,
 		{ room: { id: generalId, kind: "public" }, principal: { userId: bobId } },
-		{ content: "已经确认", replyMessageId: original.id },
+		{ content: "已經確認", replyMessageId: original.id },
 	);
 	assert.equal(result.message.replyToMessageId, original.id);
 	assert.deepEqual(result.message.replyTo, {
 		id: original.id,
 		deleted: false,
-		content: "需要确认的原消息",
+		content: "需要確認的原消息",
 		sender: {
 			kind: "local",
 			id: aliceId,
@@ -117,7 +117,7 @@ test("回复关系只接受同房间存活消息，并返回可点击的解密�
 		submitRoomMessage(
 			env,
 			{ room: { id: generalId, kind: "public" }, principal: { userId: bobId } },
-			{ content: "跨房间回复", replyMessageId: otherMessage.id },
+			{ content: "跨房間回覆", replyMessageId: otherMessage.id },
 		),
 		(error) => error instanceof MessageSubmissionError && error.code === "reply_message_unavailable",
 	);
@@ -132,13 +132,13 @@ test("回复关系只接受同房间存活消息，并返回可点击的解密�
 		submitRoomMessage(
 			env,
 			{ room: { id: generalId, kind: "public" }, principal: { userId: bobId } },
-			{ content: "不能回复已删除消息", replyMessageId: original.id },
+			{ content: "不能回覆已刪除消息", replyMessageId: original.id },
 		),
 		(error) => error instanceof MessageSubmissionError && error.code === "reply_message_unavailable",
 	);
 });
 
-test("私信回复复用有人@我计数，并随统一已读游标清零", async () => {
+test("私信回覆複用有人@我計數，並隨統一已讀游標清零", async () => {
 	const { database, env } = createEnvironment();
 	const aliceId = insertUser(database, "alice", "Alice");
 	const bobId = insertUser(database, "bob", "Bob");
@@ -156,7 +156,7 @@ test("私信回复复用有人@我计数，并随统一已读游标清零", asyn
 	const reply = await submitRoomMessage(
 		env,
 		{ room: { id: dmId, kind: "dm" }, principal: { userId: bobId } },
-		{ content: "私信回复", replyMessageId: original.id },
+		{ content: "私信回覆", replyMessageId: original.id },
 	);
 
 	assert.equal((await listUserDms(env.DB, aliceId))[0].mentionUnreadCount, 1);

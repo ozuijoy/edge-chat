@@ -27,7 +27,7 @@ const changes = computed(() => {
   return { added: form.permissions.filter((p) => !previous.includes(p)), removed: previous.filter((p) => !form.permissions.includes(p)) };
 });
 const moduleCount = (module) => module.permissions.filter((p) => form.permissions.includes(p.key)).length;
-// 整组勾选复用 togglePermission，保证依赖权限（如写需读）与单项勾选规则一致。
+// 整組勾選複用 togglePermission，保證依賴權限（如寫需讀）與單項勾選規則一致。
 function toggleModule(module) {
   const enable = moduleCount(module) < module.permissions.length;
   form.permissions = module.permissions.reduce((current, p) => togglePermission(current, p.key, enable), form.permissions);
@@ -37,7 +37,7 @@ async function perform(operation) {
   busy.value = true; error.value = '';
   try { await operation(); } catch (e) { error.value = e.message; } finally { busy.value = false; }
 }
-// 编辑区和成员区位于表格下方，打开后滚动到可视区域，避免用户误以为点击无反应。
+// 編輯區和成員區位於表格下方，打開後滾動到可視區域，避免用戶誤以為點擊無反應。
 async function reveal() { await nextTick(); workspace.value?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 function closeWorkspace() { editorOpen.value = false; selected.value = null; members.value = []; }
 async function load() { roles.value = (await api.rbacRoles(roleOffset.value)).roles; }

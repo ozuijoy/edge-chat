@@ -83,7 +83,7 @@ async function seedUser(database, username = 'alice') {
   };
 }
 
-test('设备会话轮换 refresh token，注销后立即拒绝现有 access token', async () => {
+test('設備會話輪換 refresh token，註銷後立即拒絕現有 access token', async () => {
   const { database, env } = createEnvironment();
   const { user } = await seedUser(database);
   const device = {
@@ -102,7 +102,7 @@ test('设备会话轮换 refresh token，注销后立即拒绝现有 access toke
   assert.notEqual(second.refreshToken, first.refreshToken);
   await assert.rejects(
     refreshMobileDeviceSession(env, first.refreshToken, device.installationId),
-    /刷新凭据/
+    /刷新憑據/
   );
   assert.equal((await validateSession(env, second.accessToken)).ok, true);
 
@@ -111,7 +111,7 @@ test('设备会话轮换 refresh token，注销后立即拒绝现有 access toke
   assert.equal((await validateSession(env, second.accessToken)).ok, false);
 });
 
-test('实时票据绑定移动会话并且只能消费一次', async () => {
+test('實時票據綁定移動會話並且只能消費一次', async () => {
   const { database, env } = createEnvironment();
   const { user } = await seedUser(database);
   const login = await createMobileDeviceSession(env, user, {
@@ -131,7 +131,7 @@ test('实时票据绑定移动会话并且只能消费一次', async () => {
   assert.equal(await consumeRealtimeTicket(env, issued.ticket), null);
 });
 
-test('客户端消息和附件重试复用同一服务端记录', async () => {
+test('客戶端消息和附件重試複用同一服務端記錄', async () => {
   const { database, env } = createEnvironment();
   const { user } = await seedUser(database);
   const channelId = Number(
@@ -218,7 +218,7 @@ test('客户端消息和附件重试复用同一服务端记录', async () => {
   );
 });
 
-test('API v1 从 capabilities、设备登录到复用 bootstrap 保持统一契约', async () => {
+test('API v1 從 capabilities、設備登錄到複用 bootstrap 保持統一契約', async () => {
   const { database, env } = createEnvironment();
   const { password } = await seedUser(database);
 
@@ -266,7 +266,7 @@ test('API v1 从 capabilities、设备登录到复用 bootstrap 保持统一契�
   assert.deepEqual(Object.keys((await unauthorized.json()).error).sort(), ['code', 'message']);
 });
 
-test('GC 清理同步事件前记录每个会话的压缩游标', async () => {
+test('GC 清理同步事件前記錄每個會話的壓縮游標', async () => {
   const { database, env } = createEnvironment();
   const { user } = await seedUser(database);
   const channelId = Number(

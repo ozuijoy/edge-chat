@@ -77,7 +77,7 @@ test('storage scan returns a structured 503 response when R2 is unavailable', as
   await assert.rejects(() => storageScanHandler()({
     env: {},
     req: { url: 'https://edgechat.example/api/admin/storage/scan' }
-  }), (error) => error.status === 503 && error.message === '当前部署没有绑定 R2，无法统计存储空间');
+  }), (error) => error.status === 503 && error.message === '當前部署沒有綁定 R2，無法統計存儲空間');
 });
 
 test('paged summaries merge and include active zero-usage users', () => {

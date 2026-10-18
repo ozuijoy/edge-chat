@@ -40,7 +40,7 @@ export async function saveStealthSettings(db, enabled: boolean) {
     variant: existing?.variant ?? crypto.getRandomValues(new Uint8Array(1))[0] % 3,
     appearance: existing?.appearance ?? createGateAppearance(),
   };
-  // 存在既有设置表中，随机标识只在首次配置时生成，重新部署不会使正在使用的入口失效。
+  // 存在既有設置表中，隨機標識只在首次配置時生成，重新部署不會使正在使用的入口失效。
   await db.prepare(
     `INSERT INTO site_settings (setting_key, setting_value, updated_at)
      VALUES ('stealth_mode', ?, CURRENT_TIMESTAMP)

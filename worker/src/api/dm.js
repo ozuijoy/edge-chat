@@ -17,7 +17,7 @@ export function registerDmRoutes(app) {
     const targetUserId = Number(payload.userId);
 
     if (!Number.isFinite(targetUserId) || targetUserId === session.userId) {
-      return errorResponse('请选择有效用户');
+      return errorResponse('請選擇有效用戶');
     }
 
     const targetUser = await c.env.DB.prepare(
@@ -32,7 +32,7 @@ export function registerDmRoutes(app) {
       .all();
 
     if (!targetUser.results[0]) {
-      return errorResponse('目标用户不存在', 404);
+      return errorResponse('目標用戶不存在', 404);
     }
 
     const [channel, blockStatus] = await Promise.all([

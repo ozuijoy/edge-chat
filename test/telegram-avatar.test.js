@@ -72,7 +72,7 @@ async function createEnv({ knownSender = true } = {}) {
 	};
 }
 
-test("Telegram 头像端点选择最大尺寸并写入 Edge Cache", async () => {
+test("Telegram 頭像端點選擇最大尺寸並寫入 Edge Cache", async () => {
 	const originalFetch = globalThis.fetch;
 	const originalCaches = globalThis.caches;
 	const { cache, entries } = createCache();
@@ -125,14 +125,14 @@ test("Telegram 头像端点选择最大尺寸并写入 Edge Cache", async () => 
 	}
 });
 
-test("非法 Telegram user ID 不查询业务数据（入口只读取隐身设置）", async () => {
+test("非法 Telegram user ID 不查詢業務數據（入口只讀取隱身設置）", async () => {
 	const response = await worker.fetch(
 		new Request("https://example.com/api/integrations/telegram/avatar/not-a-user"),
 		{
 			DB: {
 				prepare(sql) {
 					if (sql.includes("FROM site_settings")) return { async all() { return { results: [] }; } };
-					throw new Error("非法 ID 不应查询数据库");
+					throw new Error("非法 ID 不應查詢數據庫");
 				},
 			},
 		},
@@ -140,16 +140,16 @@ test("非法 Telegram user ID 不查询业务数据（入口只读取隐身设�
 	);
 
 	assert.equal(response.status, 404);
-	assert.deepEqual(await response.json(), { error: "头像不存在" });
+	assert.deepEqual(await response.json(), { error: "頭像不存在" });
 });
 
-test("未知 Telegram sender 不请求 Telegram API", async () => {
+test("未知 Telegram sender 不請求 Telegram API", async () => {
 	const originalFetch = globalThis.fetch;
 	const originalCaches = globalThis.caches;
 	let fetchCount = 0;
 	globalThis.fetch = async () => {
 		fetchCount += 1;
-		throw new Error("不应请求 Telegram");
+		throw new Error("不應請求 Telegram");
 	};
 	globalThis.caches = { default: createCache().cache };
 
@@ -160,7 +160,7 @@ test("未知 Telegram sender 不请求 Telegram API", async () => {
 			{},
 		);
 		assert.equal(response.status, 404);
-		assert.deepEqual(await response.json(), { error: "头像不存在" });
+		assert.deepEqual(await response.json(), { error: "頭像不存在" });
 		assert.equal(fetchCount, 0);
 	} finally {
 		globalThis.fetch = originalFetch;
@@ -168,7 +168,7 @@ test("未知 Telegram sender 不请求 Telegram API", async () => {
 	}
 });
 
-test("Telegram 用户无头像时短暂缓存 404", async () => {
+test("Telegram 用戶無頭像時短暫緩存 404", async () => {
 	const originalFetch = globalThis.fetch;
 	const originalCaches = globalThis.caches;
 	const { cache } = createCache();
@@ -189,7 +189,7 @@ test("Telegram 用户无头像时短暂缓存 404", async () => {
 		assert.equal(first.headers.get("cache-control"), "public, max-age=600, s-maxage=600");
 		assert.equal(second.status, 404);
 		assert.equal(fetchCount, 1);
-		assert.equal((await second.json()).error, "头像不存在");
+		assert.equal((await second.json()).error, "頭像不存在");
 	} finally {
 		globalThis.fetch = originalFetch;
 		globalThis.caches = originalCaches;

@@ -1,4 +1,4 @@
-// 部署工具与 Worker 共用采集、判定规则；这里不依赖 Node，也不执行修复或业务数据查询。
+// 部署工具與 Worker 共用採集、判定規則；這裡不依賴 Node，也不執行修復或業務數據查詢。
 export const D1_MIGRATION_LEDGER = 'edgechat_schema_migrations';
 
 type Row = Record<string, string | number | null>;
@@ -22,7 +22,7 @@ export async function collectSchemaArtifacts(query: SchemaQuery, tables?: string
   const artifacts = new Set(objects.map((object) => `${object.type}:${object.name}`));
   const inspectedTables = tables ?? objects.filter((object) => object.type === 'table').map((object) => String(object.name));
   for (const table of inspectedTables) {
-    // REST 与 binding 都支持表值 PRAGMA，避免 CI 与线上走不同查询。
+    // REST 與 binding 都支持表值 PRAGMA，避免 CI 與線上走不同查詢。
     const columns = await query(`SELECT name FROM pragma_table_info('${table.replaceAll("'", "''")}')`);
     for (const column of columns) artifacts.add(`column:${table}.${column.name}`);
   }

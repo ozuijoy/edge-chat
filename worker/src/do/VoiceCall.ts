@@ -23,7 +23,7 @@ export class VoiceCall {
     this.call = await this.state.storage.get('call') || null;
     this.loaded = true;
   }
-  // 外部投递会 await；串行化整个动作，避免接听和取消在这些 I/O 间交错。
+  // 外部投遞會 await；串行化整個動作，避免接聽和取消在這些 I/O 間交錯。
   serial<T>(task: () => Promise<T>): Promise<T> {
     const next = this.queue.then(task);
     this.queue = next.catch(() => {});
@@ -52,15 +52,15 @@ export class VoiceCall {
       try {
         await this.load();
         const userId = parseVerifiedUserId(request);
-        if (!userId) return errorResponse('未登录', 401);
+        if (!userId) return errorResponse('未登錄', 401);
         const url = new URL(request.url);
         const roomId = Number(url.searchParams.get('roomId'));
         const access = await authorizeVoiceCall(this.env.DB, roomId, userId);
         if (this.call && callExpired(this.call, Date.now())) await this.end(this.call.phase === 'accepted' && Date.now() >= this.call.createdAt + CALL_MAX_MS ? 'limit' : 'timeout');
         if (url.pathname === '/ice') {
-          if (!this.call || this.call.id !== url.searchParams.get('callId') || this.call.phase !== 'accepted') return errorResponse('通话已结束', 410);
+          if (!this.call || this.call.id !== url.searchParams.get('callId') || this.call.phase !== 'accepted') return errorResponse('通話已結束', 410);
           const client = userId === this.call.callerId ? this.call.callerClient : this.call.calleeClient;
-          if (client !== url.searchParams.get('clientId')) return errorResponse('通话已被其他窗口接听', 409);
+          if (client !== url.searchParams.get('clientId')) return errorResponse('通話已被其他窗口接聽', 409);
           const key = userId === this.call.callerId ? 'callerIce' : 'calleeIce';
           let ice = await this.state.storage.get(key);
           if (!ice) {
@@ -70,8 +70,8 @@ export class VoiceCall {
           return Response.json(ice, { headers: { 'Cache-Control': 'no-store' } });
         }
         let action: CallAction;
-        try { action = await request.json(); } catch { return errorResponse('无效的通话请求', 400); }
-        if (!action || typeof action !== 'object') return errorResponse('无效的通话请求', 400);
+        try { action = await request.json(); } catch { return errorResponse('無效的通話請求', 400); }
+        if (!action || typeof action !== 'object') return errorResponse('無效的通話請求', 400);
         if (['start', 'accept', 'restart'].includes(action.type) && action.mode === 'relay' && !turnConfigured(this.env)) return errorResponse('TURN 尚未配置', 503);
         const previous = this.call;
         const next = nextCallState(previous, action, userId, access.peerId, roomId, Date.now());
@@ -84,7 +84,7 @@ export class VoiceCall {
           if (claims.some(response => !response.ok)) {
             await Promise.all([next.callerId, next.calleeId].map(id => updateCallLease(this.env, id, { callId: next.id }, true)));
             if (previous) await this.end('unavailable');
-            return errorResponse('对方正在通话', 409);
+            return errorResponse('對方正在通話', 409);
           }
         }
         this.call = next;
@@ -106,7 +106,7 @@ export class VoiceCall {
       } catch (error) {
         if (error instanceof ApiError) return errorResponse(error.message, error.status);
         console.error('voice call action failed');
-        return errorResponse('通话暂时不可用', 503);
+        return errorResponse('通話暫時不可用', 503);
       }
     });
   }

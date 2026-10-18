@@ -81,7 +81,7 @@ fun EdgeChatTheme(content: @Composable () -> Unit) {
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            // Compose 负责绘制系统栏背景，这里只同步图标明暗，避免深色模式仍显示浅色导航栏。
+            // Compose 負責繪製系統欄背景，這裡只同步圖標明暗，避免深色模式仍顯示淺色導航欄。
             val controller = WindowCompat.getInsetsController((view.context as Activity).window, view)
             controller.isAppearanceLightStatusBars = !dark
             controller.isAppearanceLightNavigationBars = !dark

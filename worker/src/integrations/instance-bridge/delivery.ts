@@ -37,7 +37,7 @@ export async function deliverBinding(env: BridgeEnv, id: string, send = sendEnve
     const revision = binding.revision;
     const type = binding.status === "claiming" ? "claim" : binding.status === "activating" ? "activate" : "state";
     try {
-      // 控制领取也有租约；DO/cron 同时唤醒或进程退出不会无限重复启动。
+      // 控制領取也有租約；DO/cron 同時喚醒或進程退出不會無限重複啟動。
       const claimed = await env.DB.prepare(`UPDATE instance_bindings SET control_next_at = ?
         WHERE id = ? AND revision = ? AND control_pending = 1 AND control_next_at <= ?`)
         .bind(Date.now() + 30_000, id, revision, Date.now()).run();
@@ -64,7 +64,7 @@ export async function deliverBinding(env: BridgeEnv, id: string, send = sendEnve
     const item = await first<OutboxItem>(env.DB, `SELECT * FROM bridge_outbox WHERE binding_id = ?
       AND next_at <= ? AND expires_at > ? ORDER BY created_at, message_id LIMIT 1`, id, Date.now(), Date.now());
     if (!item) break;
-    // 原子领取定义任务启动点；暂停/解绑发生在领取之后的请求属于在途，不承诺远端回滚。
+    // 原子領取定義任務啟動點；暫停/解綁發生在領取之後的請求屬於在途，不承諾遠端回滾。
     const claimed = await env.DB.prepare(`UPDATE bridge_outbox SET next_at = ?, attempts = attempts + 1
       WHERE binding_id = ? AND event_id = ? AND next_at <= ?
       AND EXISTS (SELECT 1 FROM instance_bindings WHERE id = ? AND status = 'active'
@@ -83,7 +83,7 @@ export async function deliverBinding(env: BridgeEnv, id: string, send = sendEnve
       ]);
     } catch (error) {
       const code = failureCode(error);
-      // 明确的暂停/过期拒绝不可在恢复后补发；网络故障与激活确认丢失仍可重试。
+      // 明確的暫停/過期拒絕不可在恢復後補發；網絡故障與激活確認丟失仍可重試。
       if (["not_receiving", "binding_revoked", "invalid_or_expired_message"].includes(code)) {
         await env.DB.batch([
           env.DB.prepare("DELETE FROM bridge_outbox WHERE binding_id = ? AND event_id = ?").bind(id, item.event_id),
@@ -126,7 +126,7 @@ export async function wakeForMessage(env: BridgeEnv, room: { id: number },
     const binding = await first<{ id: string }>(env.DB, "SELECT id FROM instance_bindings WHERE channel_id = ? AND status = 'active'", room.id);
     if (binding) await wakeBinding(env, binding.id);
   } catch {
-    // outbox 已由消息事务持久化，cron 会救援漏掉的唤醒，不能因此拒绝本站聊天。
+    // outbox 已由消息事務持久化，cron 會救援漏掉的喚醒，不能因此拒絕本站聊天。
     console.warn(JSON.stringify({ event: "instance_bridge_wake_failed", channelId: room.id }));
   }
 }
@@ -150,7 +150,7 @@ export async function rescueBridgeDeliveries(env: BridgeEnv) {
     SELECT id FROM instance_bindings WHERE control_pending = 1 AND control_next_at <= ?
     UNION SELECT binding_id AS id FROM bridge_outbox WHERE next_at <= ?
   ) LIMIT 100`).bind(now, now).all<{ id: string }>();
-  // 有界并发；每轮最多唤醒 100 个有待办的绑定，闲置绑定没有网络请求或 alarm。
+  // 有界併發；每輪最多喚醒 100 個有待辦的綁定，閒置綁定沒有網絡請求或 alarm。
   for (let i = 0; i < results.length; i += 10) {
     await Promise.all(results.slice(i, i + 10).map((row: { id: string }) => wakeBinding(env, row.id)));
   }

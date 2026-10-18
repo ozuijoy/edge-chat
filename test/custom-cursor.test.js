@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { calculateCursorLeft } from "../frontend/src/composables/useCursor.js";
 
-test("自定义光标会抵消输入框横向滚动并保持在可视范围内", () => {
+test("自定義光標會抵消輸入框橫向滾動並保持在可視範圍內", () => {
 	assert.equal(
 		calculateCursorLeft({
 			textWidth: 120,

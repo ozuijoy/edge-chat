@@ -1,5 +1,5 @@
--- 旧版 channel_reads 直接外键引用 messages，会阻止 Telegram 迁移重建消息表。
--- 先把仍有价值的已读游标合并到现行表，再移除已经停用的旧表及其外键。
+-- 舊版 channel_reads 直接外鍵引用 messages，會阻止 Telegram 遷移重建消息表。
+-- 先把仍有價值的已讀游標合併到現行表，再移除已經停用的舊錶及其外鍵。
 CREATE TABLE IF NOT EXISTS message_reads (
   channel_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,

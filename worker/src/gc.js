@@ -41,7 +41,7 @@ export const ORPHAN_UPLOAD_QUERY = `SELECT object_key, created_at
 	LIMIT ?`;
 
 function toPositiveInteger(value, fallback) {
-	// 先取整再验证，避免 0.5 天变成 0 天而误清全部历史消息。
+	// 先取整再驗證，避免 0.5 天變成 0 天而誤清全部歷史消息。
 	const parsed = Math.floor(Number(value));
 	if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
 	return parsed;
@@ -208,7 +208,7 @@ async function loadSiteIconGuard(db, config, budget) {
 		results[0]?.setting_value,
 		config.trustedSiteOrigins,
 	);
-	// 无可信 origin 时，历史完整 /files/ URL 只作为保守保护项，不据此改写或认定域名属于本站。
+	// 無可信 origin 時，歷史完整 /files/ URL 只作為保守保護項，不據此改寫或認定域名屬於本站。
 	return reference.key || null;
 }
 
@@ -320,7 +320,7 @@ async function processR2Rows(env, config, summary, rows, siteIconKey, budget) {
 	for (const row of rows) {
 		const key = String(row.object_key || "");
 		if (!key || referenced.has(key)) continue;
-		// R2 成功后若 D1 完成批次失败，还要保留一次写回退避状态的余量。
+		// R2 成功後若 D1 完成批次失敗，還要保留一次寫回退避狀態的餘量。
 		const worstCaseCost = { d1ApiCalls: 2, d1Statements: 3, r2Operations: 1 };
 		if (!budget.canSpend(worstCaseCost)) {
 			budget.markExhausted();

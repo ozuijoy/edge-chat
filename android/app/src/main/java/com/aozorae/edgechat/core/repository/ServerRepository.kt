@@ -39,14 +39,14 @@ class ServerRepository @Inject constructor(
                 val error = runCatching { json.decodeFromString<ApiErrorEnvelope>(body).error }.getOrNull()
                 throw EdgeChatApiException(
                     error?.code ?: "server_unavailable",
-                    error?.message ?: "无法连接该 EdgeChat 服务器",
+                    error?.message ?: "無法連接該 EdgeChat 服務器",
                     response.code,
                 )
             }
             json.decodeFromString<CapabilitiesResponse>(body)
         }
         if (capabilities.apiVersion != 1) {
-            throw EdgeChatApiException("api_version_unsupported", "服务器尚未支持 EdgeChat API v1", 400)
+            throw EdgeChatApiException("api_version_unsupported", "服務器尚未支持 EdgeChat API v1", 400)
         }
         val previous = serverStore.baseUrl()
         if (previous != null && previous != baseUrl) {

@@ -42,7 +42,7 @@ function createSocketHarness() {
 	return { openConnection, sockets };
 }
 
-test("同一 key 在连接建立前重复 connect 只创建一条连接", () => {
+test("同一 key 在連接建立前重複 connect 只創建一條連接", () => {
 	const harness = createSocketHarness();
 	const session = createRealtimeSession({ openConnection: harness.openConnection });
 
@@ -53,7 +53,7 @@ test("同一 key 在连接建立前重复 connect 只创建一条连接", () => 
 	assert.equal(harness.sockets[0].closeCalls, 0);
 });
 
-test("切换 key 会关闭尚未建立的旧连接并丢弃旧事件", () => {
+test("切換 key 會關閉尚未建立的舊連接並丟棄舊事件", () => {
 	const harness = createSocketHarness();
 	const messages = [];
 	const session = createRealtimeSession({
@@ -78,7 +78,7 @@ test("切换 key 会关闭尚未建立的旧连接并丢弃旧事件", () => {
 	assert.equal(session.isOpenFor("room:2"), true);
 });
 
-test("协议解析集中处理 JSON、文本与二进制帧", () => {
+test("協議解析集中處理 JSON、文本與二進制幀", () => {
 	assert.deepEqual(parseRealtimeFrame('{"type":"message","id":1}'), {
 		type: "message",
 		id: 1,
@@ -92,7 +92,7 @@ test("协议解析集中处理 JSON、文本与二进制帧", () => {
 	assert.deepEqual(parseRealtimeFrame(bytes.subarray(0)), { type: "pong" });
 });
 
-test("同步 open/message 回调不会因 transport 初始化时序丢失", () => {
+test("同步 open/message 回調不會因 transport 初始化時序丟失", () => {
 	const messages = [];
 	const statuses = [];
 	const session = createRealtimeSession({
@@ -120,7 +120,7 @@ test("同步 open/message 回调不会因 transport 初始化时序丢失", () =
 	assert.equal(session.isOpenFor("room:1"), true);
 });
 
-test("send 只向当前已打开连接发送", () => {
+test("send 只向當前已打開連接發送", () => {
 	const harness = createSocketHarness();
 	const session = createRealtimeSession({ openConnection: harness.openConnection });
 	session.connect("room:1");
@@ -130,7 +130,7 @@ test("send 只向当前已打开连接发送", () => {
 	assert.deepEqual(harness.sockets[0].sent, ["hello"]);
 });
 
-test("新连接打开后才关闭仍在服务的旧连接", () => {
+test("新連接打開後才關閉仍在服務的舊連接", () => {
 	const harness = createSocketHarness();
 	const session = createRealtimeSession({ openConnection: harness.openConnection });
 
@@ -145,7 +145,7 @@ test("新连接打开后才关闭仍在服务的旧连接", () => {
 	assert.equal(oldSocket.closeCalls, 1);
 });
 
-test("策略关闭码不重连，网络关闭会重连", async () => {
+test("策略關閉碼不重連，網絡關閉會重連", async () => {
 	const harness = createSocketHarness();
 	const session = createRealtimeSession({
 		openConnection: harness.openConnection,
@@ -165,7 +165,7 @@ test("策略关闭码不重连，网络关闭会重连", async () => {
 	assert.equal(harness.sockets.length, 3);
 });
 
-test("disconnect 会取消待执行的重连", async () => {
+test("disconnect 會取消待執行的重連", async () => {
 	const harness = createSocketHarness();
 	const session = createRealtimeSession({
 		openConnection: harness.openConnection,

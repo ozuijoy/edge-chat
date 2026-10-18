@@ -19,14 +19,14 @@ export function authorizationFromRow(row) {
 }
 export async function readAuthorization(db, userId: number) {
   const row = await db.prepare(`SELECT ${AUTHORIZATION_COLUMNS} FROM users u ${AUTHORIZATION_JOIN} WHERE u.id = ?`).bind(userId).first();
-  if (!row) throw new ApiError('用户不存在', 404);
+  if (!row) throw new ApiError('用戶不存在', 404);
   return authorizationFromRow(row);
 }
 export function requirePermission(auth, key: string) {
-  if (!hasPermission(auth, key)) throw new ApiError('没有此操作权限', 403);
+  if (!hasPermission(auth, key)) throw new ApiError('沒有此操作權限', 403);
 }
 export function checkPolicy(auth, policy: Policy) {
-  if (policy.superOnly && !auth.isSuperAdmin) throw new ApiError('需要超级管理员权限', 403);
+  if (policy.superOnly && !auth.isSuperAdmin) throw new ApiError('需要超級管理員權限', 403);
   for (const key of policy.permissions) requirePermission(auth, key);
 }
 export function managedGroupScope(actor, column: string) {
@@ -35,7 +35,7 @@ export function managedGroupScope(actor, column: string) {
   };
 }
 
-// SQL 只描述集中策略的授权条件，供读取范围与事务断言共用，不再由各接口手写管理员分支。
+// SQL 只描述集中策略的授權條件，供讀取範圍與事務斷言共用，不再由各接口手寫管理員分支。
 export function policyAssertion(policy: Policy, session, target: string | number) {
   const params: unknown[] = [session.userId, session.sessionVersion];
   const required = policy.superOnly ? [] : [...new Set(policy.permissions.flatMap((key) => [key, ...(ADMIN_PERMISSIONS.find((p) => p.key === key)?.dependencies || [])]))];
@@ -77,15 +77,15 @@ export async function runAuthorizedBatch(db, context, statements, extra?: { sql:
     const message = String(error.message);
     if (message.includes('admin_write_guard') || message.includes('CHECK constraint failed: ok')) {
       const current = await db.prepare(`SELECT ${assertion.sql} AS ok`).bind(...assertion.params).first();
-      throw new ApiError(current?.ok && extra ? '数据已变化，请刷新后重试' : '没有此操作权限', current?.ok && extra ? 409 : 403);
+      throw new ApiError(current?.ok && extra ? '數據已變化，請刷新後重試' : '沒有此操作權限', current?.ok && extra ? 409 : 403);
     }
-    if (message.includes('rbac_last_super')) throw new ApiError('必须保留至少一个有效超级管理员', 409);
-    if (message.includes('rbac_default') || message.includes('FOREIGN KEY')) throw new ApiError('用户组仍有成员或受系统保护', 409);
+    if (message.includes('rbac_last_super')) throw new ApiError('必須保留至少一個有效超級管理員', 409);
+    if (message.includes('rbac_default') || message.includes('FOREIGN KEY')) throw new ApiError('用戶組仍有成員或受系統保護', 409);
     throw error;
   }
 }
 
-// 对已有数据层的 run/batch 统一注入同事务复验；查询保持原 D1 API，避免授权规则散落到业务 SQL。
+// 對已有數據層的 run/batch 統一注入同事務複驗；查詢保持原 D1 API，避免授權規則散落到業務 SQL。
 export function authorizedDatabase(db, context) {
   return {
     prepare(sql: string) {

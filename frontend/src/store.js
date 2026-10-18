@@ -25,7 +25,7 @@ function collectLoginNetwork(session) {
   loginProbeController?.abort();
   const controller = new AbortController();
   loginProbeController = controller;
-  // 探测失败不影响登录；先记一次性 ID，刷新和重新进入后台时不重复加载或探测。
+  // 探測失敗不影響登錄；先記一次性 ID，刷新和重新進入後臺時不重複加載或探測。
   void (async () => {
     if (localStorage.getItem('edgechat.login-probe') === session.loginProbeId) return;
     localStorage.setItem('edgechat.login-probe', session.loginProbeId);
@@ -76,7 +76,7 @@ async function initialize() {
   }
 
   if (hasDocumentSession && !isDemoMode && !isCapacitorAndroid) {
-    // 网关登录可能切换了账号，不能让之前 localStorage 中的旧 token 覆盖刚验证的 Cookie。
+    // 網關登錄可能切換了賬號，不能讓之前 localStorage 中的舊 token 覆蓋剛驗證的 Cookie。
     clearAuthState();
   }
   await loadSite();

@@ -9,9 +9,9 @@ export function registerStealthRoutes(app) {
   });
   app.put('/api/admin/stealth', async (c) => {
     const payload = await parseJsonRequest(c.req.raw);
-    if (typeof payload.enabled !== 'boolean') return errorResponse('设置无效');
+    if (typeof payload.enabled !== 'boolean') return errorResponse('設置無效');
     const settings = await saveStealthSettings(c.env.DB, payload.enabled);
-    // 打开后立即刷新仍能进入后台，避免只有旧 localStorage token 的管理员被锁在网关外。
+    // 打開後立即刷新仍能進入後臺，避免只有舊 localStorage token 的管理員被鎖在網關外。
     c.header('Set-Cookie', sessionCookie(c.req.raw, c.get('session').token));
     return c.json({ enabled: settings.enabled });
   });

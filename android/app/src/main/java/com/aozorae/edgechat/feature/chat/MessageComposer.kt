@@ -111,7 +111,7 @@ fun MessageComposer(
                             style = MaterialTheme.typography.bodyMedium,
                         )
                         IconButton(onClick = onClearAttachment) {
-                            Icon(Icons.Outlined.Close, contentDescription = if (language == "zh-CN") "移除附件" else "Remove attachment")
+                            Icon(Icons.Outlined.Close, contentDescription = if (language == "zh-TW") "移除附件" else "Remove attachment")
                         }
                     }
                 }
@@ -168,7 +168,7 @@ fun MessageComposer(
                         contentColor = colors.canvas,
                     ),
                 ) {
-                    Icon(Icons.Outlined.Add, contentDescription = if (language == "zh-CN") "选择附件" else "Choose attachment")
+                    Icon(Icons.Outlined.Add, contentDescription = if (language == "zh-TW") "選擇附件" else "Choose attachment")
                 }
                 Spacer(Modifier.width(8.dp))
                 Surface(
@@ -195,7 +195,7 @@ fun MessageComposer(
                             Box(contentAlignment = Alignment.CenterStart) {
                                 if (content.text.isBlank()) {
                                     Text(
-                                        text = if (language == "zh-CN") "发送消息到 $roomTitle" else "Message $roomTitle",
+                                        text = if (language == "zh-TW") "發送消息到 $roomTitle" else "Message $roomTitle",
                                         color = colors.textSecondary,
                                         style = MaterialTheme.typography.bodyLarge,
                                         maxLines = 1,
@@ -218,7 +218,7 @@ fun MessageComposer(
 					) {
 						Icon(
 							Icons.AutoMirrored.Filled.Send,
-							contentDescription = if (language == "zh-CN") "发送消息" else "Send message",
+							contentDescription = if (language == "zh-TW") "發送消息" else "Send message",
 							tint = colors.accent,
 						)
 					}
@@ -229,7 +229,7 @@ fun MessageComposer(
 					) {
 						Icon(
 							Icons.Outlined.Mic,
-							contentDescription = if (language == "zh-CN") "录制语音消息" else "Record voice message",
+							contentDescription = if (language == "zh-TW") "錄製語音消息" else "Record voice message",
 							tint = colors.accent,
 						)
 					}
@@ -254,7 +254,7 @@ private fun VoiceRecordingBar(
         IconButton(onClick = onCancel, modifier = Modifier.size(48.dp).testTag("cancel_voice")) {
             Icon(
                 Icons.Outlined.DeleteOutline,
-                contentDescription = if (language == "zh-CN") "取消录音" else "Cancel recording",
+                contentDescription = if (language == "zh-TW") "取消錄音" else "Cancel recording",
                 tint = colors.critical,
             )
         }
@@ -283,7 +283,7 @@ private fun VoiceRecordingBar(
         IconButton(onClick = onSend, modifier = Modifier.size(48.dp).testTag("send_voice")) {
             Icon(
                 Icons.AutoMirrored.Filled.Send,
-                contentDescription = if (language == "zh-CN") "发送语音消息" else "Send voice message",
+                contentDescription = if (language == "zh-TW") "發送語音消息" else "Send voice message",
                 tint = colors.accent,
             )
         }

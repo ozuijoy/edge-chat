@@ -59,7 +59,7 @@ internal fun MessageImageAttachment(
     } else {
         Modifier.clickable(
             role = Role.Button,
-            onClickLabel = if (language == "zh-CN") "打开图片" else "Open image",
+            onClickLabel = if (language == "zh-TW") "打開圖片" else "Open image",
             onClick = onClick,
         )
     }

@@ -19,7 +19,7 @@ function createDb(row) {
 	};
 }
 
-test("头像更新只接受当前用户上传的图片，并显式支持清除", async () => {
+test("頭像更新只接受當前用戶上傳的圖片，並顯式支持清除", async () => {
 	assert.deepEqual(await resolveAvatarKeyUpdate(createDb(), 7, {}), {
 		provided: false,
 		key: null,
@@ -38,7 +38,7 @@ test("头像更新只接受当前用户上传的图片，并显式支持清除",
 	);
 	await assert.rejects(
 		resolveAvatarKeyUpdate(createDb(), 7, { avatarKey: "8/private.png" }),
-		/当前账号上传/,
+		/當前賬號上傳/,
 	);
 	await assert.rejects(
 		resolveAvatarKeyUpdate(
@@ -46,6 +46,6 @@ test("头像更新只接受当前用户上传的图片，并显式支持清除",
 			7,
 			{ avatarKey: "7/report.pdf" },
 		),
-		/必须是图片/,
+		/必須是圖片/,
 	);
 });

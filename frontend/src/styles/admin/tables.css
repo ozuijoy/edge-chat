@@ -44,7 +44,7 @@
   color: var(--admin-text);
 }
 
-/* 行操作保持常显；危险操作用文字与浅底区分，不让整张表充满主操作色。 */
+/* 行操作保持常顯；危險操作用文字與淺底區分，不讓整張表充滿主操作色。 */
 .admin-page .list-table .ui-button--destructive {
   border-color: var(--admin-border);
   background: var(--admin-panel);

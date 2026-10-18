@@ -21,21 +21,21 @@ import { installChunkLoadRecovery } from './chunk-load.ts';
 
 installChunkLoadRecovery(window);
 
-// 点击通知后新打开的窗口从 URL 恢复会话；登录后聊天页也能消费这个目标。
+// 點擊通知後新打開的窗口從 URL 恢復會話；登錄後聊天頁也能消費這個目標。
 const isCapacitorNative = Capacitor.isNativePlatform();
 const initialNotificationTarget = isCapacitorNative ? null : takeNotificationRoomTarget(window);
 if (initialNotificationTarget) queueNativeRoomTarget(initialNotificationTarget);
 
-// 注册 Service Worker，使 Chrome/Edge 满足 PWA 可安装条件（地址栏安装按钮）。
-// 仅在浏览器支持且非 Capacitor 原生环境下注册。
+// 註冊 Service Worker，使 Chrome/Edge 滿足 PWA 可安裝條件（地址欄安裝按鈕）。
+// 僅在瀏覽器支持且非 Capacitor 原生環境下注冊。
 if ('serviceWorker' in navigator && !isCapacitorNative) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {
-      // 注册失败不影响应用功能，忽略即可。
+      // 註冊失敗不影響應用功能，忽略即可。
     });
   });
 
-  // 系统通知（Service Worker 弹出）被点击时，打开对应会话。
+  // 系統通知（Service Worker 彈出）被點擊時，打開對應會話。
   navigator.serviceWorker.addEventListener('message', (event) => {
     const payload = event.data;
     if (payload?.type !== 'edgechat:notification-click') return;
@@ -46,7 +46,7 @@ if ('serviceWorker' in navigator && !isCapacitorNative) {
   });
 }
 
-// 应用自定义背景
+// 應用自定義背景
 const customBg = localStorage.getItem('customBackground');
 if (customBg) {
   document.body.style.background = customBg;
@@ -58,7 +58,7 @@ initializeI18n().then(() => store.initialize()).finally(() => {
   app.mount('#app');
   if (typeof document.modelContext?.registerTool === 'function') {
     void import('./webmcp.ts').then(({ registerEdgeChatWebMcp }) => registerEdgeChatWebMcp()).catch(() => {
-      // 实验性浏览器集成不可用时，普通聊天仍应正常启动。
+      // 實驗性瀏覽器集成不可用時，普通聊天仍應正常啟動。
     });
   }
   void installCapacitorIntegration({

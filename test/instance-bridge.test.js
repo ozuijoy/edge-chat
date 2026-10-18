@@ -23,7 +23,7 @@ function instance(origin, byte = 1) {
   const db = new SQL.Database();
   db.exec(readFileSync(new URL("../worker/schema.sql", import.meta.url), "utf8"));
   db.run(`INSERT INTO users (id, username, display_name, password_hash, password_salt, is_super_admin)
-    VALUES (1, 'admin', '管理员', 'hash', 'salt', 1), (2, 'member', '成员', 'hash', 'salt', 0);
+    VALUES (1, 'admin', '管理員', 'hash', 'salt', 1), (2, 'member', '成員', 'hash', 'salt', 0);
     INSERT INTO channels (id, name, kind, created_by) VALUES (2, '私有群', 'private', 1), (3, '私信', 'dm', 1);
     INSERT INTO channel_members (channel_id, user_id, role) VALUES (2, 1, 'owner');`);
   const promises = [];
@@ -59,7 +59,7 @@ function network(...instances) {
     checkDns: async () => {},
     fetcher: async (url, init) => {
       const peer = instances.find((i) => url.startsWith(`${i.origin}/`));
-      assert.ok(peer, "只能向绑定对端发请求");
+      assert.ok(peer, "只能向綁定對端發請求");
       return peer.app.fetch(new Request(url, init), peer.env);
     },
   });
@@ -80,7 +80,7 @@ async function pair() {
   return { a, b, id, send };
 }
 
-async function local(i, content = "原创文字", options = {}) {
+async function local(i, content = "原創文字", options = {}) {
   return insertMessageIdempotent(i.env, { channelId: 2, senderId: 1, content, ...options });
 }
 async function packet(i, id, type, data) {
@@ -89,25 +89,25 @@ async function packet(i, id, type, data) {
     sentAt: Date.now(), nonce: crypto.randomUUID(), data };
 }
 
-test("双管理员确认后双向纯文字同步，独立加密密钥且不创建远端账号", async () => {
+test("雙管理員確認後雙向純文字同步，獨立加密密鑰且不創建遠端賬號", async () => {
   const { a, b, id, send } = await pair();
-  await local(a, "**来自 A**");
+  await local(a, "**來自 A**");
   assert.equal(a.count("bridge_outbox"), 1);
-  assert.equal(a.db.exec("SELECT content FROM bridge_outbox")[0].values[0][0].includes("来自 A"), false);
+  assert.equal(a.db.exec("SELECT content FROM bridge_outbox")[0].values[0][0].includes("來自 A"), false);
   await deliverBinding(a.env, id, send);
   const received = (await listMessages(b.env, 2))[0];
-  assert.equal(received.content, "**来自 A**");
+  assert.equal(received.content, "**來自 A**");
   assert.equal(received.source, "instance-bridge");
   assert.equal(received.sender.kind, "external");
   assert.equal(received.sender.sourceInstance, a.origin);
   assert.equal(b.count("users"), 2);
   assert.equal(b.count("bridge_outbox"), 0);
-  await local(b, "来自 B");
+  await local(b, "來自 B");
   await deliverBinding(b.env, id, send);
-  assert.equal((await listMessages(a.env, 2)).at(-1).content, "来自 B");
+  assert.equal((await listMessages(a.env, 2)).at(-1).content, "來自 B");
 });
 
-test("对方已保存但 ACK 丢失，重试及并发重复请求只落一条消息", async () => {
+test("對方已保存但 ACK 丟失，重試及併發重複請求只落一條消息", async () => {
   const { a, b, id, send } = await pair();
   await local(a);
   let sent;
@@ -123,7 +123,7 @@ test("对方已保存但 ACK 丢失，重试及并发重复请求只落一条消
   assert.equal(b.count("messages"), 1);
 });
 
-test("删除已接收消息后 receipt 保留，旧投递不能复活消息", async () => {
+test("刪除已接收消息後 receipt 保留，舊投遞不能復活消息", async () => {
   const { a, b, id, send } = await pair();
   await local(a);
   let sent;
@@ -134,7 +134,7 @@ test("删除已接收消息后 receipt 保留，旧投递不能复活消息", as
   assert.equal(b.count("messages"), 0);
 });
 
-test("离线不影响本站落库；退避持久化、恢复后按需重试", async () => {
+test("離線不影響本站落庫；退避持久化、恢復後按需重試", async () => {
   const { a, b, id, send } = await pair();
   await local(a);
   const now = Date.now();
@@ -147,27 +147,27 @@ test("离线不影响本站落库；退避持久化、恢复后按需重试", as
   assert.equal(b.count("messages"), 1);
 });
 
-test("暂停取消积压、恢复不补发；对端未获知暂停前的在途数据也不能在恢复后进入", async () => {
+test("暫停取消積壓、恢復不補發；對端未獲知暫停前的在途數據也不能在恢復後進入", async () => {
   const { a, b, id, send } = await pair();
-  await local(a, "积压");
-  await local(b, "旧对端");
+  await local(a, "積壓");
+  await local(b, "舊對端");
   let old;
   await deliverBinding(b.env, id, async (_secret, envelope) => { old = envelope; throw new Error("offline"); });
   await changeBinding(a.env, admin, id, "pause");
   assert.equal(a.count("bridge_outbox"), 0);
-  await local(a, "暂停时");
+  await local(a, "暫停時");
   assert.equal(a.count("bridge_outbox"), 0);
   await changeBinding(a.env, admin, id, "resume");
   const secret = await bindingSecret(b.env, await getBinding(b.env, id));
   await assert.rejects(send(secret, old), /not_receiving/);
   await deliverBinding(a.env, id, send);
   assert.equal(b.count("bridge_outbox"), 0);
-  await local(b, "恢复后新消息");
+  await local(b, "恢復後新消息");
   await deliverBinding(b.env, id, send);
-  assert.equal((await listMessages(a.env, 2)).at(-1).content, "恢复后新消息");
+  assert.equal((await listMessages(a.env, 2)).at(-1).content, "恢復後新消息");
 });
 
-test("双端独立暂停开关；重复控制不能清空后来的新消息", async () => {
+test("雙端獨立暫停開關；重複控制不能清空後來的新消息", async () => {
   const { a, b, id, send } = await pair();
   await changeBinding(a.env, admin, id, "pause");
   let control;
@@ -180,12 +180,12 @@ test("双端独立暂停开关；重复控制不能清空后来的新消息", as
   assert.equal(a.count("bridge_outbox"), 0);
   await changeBinding(b.env, admin, id, "resume");
   await deliverBinding(b.env, id, send);
-  await local(b, "不会被旧控制删除");
+  await local(b, "不會被舊控制刪除");
   await send(await bindingSecret(a.env, await getBinding(a.env, id)), control);
   assert.equal(b.count("bridge_outbox"), 1);
 });
 
-test("解绑与群组硬删除撤销接收并取消出站，保留最小通知墓碑", async () => {
+test("解綁與群組硬刪除撤銷接收並取消出站，保留最小通知墓碑", async () => {
   const { a, b, id, send } = await pair();
   await local(a);
   await changeBinding(a.env, admin, id, "unlink");
@@ -199,7 +199,7 @@ test("解绑与群组硬删除撤销接收并取消出站，保留最小通知�
   assert.deepEqual(a.db.exec("PRAGMA foreign_key_check"), []);
 });
 
-test("公开/私有/general 可邀请，DM/非管理员/重复群被拒绝，邀请一次认领", async () => {
+test("公開/私有/general 可邀請，DM/非管理員/重複群被拒絕，邀請一次認領", async () => {
   const a = instance("https://one.workers.dev");
   const b = instance("https://two.workers.dev");
   const c = instance("https://three.workers.dev");
@@ -216,7 +216,7 @@ test("公开/私有/general 可邀请，DM/非管理员/重复群被拒绝，邀
   assert.equal((await getBinding(a.env, id)).peer_origin, b.origin);
 });
 
-test("伪造签名、错误目标群、过期信封不能接收；管理 API 不向成员泄露私有关系", async () => {
+test("偽造簽名、錯誤目標群、過期信封不能接收；管理 API 不向成員洩露私有關係", async () => {
   const { a, b, id, send } = await pair();
   const message = await packet(a, id, "message", {
     eventId: crypto.randomUUID(), createdAt: Date.now(), senderId: "1", senderName: "a", content: "x", targetRevision: 0,
@@ -233,27 +233,27 @@ test("伪造签名、错误目标群、过期信封不能接收；管理 API 不
   assert.equal(b.count("messages"), 0);
 });
 
-test("跨桥不扩散 Telegram/其他外部消息，带附件整条排除；回复仅正文", async () => {
+test("跨橋不擴散 Telegram/其他外部消息，帶附件整條排除；回覆僅正文", async () => {
   const { a, b, id, send } = await pair();
   await insertExternalMessage(a.env, { channelId: 2, content: "Telegram 入站", source: "telegram",
     sourceMessageId: "-1:123", externalSender: { id: "123", displayName: "TG" } });
   assert.equal(a.count("bridge_outbox"), 0);
-  const deniedEnv = { get DB() { throw new Error("不得读取 Telegram 配置"); } };
+  const deniedEnv = { get DB() { throw new Error("不得讀取 Telegram 配置"); } };
   for (const source of ["telegram", "instance-bridge", "unknown"]) {
     await forwardEdgeChatMessageToTelegram(deniedEnv, { room: { id: 2, kind: "private" }, message: { source, sender: { kind: "external" } } });
   }
   a.db.run("INSERT INTO uploaded_files (object_key, owner_user_id) VALUES ('1/doc', 1)");
-  await local(a, "附件说明", { attachment: { key: "1/doc", name: "doc", type: "text/plain", size: 1 } });
+  await local(a, "附件說明", { attachment: { key: "1/doc", name: "doc", type: "text/plain", size: 1 } });
   assert.equal(a.count("bridge_outbox"), 0);
   const original = (await listMessages(a.env, 2))[0];
-  await local(a, "回复的正文", { replyToMessageId: original.id });
+  await local(a, "回覆的正文", { replyToMessageId: original.id });
   await deliverBinding(a.env, id, send);
   const remote = (await listMessages(b.env, 2))[0];
-  assert.equal(remote.content, "回复的正文");
+  assert.equal(remote.content, "回覆的正文");
   assert.equal(remote.replyTo, undefined);
 });
 
-test("HTTPS 地址/DNS/重定向防护与无签名成功响应拒绝", async () => {
+test("HTTPS 地址/DNS/重定向防護與無簽名成功響應拒絕", async () => {
   for (const origin of ["http://a.com", "https://127.0.0.1", "https://localhost", "https://a.local",
     "https://user:pass@a.com", "https://a.com/x", "https://a.com:444", "https://[::1]", "https://2130706433"]) {
     assert.throws(() => normalizeOrigin(origin), /invalid_origin/);
@@ -268,7 +268,7 @@ test("HTTPS 地址/DNS/重定向防护与无签名成功响应拒绝", async () 
   } }), /invalid_peer_response/);
 });
 
-test("触发器强制积压上限；超限不阻塞聊天，过期清理不遗失失败计数", async () => {
+test("觸發器強制積壓上限；超限不阻塞聊天，過期清理不遺失失敗計數", async () => {
   const { a, id } = await pair();
   a.db.run(`WITH RECURSIVE n(x) AS (SELECT 1 UNION ALL SELECT x+1 FROM n WHERE x<1001)
     INSERT INTO messages(channel_id,sender_id,content) SELECT 2,1,'x' FROM n`);
@@ -281,7 +281,7 @@ test("触发器强制积压上限；超限不阻塞聊天，过期清理不遗�
   assert.equal((await getBinding(a.env, id)).discarded_count, 1001);
 });
 
-test("激活确认丢失期间对端新消息不会因恢复时间水位而永远丢弃", async () => {
+test("激活確認丟失期間對端新消息不會因恢復時間水位而永遠丟棄", async () => {
   const a = instance("https://ack-a.workers.dev");
   const b = instance("https://ack-b.workers.dev", 2);
   const invite = await createInvite(a.env, admin, 2, a.origin);
@@ -290,7 +290,7 @@ test("激活确认丢失期间对端新消息不会因恢复时间水位而永�
   await deliverBinding(b.env, id, send);
   await changeBinding(a.env, admin, id, "confirm");
   await deliverBinding(a.env, id, async (s, p) => { await send(s, p); throw new Error("ack lost"); });
-  await local(b, "激活窗口内的新消息");
+  await local(b, "激活窗口內的新消息");
   await deliverBinding(b.env, id, send);
   assert.equal(b.count("bridge_outbox"), 1);
   await changeBinding(a.env, admin, id, "retry");
@@ -300,7 +300,7 @@ test("激活确认丢失期间对端新消息不会因恢复时间水位而永�
   assert.equal(a.count("messages"), 1);
 });
 
-test("激活前不能用普通状态控制抢占 revision", async () => {
+test("激活前不能用普通狀態控制搶佔 revision", async () => {
   const a = instance("https://state-a.workers.dev");
   const b = instance("https://state-b.workers.dev", 2);
   const invite = await createInvite(a.env, admin, 2, a.origin);
@@ -315,7 +315,7 @@ test("激活前不能用普通状态控制抢占 revision", async () => {
   assert.equal((await getBinding(b.env, id)).status, "active");
 });
 
-test("已认领邀请过期会持久化通知对端撤销", async () => {
+test("已認領邀請過期會持久化通知對端撤銷", async () => {
   const a = instance("https://expiry-a.workers.dev");
   const b = instance("https://expiry-b.workers.dev", 2);
   const invite = await createInvite(a.env, admin, 2, a.origin);
@@ -332,7 +332,7 @@ test("已认领邀请过期会持久化通知对端撤销", async () => {
   assert.equal((await getBinding(b.env, id)).status, "revoked");
 });
 
-test("一次性邀请只可用于认领，长期凭据独立，持有旧邀请不能签署消息", async () => {
+test("一次性邀請只可用於認領，長期憑據獨立，持有舊邀請不能簽署消息", async () => {
   const a = instance("https://keys-a.workers.dev");
   const b = instance("https://keys-b.workers.dev", 2);
   const invite = await createInvite(a.env, admin, 2, a.origin);
@@ -349,7 +349,7 @@ test("一次性邀请只可用于认领，长期凭据独立，持有旧邀请�
   assert.equal((await getBinding(b.env, id)).peer_paused, 0);
 });
 
-test("接收校验后发生暂停，由 INSERT 事务门禁拒绝，发送方不能误认已保存", async () => {
+test("接收校驗後發生暫停，由 INSERT 事務門禁拒絕，發送方不能誤認已保存", async () => {
   const { a, b, id, send } = await pair();
   const original = b.env.CHANNEL_ROOM.get;
   b.env.CHANNEL_ROOM.get = (...args) => {
@@ -366,7 +366,7 @@ test("接收校验后发生暂停，由 INSERT 事务门禁拒绝，发送方不
   assert.equal((await getBinding(a.env, id)).delivered_count, 0);
 });
 
-test("消息事务回滚也回滚 outbox；接收事务失败也回滚 receipt", async () => {
+test("消息事務回滾也回滾 outbox；接收事務失敗也回滾 receipt", async () => {
   const { a, b, id, send } = await pair();
   a.db.run(`CREATE TRIGGER fail_local AFTER INSERT ON messages BEGIN SELECT RAISE(ABORT, 'test failure'); END`);
   await assert.rejects(local(a), /test failure/);
@@ -381,7 +381,7 @@ test("消息事务回滚也回滚 outbox；接收事务失败也回滚 receipt",
   assert.equal(a.count("bridge_outbox"), 1);
 });
 
-test("旧库增量迁移与新安装一致，过期邀请释放占位且不能再认领", async () => {
+test("舊庫增量遷移與新安裝一致，過期邀請釋放佔位且不能再認領", async () => {
   const schema = readFileSync(new URL("../worker/schema.sql", import.meta.url), "utf8");
   const db = new SQL.Database();
   const prior = schema.slice(0, schema.indexOf("CREATE TABLE IF NOT EXISTS bridge_instance"))
@@ -398,7 +398,7 @@ test("旧库增量迁移与新安装一致，过期邀请释放占位且不能�
   assert.equal((await getBinding(a.env, old.id)).invitation_secret, "");
 });
 
-test("非成员不能读取私有群绑定关系，伪造 session 管理员字段也不能写配置", async () => {
+test("非成員不能讀取私有群綁定關係，偽造 session 管理員字段也不能寫配置", async () => {
   const { a, id } = await pair();
   const app = new Hono();
   app.use("*", async (c, next) => { c.set("session", { userId: 2, isAdmin: false }); await next(); });
@@ -410,7 +410,7 @@ test("非成员不能读取私有群绑定关系，伪造 session 管理员字�
   await assert.rejects(createInvite(a.env, { userId: 2, isAdmin: true }, 1, a.origin), /admin_required/);
 });
 
-test("单一 15 分钟 cron 在 UTC 19:00 轮次同时执行每日 GC", () => {
+test("單一 15 分鐘 cron 在 UTC 19:00 輪次同時執行每日 GC", () => {
   const config = readFileSync(new URL("../wrangler.example.toml", import.meta.url), "utf8");
   assert.match(config, /crons = \["\*\/15 \* \* \* \*"\]/);
   assert.equal(shouldRunDailyGc(Date.UTC(2026, 8, 19, 19, 0)), true);

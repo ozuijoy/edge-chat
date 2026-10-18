@@ -75,8 +75,8 @@ export function useBrowserNotifications(options = {}) {
 		if (nativeNotifications) {
 			return nativeNotifications.checkPermission().then((state) => {
 				permission.value = state;
-				// 仅在权限被明确拒绝时关闭开关；pending/prompt 状态不关闭，
-				// 避免在权限读取时序问题或待决状态下误关用户的开关。
+				// 僅在權限被明確拒絕時關閉開關；pending/prompt 狀態不關閉，
+				// 避免在權限讀取時序問題或待決狀態下誤關用戶的開關。
 				if (state === "denied" && enabled.value) {
 					enabled.value = false;
 					persistPreferences();
@@ -88,7 +88,7 @@ export function useBrowserNotifications(options = {}) {
 		permission.value = supported.value
 			? notificationApi.permission
 			: "unsupported";
-		// 同上：只在 denied 时关闭，default/prompt 不关闭。
+		// 同上：只在 denied 時關閉，default/prompt 不關閉。
 		if (permission.value === "denied" && enabled.value) {
 			enabled.value = false;
 			persistPreferences();
@@ -207,11 +207,11 @@ export function useBrowserNotifications(options = {}) {
 		const tag = `edgechat:${browserNotificationRoomKey(room)}`;
 
 		// PWA / standalone 模式下，Service Worker 的 showNotification 比
-		// Notification 构造函数更可靠（构造函数在部分 Chrome 独立窗口中
-		// 不会显示）。优先走 SW，失败或无 SW 时回退到构造函数。
+		// Notification 構造函數更可靠（構造函數在部分 Chrome 獨立窗口中
+		// 不會顯示）。優先走 SW，失敗或無 SW 時回退到構造函數。
 		const swContainer = browserWindow?.navigator?.serviceWorker;
 		if (typeof swContainer?.getRegistration === "function") {
-			// ready 在注册失败时可能永远不完成，不能让通知一直等待它。
+			// ready 在註冊失敗時可能永遠不完成，不能讓通知一直等待它。
 			void swContainer.getRegistration()
 				.then((registration) => {
 					if (

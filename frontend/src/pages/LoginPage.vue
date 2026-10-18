@@ -40,7 +40,7 @@ async function submit(event) {
   loading.value = true;
   error.value = '';
   try {
-    // Android WebView 的自动填充不一定触发 input 事件，提交时以输入框当前值为准。
+    // Android WebView 的自動填充不一定觸發 input 事件，提交時以輸入框當前值為準。
     const submitted = new FormData(event.currentTarget);
     const { serverOrigin, credentials } = readLoginSubmission(submitted);
     if (isCapacitorAndroid) {

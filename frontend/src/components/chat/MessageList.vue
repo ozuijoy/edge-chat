@@ -9,7 +9,7 @@ defineProps<{
 	highlightedMessageId: number | null;
 }>();
 
-// 将列表与草稿、通话计时、菜单等页面状态隔开，避免每次输入都遍历历史消息。
+// 將列表與草稿、通話計時、菜單等頁面狀態隔開，避免每次輸入都遍歷歷史消息。
 const emit = defineEmits<{
 	profile: [sender: MessageSender];
 	reveal: [messageId: number | string | null | undefined];

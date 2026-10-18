@@ -57,7 +57,7 @@
   box-shadow: 0 4px 14px rgba(45, 156, 151, 0.12);
 }
 
-/* 连续消息：隐藏上边框，形成无缝堆叠 */
+/* 連續消息：隱藏上邊框，形成無縫堆疊 */
 .chat-bubble--continued {
   border-radius: 6px 22px 22px 10px;
   border-top: none;
@@ -69,7 +69,7 @@
   border-top: none;
 }
 
-/* 尾部消息：隐藏下边框，avatar 缩小 */
+/* 尾部消息：隱藏下邊框，avatar 縮小 */
 .chat-bubble--tail-hidden {
   border-radius: 22px 22px 6px 10px;
   border-bottom: none;
@@ -81,7 +81,7 @@
   border-bottom: none;
 }
 
-/* 首尾都有：单独一条消息时不应用 */
+/* 首尾都有：單獨一條消息時不應用 */
 
 .chat-bubble--continued.chat-bubble--tail-hidden {
   border-radius: 6px 22px 6px 10px;

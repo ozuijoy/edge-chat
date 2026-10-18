@@ -28,7 +28,7 @@ function createMutationDb(changes = 1) {
 	};
 }
 
-test("消息软删除限定消息与房间，并保留记录供后续清理", async () => {
+test("消息軟刪除限定消息與房間，並保留記錄供後續清理", async () => {
 	const { db, capture } = createMutationDb();
 
 	assert.equal(await softDeleteMessage(db, { channelId: "4", messageId: "9" }), true);
@@ -37,7 +37,7 @@ test("消息软删除限定消息与房间，并保留记录供后续清理", as
 	assert.match(capture.sql, /AND deleted_at IS NULL/);
 });
 
-test("消息删除统一完成权限校验、持久化与实时删除 packet", async () => {
+test("消息刪除統一完成權限校驗、持久化與實時刪除 packet", async () => {
 	const calls = [];
 	const remove = createMessageDeletion({
 		async authorize(db, principal, kind, roomId) {
@@ -73,7 +73,7 @@ test("消息删除统一完成权限校验、持久化与实时删除 packet", a
 	});
 });
 
-test("消息删除后会回收不再引用的附件", async () => {
+test("消息刪除後會回收不再引用的附件", async () => {
 	const cleaned = [];
 	const remove = createMessageDeletion({
 		async authorize() {
@@ -101,7 +101,7 @@ test("消息删除后会回收不再引用的附件", async () => {
 	assert.deepEqual(cleaned, [{ env, keys: ["7/voice.webm"] }]);
 });
 
-test("消息删除向客户端收敛无权限、无效参数与重复删除错误", async () => {
+test("消息刪除向客戶端收斂無權限、無效參數與重複刪除錯誤", async () => {
 	const denied = createMessageDeletion({
 		async authorize() {
 			return { ok: false };
@@ -113,7 +113,7 @@ test("消息删除向客户端收敛无权限、无效参数与重复删除错�
 			{ room: { id: 4, kind: "private" }, principal: { userId: 7 } },
 			{ messageId: 9 },
 		),
-		(error) => error instanceof MessageDeletionError && error.message === "无权删除该消息",
+		(error) => error instanceof MessageDeletionError && error.message === "無權刪除該消息",
 	);
 
 	const missing = createMessageDeletion({
@@ -131,7 +131,7 @@ test("消息删除向客户端收敛无权限、无效参数与重复删除错�
 			{ messageId: 9 },
 		),
 		(error) =>
-			error instanceof MessageDeletionError && error.message === "消息不存在或已被删除",
+			error instanceof MessageDeletionError && error.message === "消息不存在或已被刪除",
 	);
 
 	await assert.rejects(

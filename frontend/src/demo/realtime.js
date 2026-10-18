@@ -85,11 +85,11 @@ function handleRoomFrame(socket, frame) {
 		if (socket.kind === 'dm') {
 			const status = getDemoDirectMessageBlockStatus(socket.roomId, demoState.session.userId);
 			if (status.blockedByPeer) {
-				emit(socket, { type: 'error', error: '发送被拒，你已经被拉黑' });
+				emit(socket, { type: 'error', error: '發送被拒，你已經被拉黑' });
 				return;
 			}
 			if (status.blockedBySender) {
-				emit(socket, { type: 'error', error: '请先解除拉黑再发送' });
+				emit(socket, { type: 'error', error: '請先解除拉黑再發送' });
 				return;
 			}
 		}

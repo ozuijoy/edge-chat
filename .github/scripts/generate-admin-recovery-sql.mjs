@@ -8,7 +8,7 @@ export async function generateRecoverySql(userId, password) {
   if (!Number.isSafeInteger(userId) || userId < 1 || !password) throw new Error('Provide an existing user ID and a new password');
   const hashed = await hashPassword(password);
   const requestId = crypto.randomUUID();
-  // 恢复由部署者显式执行，先确认目标存在，再恢复身份与分组，并使所有旧会话失效。
+  // 恢復由部署者顯式執行，先確認目標存在，再恢復身份與分組，並使所有舊會話失效。
   return `INSERT INTO admin_write_guard (request_id, ok) VALUES ('${requestId}', CASE WHEN EXISTS (SELECT 1 FROM users WHERE id = ${userId}) THEN 1 ELSE 0 END);
 INSERT INTO rbac_user_roles (user_id, role_id) VALUES (${userId}, 1) ON CONFLICT(user_id) DO UPDATE SET role_id = 1;
 UPDATE users SET is_super_admin = 1, is_admin = 1, management_protected = 1,

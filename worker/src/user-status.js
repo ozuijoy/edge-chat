@@ -2,7 +2,7 @@ const MINUTE_MS = 60 * 1000;
 
 export function activeUserSql(alias = '') {
   const prefix = alias ? `${alias}.` : '';
-  // 到期时间直接在查询时判断，避免为少量时间偏差引入定时任务与额外写入。
+  // 到期時間直接在查詢時判斷，避免為少量時間偏差引入定時任務與額外寫入。
   return `${prefix}is_disabled = 0
     AND (${prefix}disabled_until IS NULL OR datetime(${prefix}disabled_until) <= CURRENT_TIMESTAMP)`;
 }

@@ -11,7 +11,7 @@ const roleId = ref(props.user.role?.id || 1);
 const saving = ref(false);
 const error = ref('');
 const notice = ref('');
-// 选中即提交：原先「下拉 + 保存」两步容易漏点保存，确认弹窗已足够防误操作。
+// 選中即提交：原先「下拉 + 保存」兩步容易漏點保存，確認彈窗已足夠防誤操作。
 async function assign(nextId) {
   if (!window.confirm(t('rbac.confirmAssign', { name: props.user.displayName }))) return;
   const previous = roleId.value;

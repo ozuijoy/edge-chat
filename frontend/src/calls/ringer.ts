@@ -29,7 +29,7 @@ export function createCallRinger() {
       }
       setTimeout(() => gain.disconnect(), 1000);
     }
-    // 自动播放被浏览器阻止时保留可视来电，不能为了响铃索取麦克风权限。
+    // 自動播放被瀏覽器阻止時保留可視來電，不能為了響鈴索取麥克風權限。
     void current.resume().then(ring).catch(() => {});
     timer = setInterval(ring, 3000);
   }

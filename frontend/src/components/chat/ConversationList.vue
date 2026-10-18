@@ -262,7 +262,7 @@ const emit = defineEmits(["select"]);
 		border-radius: 0;
 	}
 
-	/* 分隔线从正文起笔，避免头像和内容被粗重的整行边框割开。 */
+	/* 分隔線從正文起筆，避免頭像和內容被粗重的整行邊框割開。 */
 	.sidebar-item { position: relative; }
 	.sidebar-item + .sidebar-item::before {
 		content: "";

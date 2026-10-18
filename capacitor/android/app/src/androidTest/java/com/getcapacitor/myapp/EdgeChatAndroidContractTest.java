@@ -147,7 +147,7 @@ public class EdgeChatAndroidContractTest {
             }
             SystemClock.sleep(100);
         }
-        throw new AssertionError("系统权限按钮未出现: " + viewId);
+        throw new AssertionError("系統權限按鈕未出現: " + viewId);
     }
 
     private static String waitForJavascript(WebView webView, String script, String expected, long timeoutMillis)

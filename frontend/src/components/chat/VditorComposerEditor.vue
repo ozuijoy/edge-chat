@@ -66,7 +66,7 @@ function clipboardText(data: DataTransfer | null) {
 	if (plainText) return plainText;
 	const html = data.getData("text/html");
 	if (!html) return "";
-	// 仅在剪贴板没有纯文本时处理 HTML；只保留文本和图片说明，不保留可加载的 src。
+	// 僅在剪貼板沒有純文本時處理 HTML；只保留文本和圖片說明，不保留可加載的 src。
 	const fragment = DOMPurify.sanitize(html, {
 		ALLOWED_TAGS: ["img"],
 		ALLOWED_ATTR: ["alt"],
@@ -161,7 +161,7 @@ onMounted(() => {
 				if (initializationTimer !== null) globalThis.clearTimeout(initializationTimer);
 				installVditorContentSafety(editor.vditor.lute);
 				transferTarget = editor.vditor.wysiwyg.element;
-				// 必须在真实编辑节点的捕获阶段截断，才能早于 Vditor 自身的冒泡监听器处理不可信 HTML。
+				// 必須在真實編輯節點的捕獲階段截斷，才能早於 Vditor 自身的冒泡監聽器處理不可信 HTML。
 				transferTarget.addEventListener("paste", insertTransferredText, true);
 				transferTarget.addEventListener("drop", insertTransferredText, true);
 				editor.setValue(props.modelValue, true);
@@ -228,7 +228,7 @@ defineExpose({
 	min-width: 0;
 }
 
-/* 工具栏在窄屏内部横向滚动，发送与收起按钮始终留在编辑器外部。 */
+/* 工具欄在窄屏內部橫向滾動，發送與收起按鈕始終留在編輯器外部。 */
 /* biome-ignore lint/correctness/noUnknownPseudoClass: Vue deep selector */
 .composer-vditor :deep(.vditor-toolbar) {
 	display: flex;

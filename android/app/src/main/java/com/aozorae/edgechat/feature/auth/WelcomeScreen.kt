@@ -75,15 +75,15 @@ fun WelcomeScreen(
             EdgeChatBrandMark(size = 72.dp)
             Spacer(Modifier.height(20.dp))
             Text(
-                text = if (language == "zh-CN") "登录 EdgeChat" else "Sign in to EdgeChat",
+                text = if (language == "zh-TW") "登錄 EdgeChat" else "Sign in to EdgeChat",
                 style = MaterialTheme.typography.headlineSmall,
                 color = colors.textPrimary,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = if (language == "zh-CN") {
-                    "输入服务器地址和账号，继续你的对话"
+                text = if (language == "zh-TW") {
+                    "輸入服務器地址和賬號，繼續你的對話"
                 } else {
                     "Enter your server and account to continue your conversations."
                 },
@@ -100,7 +100,7 @@ fun WelcomeScreen(
                     modifier = Modifier.fillMaxWidth().testTag("serverField"),
                     enabled = !loading,
                     singleLine = true,
-                    label = { Text(if (language == "zh-CN") "服务器地址" else "Server address") },
+                    label = { Text(if (language == "zh-TW") "服務器地址" else "Server address") },
                     placeholder = { Text("https://chat.example.com") },
                     leadingIcon = { Icon(Icons.Outlined.Link, contentDescription = null) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
@@ -113,7 +113,7 @@ fun WelcomeScreen(
                     modifier = Modifier.fillMaxWidth().testTag("usernameField"),
                     enabled = !loading,
                     singleLine = true,
-                    label = { Text(if (language == "zh-CN") "用户名" else "Username") },
+                    label = { Text(if (language == "zh-TW") "用戶名" else "Username") },
                     leadingIcon = { Icon(Icons.Outlined.AccountCircle, contentDescription = null) },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     shape = MaterialTheme.shapes.large,
@@ -126,13 +126,13 @@ fun WelcomeScreen(
                     enabled = !loading,
                     singleLine = true,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    label = { Text(if (language == "zh-CN") "密码" else "Password") },
+                    label = { Text(if (language == "zh-TW") "密碼" else "Password") },
                     leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
                                 if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
-                                contentDescription = if (language == "zh-CN") "切换密码可见性" else "Toggle password visibility",
+                                contentDescription = if (language == "zh-TW") "切換密碼可見性" else "Toggle password visibility",
                             )
                         }
                     },
@@ -154,7 +154,7 @@ fun WelcomeScreen(
                             strokeWidth = 2.dp,
                         )
                     } else {
-                        Text(if (language == "zh-CN") "登录" else "Sign in")
+                        Text(if (language == "zh-TW") "登錄" else "Sign in")
                     }
                 }
             }

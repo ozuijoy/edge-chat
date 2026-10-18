@@ -1,4 +1,4 @@
--- 保留旧首末快照里实际存在的数据，不虚构未采集过的中间登录或早期浏览器信息。
+-- 保留舊首末快照裡實際存在的數據，不虛構未採集過的中間登錄或早期瀏覽器信息。
 ALTER TABLE user_login_info RENAME TO user_login_info_legacy;
 CREATE TABLE user_login_info (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,5 +25,5 @@ WHERE first_ip != last_ip OR first_login_at != last_login_at;
 INSERT INTO user_login_info (user_id, ip, login_at, user_agent, login_probe_id, webrtc_ips, webrtc_status, webrtc_checked_at)
 SELECT user_id, last_ip, last_login_at, user_agent, login_probe_id, webrtc_ips, webrtc_status, webrtc_checked_at
 FROM user_login_info_legacy;
--- 新表已接收可保留的旧数据，移除旧快照，防止首次 IP 成为永不淘汰的第四份记录。
+-- 新表已接收可保留的舊數據，移除舊快照，防止首次 IP 成為永不淘汰的第四份記錄。
 DROP TABLE user_login_info_legacy;

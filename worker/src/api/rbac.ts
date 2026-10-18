@@ -6,17 +6,17 @@ import { notifyUserInbox } from '../do-bridge.js';
 
 function page(c) {
   const offset = Number(c.req.query('offset') || 0);
-  if (!Number.isSafeInteger(offset) || offset < 0) throw new ApiError('分页参数无效', 400);
+  if (!Number.isSafeInteger(offset) || offset < 0) throw new ApiError('分頁參數無效', 400);
   return offset;
 }
 function revision(value) {
-  if (!Number.isSafeInteger(value) || value < 0) throw new ApiError('请提供当前数据版本', 400);
+  if (!Number.isSafeInteger(value) || value < 0) throw new ApiError('請提供當前數據版本', 400);
   return value;
 }
 function groupInput(data) {
   const name = String(data.name || '').trim();
   const description = String(data.description || '').trim();
-  if (!name || name.length > 80 || description.length > 500 || !validatePermissions(data.permissions)) throw new ApiError('用户组名称或权限无效', 400);
+  if (!name || name.length > 80 || description.length > 500 || !validatePermissions(data.permissions)) throw new ApiError('用戶組名稱或權限無效', 400);
   return { name, description, permissions: [...new Set<string>(data.permissions)] };
 }
 async function changed(c, userId: number) {
@@ -51,10 +51,10 @@ export function registerRbacRoutes(app) {
   });
   app.patch('/api/admin/rbac/roles/:id', async (c) => {
     const id = Number(c.req.param('id'));
-    if (id === 1) throw new ApiError('普通用户组不可修改', 409);
+    if (id === 1) throw new ApiError('普通用戶組不可修改', 409);
     const data = await parseJsonRequest(c.req.raw);
     const input = groupInput(data);
-    if (typeof data.enabled !== 'boolean') throw new ApiError('用户组状态无效', 400);
+    if (typeof data.enabled !== 'boolean') throw new ApiError('用戶組狀態無效', 400);
     const expected = revision(data.expectedRevision);
     const db = c.get('authorizationDatabase');
     const before = await db.prepare('SELECT * FROM rbac_roles WHERE id = ?').bind(id).first();
@@ -65,14 +65,14 @@ export function registerRbacRoutes(app) {
       db.prepare(`UPDATE users SET management_protected = 1, authz_version = authz_version + 1 WHERE id IN
         (SELECT user_id FROM rbac_user_roles WHERE role_id = ?)`).bind(id),
     ], { sql: 'EXISTS (SELECT 1 FROM rbac_roles WHERE id = ? AND revision = ?)', params: [id, expected] }, { before: { name: before?.name, enabled: before?.enabled }, after: { ...input, enabled: data.enabled } });
-    // 大组不逐个唤醒闲置 DO；通知有限批，其他会话在前台恢复与请求拒绝时刷新，服务端仍即时撤权。
+    // 大組不逐個喚醒閒置 DO；通知有限批，其他會話在前臺恢復與請求拒絕時刷新，服務端仍即時撤權。
     const { results } = await db.prepare('SELECT user_id FROM rbac_user_roles WHERE role_id = ? LIMIT 100').bind(id).all();
     c.executionCtx.waitUntil(Promise.all(results.map((u) => changed(c, u.user_id))));
     return c.json({ ok: true });
   });
   app.delete('/api/admin/rbac/roles/:id', async (c) => {
     const id = Number(c.req.param('id'));
-    if (id === 1) throw new ApiError('普通用户组不可删除', 409);
+    if (id === 1) throw new ApiError('普通用戶組不可刪除', 409);
     const db = c.get('authorizationDatabase');
     await runAuthorizedBatch(db, c.get('authorizationContext'), [db.prepare('DELETE FROM rbac_roles WHERE id = ?').bind(id)],
       { sql: 'NOT EXISTS (SELECT 1 FROM rbac_user_roles WHERE role_id = ?)', params: [id] });
@@ -88,7 +88,7 @@ export function registerRbacRoutes(app) {
     const userId = Number(c.req.param('id'));
     const data = await parseJsonRequest(c.req.raw);
     const roleId = Number(data.roleId);
-    if (!Number.isSafeInteger(roleId) || roleId < 1) throw new ApiError('用户组无效', 400);
+    if (!Number.isSafeInteger(roleId) || roleId < 1) throw new ApiError('用戶組無效', 400);
     const expected = revision(data.expectedAuthzVersion);
     const db = c.get('authorizationDatabase');
     await runAuthorizedBatch(db, c.get('authorizationContext'), [

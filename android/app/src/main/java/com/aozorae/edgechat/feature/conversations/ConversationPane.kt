@@ -117,7 +117,7 @@ fun ConversationPane(
                 containerColor = colors.accent,
                 contentColor = colors.onAccent,
             ) {
-                Icon(Icons.Outlined.Add, contentDescription = if (language == "zh-CN") "新建会话" else "New conversation")
+                Icon(Icons.Outlined.Add, contentDescription = if (language == "zh-TW") "新建會話" else "New conversation")
             }
         }
     }
@@ -160,7 +160,7 @@ private fun ConversationHeader(
                 .clickable(role = Role.Button, onClick = onSettings)
                 .semantics {
                     role = Role.Button
-                    contentDescription = if (language == "zh-CN") "设置" else "Settings"
+                    contentDescription = if (language == "zh-TW") "設置" else "Settings"
                 },
         ) {
             EdgeAvatar(
@@ -172,7 +172,7 @@ private fun ConversationHeader(
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             Text(
-                text = if (language == "zh-CN") "聊天" else "Chats",
+                text = if (language == "zh-TW") "聊天" else "Chats",
                 style = MaterialTheme.typography.headlineSmall,
                 color = colors.textPrimary,
                 maxLines = 1,
@@ -206,13 +206,13 @@ private fun EmptyConversationList(language: String, modifier: Modifier = Modifie
         }
         Spacer(Modifier.size(20.dp))
         Text(
-            text = if (language == "zh-CN") "还没有会话" else "No conversations yet",
+            text = if (language == "zh-TW") "還沒有會話" else "No conversations yet",
             style = MaterialTheme.typography.titleMedium,
             color = colors.textPrimary,
         )
         Spacer(Modifier.size(8.dp))
         Text(
-            text = if (language == "zh-CN") "新建会话或加入公开群组" else "Start a conversation or join a public group.",
+            text = if (language == "zh-TW") "新建會話或加入公開群組" else "Start a conversation or join a public group.",
             style = MaterialTheme.typography.bodyMedium,
             color = colors.textSecondary,
         )
@@ -260,8 +260,8 @@ private fun ConversationRow(
                     Icon(
                         imageVector = if (item.kind == "private") Icons.Outlined.Lock else Icons.Outlined.Group,
                         contentDescription = if (item.kind == "private") {
-                            if (language == "zh-CN") "私有群组" else "Private group"
-                        } else if (language == "zh-CN") "公开群组" else "Public group",
+                            if (language == "zh-TW") "私有群組" else "Private group"
+                        } else if (language == "zh-TW") "公開群組" else "Public group",
                         modifier = Modifier.padding(start = 6.dp).size(15.dp),
                         tint = colors.iconSecondary,
                     )
@@ -275,10 +275,10 @@ private fun ConversationRow(
             Spacer(Modifier.size(3.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 val subtitle = if (!item.isMember) {
-                    if (language == "zh-CN") "点按加入公开群组" else "Tap to join public group"
+                    if (language == "zh-TW") "點按加入公開群組" else "Tap to join public group"
                 } else {
                     item.subtitle.ifBlank {
-                        "${item.memberCount} ${if (language == "zh-CN") "位成员" else "members"}"
+                        "${item.memberCount} ${if (language == "zh-TW") "位成員" else "members"}"
                     }
                 }
                 Text(
@@ -292,7 +292,7 @@ private fun ConversationRow(
                 if (item.mentionUnreadCount > 0) {
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        text = if (language == "zh-CN") "有人@我" else "Mentioned you",
+                        text = if (language == "zh-TW") "有人@我" else "Mentioned you",
                         style = MaterialTheme.typography.labelSmall,
                         color = colors.critical,
                         fontWeight = FontWeight.Bold,

@@ -29,7 +29,7 @@ function createNamespaceHarness() {
 	return { namespace, captures };
 }
 
-test("room bridge 拥有 DO 寻址、连接 URL 与 verified metadata", async () => {
+test("room bridge 擁有 DO 尋址、連接 URL 與 verified metadata", async () => {
 	const channel = createNamespaceHarness();
 	const env = { CHANNEL_ROOM: channel.namespace };
 	const principal = { userId: 7, isAdmin: true, token: "session-token" };
@@ -59,7 +59,7 @@ test("room bridge 拥有 DO 寻址、连接 URL 与 verified metadata", async ()
 	assert.ok(Number(forwarded.headers.get("x-cfchat-verified-at")) > 0);
 });
 
-test("inbox bridge 按用户寻址，notify 使用固定内部协议", async () => {
+test("inbox bridge 按用戶尋址，notify 使用固定內部協議", async () => {
 	const inbox = createNamespaceHarness();
 	const env = { USER_INBOX: inbox.namespace };
 
@@ -81,7 +81,7 @@ test("inbox bridge 按用户寻址，notify 使用固定内部协议", async () 
 	assert.deepEqual(await notifyRequest.json(), { type: "room_message", messageId: 3 });
 });
 
-test("通用 bridge 转发非 GET 请求体且不依赖流式 duplex", async () => {
+test("通用 bridge 轉發非 GET 請求體且不依賴流式 duplex", async () => {
 	let forwarded;
 	const stub = {
 		async fetch(request) {

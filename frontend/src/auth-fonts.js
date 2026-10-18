@@ -1,4 +1,4 @@
-// 字体独立请求，避免 Google Fonts 不可达时阻断页面 CSS 预加载和登录/注册。
+// 字體獨立請求，避免 Google Fonts 不可達時阻斷頁面 CSS 預加載和登錄/註冊。
 export function loadAuthFonts() {
   if (document.getElementById('edgechat-auth-fonts')) return;
   const link = document.createElement('link');

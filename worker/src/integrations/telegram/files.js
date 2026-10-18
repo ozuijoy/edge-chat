@@ -49,7 +49,7 @@ export async function importTelegramAttachment(env, {
 	const name = sanitizeFilename(attachment.fileName);
 	const type = normalizeContentType(attachment.mimeType) || "application/octet-stream";
 	const key = telegramObjectKey({ telegramChatId, telegramMessageId, filename: name });
-	// Telegram 只负责传输，正式附件在进入消息前即转换为 EdgeChat 自有加密 R2 对象。
+	// Telegram 只負責傳輸，正式附件在進入消息前即轉換為 EdgeChat 自有加密 R2 對象。
 	const encrypted = await encryptAttachment(env, bytes, key);
 	await env.FILES.put(key, encrypted, {
 		httpMetadata: { contentType: type, cacheControl: FILE_RESPONSE_CACHE_CONTROL },

@@ -28,7 +28,7 @@ export function createMessageDeletion({
 			meta.room.id,
 		);
 		if (!access.ok) {
-			throw new MessageDeletionError("无权删除该消息");
+			throw new MessageDeletionError("無權刪除該消息");
 		}
 
 		let attachmentKey = null;
@@ -42,7 +42,7 @@ export function createMessageDeletion({
 			messageId,
 		});
 		if (!deleted) {
-			throw new MessageDeletionError("消息不存在或已被删除");
+			throw new MessageDeletionError("消息不存在或已被刪除");
 		}
 
 		const cleanupPromise = attachmentKey

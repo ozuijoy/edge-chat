@@ -118,7 +118,7 @@
     -webkit-backdrop-filter: blur(20px) saturate(180%);
   }
 
-  /* 修复移动端按钮布局 */
+  /* 修復移動端按鈕佈局 */
   .inline-actions,
   .hero-actions,
   .chat-composer__toolbar {
@@ -131,17 +131,17 @@
     flex: 1 1 auto;
   }
 
-  /* 确保按钮在小屏幕上不会太窄 */
+  /* 確保按鈕在小屏幕上不會太窄 */
   .ui-button--block {
     width: 100%;
   }
 
-  /* 登录页面按钮优化 */
+  /* 登錄頁面按鈕優化 */
   .login-card .button {
     width: 100%;
   }
 
-  /* 聊天输入框按钮优化 */
+  /* 聊天輸入框按鈕優化 */
   .chat-composer__field {
     padding: 8px;
   }

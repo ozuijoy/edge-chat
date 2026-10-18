@@ -24,7 +24,7 @@ const assetScript = readFileSync(
 	"utf8",
 ).replaceAll("\r\n", "\n");
 
-test("Vditor 只能由富文本按钮点击路径动态加载", () => {
+test("Vditor 只能由富文本按鈕點擊路徑動態加載", () => {
 	assert.match(composer, /async function openRichEditor\(\)/);
 	assert.match(composer, /import\("\.\.\/\.\.\/vditor-runtime\.ts"\)/);
 	assert.match(composer, /import\("\.\/VditorComposerEditor\.vue"\)/);
@@ -34,14 +34,14 @@ test("Vditor 只能由富文本按钮点击路径动态加载", () => {
 	assert.match(runtime, /import "vditor\/dist\/index\.css";/);
 });
 
-test("加载时保留普通输入并用代际阻止过期回调", () => {
+test("加載時保留普通輸入並用代際阻止過期回調", () => {
 	assert.match(composer, /v-if="richEditorLoading"[\s\S]*v-else-if="richEditorOpen"/);
 	assert.match(composer, /generation !== richEditorLoadGeneration/);
 	assert.match(composer, /watch\([\s\S]*props\.contextKey[\s\S]*collapseRichEditor/);
 	assert.match(composer, /richEditor\.value\?\.syncValue\(\);[\s\S]*await nextTick\(\);[\s\S]*emit\("send"\)/);
 });
 
-test("编辑器复用 Markdown 草稿、提及候选和原发送快捷键约束", () => {
+test("編輯器複用 Markdown 草稿、提及候選和原發送快捷鍵約束", () => {
 	assert.match(editor, /cache:\s*\{ enable: false \}/);
 	assert.match(editor, /mode:\s*"wysiwyg"/);
 	assert.match(editor, /extend:\s*\[\{ key: "@", hint: mentionHints \}\]/);
@@ -68,7 +68,7 @@ test("编辑器复用 Markdown 草稿、提及候选和原发送快捷键约束"
 	assert.doesNotMatch(toolbar, /"fullscreen"|"upload"|"record"|"export"|"outline"/);
 });
 
-test("构建只准备自托管的最小 Vditor 运行时", () => {
+test("構建只準備自託管的最小 Vditor 運行時", () => {
 	for (const path of [
 		"dist/css/content-theme/light.css",
 		"dist/js/icons/ant.js",

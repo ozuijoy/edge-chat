@@ -24,7 +24,7 @@ html::-webkit-scrollbar {
   display: none;
 }
 
-/* ===== 双色流体背景 ===== */
+/* ===== 雙色流體背景 ===== */
 
 body {
   position: relative;
@@ -38,7 +38,7 @@ body {
   font-family: var(--font-sans);
 }
 
-/* 上层大尺寸流体光团：更大范围、更慢周期、更强阻尼 */
+/* 上層大尺寸流體光團：更大範圍、更慢週期、更強阻尼 */
 body::before,
 body::after {
   content: "";
@@ -58,7 +58,7 @@ body::after {
   animation: float-orb-primary 22s cubic-bezier(0.37, 0, 0.63, 1) infinite alternate;
 }
 
-/* 青色光团：左上 → 对角右下 */
+/* 青色光團：左上 → 對角右下 */
 body::before {
   top: -20vw;
   left: -10vw;
@@ -66,7 +66,7 @@ body::before {
   animation-delay: -4s;
 }
 
-/* 蓝色光团：右下 → 对角左上 */
+/* 藍色光團：右下 → 對角左上 */
 body::after {
   right: -14vw;
   bottom: -18vw;

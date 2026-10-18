@@ -24,7 +24,7 @@
   touch-action: pan-y;
 }
 
-/* 只约束后台阅读宽度；滚动仍由 main 承担，避免表格和弹层多层滚动。 */
+/* 只約束後臺閱讀寬度；滾動仍由 main 承擔，避免表格和彈層多層滾動。 */
 .admin-content__inner {
   width: 100%;
   max-width: 1440px;
@@ -67,7 +67,7 @@
 }
 
 @media (max-width: 56rem) {
-  /* 菜单占据移动端工作区时隐藏被覆盖内容，也让键盘跳过不可见控件。 */
+  /* 菜單佔據移動端工作區時隱藏被覆蓋內容，也讓鍵盤跳過不可見控件。 */
   .admin-sidebar--open + .admin-workspace {
     visibility: hidden;
   }

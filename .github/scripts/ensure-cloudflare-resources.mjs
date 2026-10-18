@@ -230,7 +230,7 @@ async function hasR2Access(context) {
       throw error;
     }
 
-    // 10042 明确表示账户尚未开通 R2；只有这种情况允许部署降级，权限或凭据错误仍应中止。
+    // 10042 明確表示賬戶尚未開通 R2；只有這種情況允許部署降級，權限或憑據錯誤仍應中止。
     console.warn("R2 is not enabled for this Cloudflare account; deploying without FILES binding.");
     return false;
   }

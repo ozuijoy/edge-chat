@@ -20,7 +20,7 @@ function timingSafeEqual(left, right) {
   const rightBytes = encoder.encode(right);
   let difference = leftBytes.length ^ rightBytes.length;
 
-  // 密码哈希是固定长度的敏感值；始终遍历完整派生结果，避免普通字符串比较随首个差异提前结束。
+  // 密碼哈希是固定長度的敏感值；始終遍歷完整派生結果，避免普通字符串比較隨首個差異提前結束。
   for (let index = 0; index < leftBytes.length; index += 1) {
     difference |= leftBytes[index] ^ (rightBytes[index] ?? 0);
   }
@@ -70,14 +70,14 @@ function parseAdminUsernames(env) {
     .filter(Boolean);
 }
 
-// 仅用于注册环节的用户名占用检查，防止有人注册出跟管理员同名(忽略大小写)的账号用于钓鱼/混淆。
-// 不再作为权限判定依据。
+// 僅用於註冊環節的用戶名佔用檢查，防止有人註冊出跟管理員同名(忽略大小寫)的賬號用於釣魚/混淆。
+// 不再作為權限判定依據。
 export function isConfiguredAdminUsername(env, username) {
   const normalizedUsername = String(username || '').trim().toLowerCase();
   return Boolean(normalizedUsername) && parseAdminUsernames(env).includes(normalizedUsername);
 }
 
-// 兼容客户端的 isAdmin 仅镜像独立超管身份；用户组不能制造全权管理员。
+// 兼容客戶端的 isAdmin 僅鏡像獨立超管身份；用戶組不能製造全權管理員。
 export function isAdminUser(_env, user) {
   return Boolean(Number(user?.is_super_admin));
 }
@@ -92,7 +92,7 @@ function resolveSessionTtl(session, fallback) {
 
 export async function putSession(env, session, { ttlSeconds = SESSION_TTL_SECONDS } = {}) {
   await env.SESSIONS.put(session.token, JSON.stringify(session), {
-    // 移动端 access token 的寿命短于网页会话；刷新资料时必须保留原到期时间，不能被普通写回延长。
+    // 移動端 access token 的壽命短於網頁會話；刷新資料時必須保留原到期時間，不能被普通寫回延長。
     expirationTtl: resolveSessionTtl(session, ttlSeconds)
   });
 }

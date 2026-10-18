@@ -26,7 +26,7 @@ export async function createInvite(env: BridgeEnv, session: Session, channelId: 
   }
   const invite: Invite = { v: 1, bindingId: id, secret, expiresAt,
     endpoint: { instanceId: instance.instance_id, origin: instance.origin, channelId: group.id, channelName: group.name } };
-  // 剪贴板文本而非 URL，避免浏览器历史、Referer 与访问日志泄露一次性凭据。
+  // 剪貼板文本而非 URL，避免瀏覽器歷史、Referer 與訪問日誌洩露一次性憑據。
   return { invitation: JSON.stringify(invite), expiresAt, id };
 }
 
@@ -70,7 +70,7 @@ export async function changeBinding(env: BridgeEnv, session: Session, id: string
   if (binding.status !== "revoked") await managedGroup(env, session, binding.channel_id);
   const now = Date.now();
   if (action === "confirm") {
-    // 最终确认重新校验管理员与当前群，认领凭据不能代替发起方对具体目标的同意。
+    // 最終確認重新校驗管理員與當前群，認領憑據不能代替發起方對具體目標的同意。
     const result = await env.DB.prepare(`UPDATE instance_bindings SET status = 'activating',
       revision = revision + 1, control_pending = 1, control_next_at = 0, control_attempts = 0, updated_at = ?
       WHERE id = ? AND role = 'inviter' AND status = 'pending' AND expires_at > ?`)
@@ -142,7 +142,7 @@ export async function receiveControl(env: BridgeEnv, binding: Binding, type: str
     throw bridgeError("binding_revoked", 410);
   }
   if (type === "state" && binding.status !== "active" && !data.revoked) throw bridgeError("binding_not_active", 409);
-  // 同一个 revision 的重试只确认；不得重设水位而吞掉后来产生的新消息。
+  // 同一個 revision 的重試只確認；不得重設水位而吞掉後來產生的新消息。
   if (Number(data.revision) <= binding.peer_revision) return;
   const now = Date.now();
   await env.DB.batch([

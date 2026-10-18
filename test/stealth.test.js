@@ -54,7 +54,7 @@ async function fixture(enabled = true) {
   };
 }
 
-test('隐身模式默认关闭，未配置时保留常规站点与登录 API', async () => {
+test('隱身模式默認關閉，未配置時保留常規站點與登錄 API', async () => {
   const f = await fixture(false);
   const put = f.env.SESSIONS.put.bind(f.env.SESSIONS);
   let sessionTtl;
@@ -74,7 +74,7 @@ test('隐身模式默认关闭，未配置时保留常规站点与登录 API', a
   assert.equal(sessionTtl, 2592000);
 });
 
-test('未认证网关无品牌、脚本、外部资源、manifest 或构建信息', async () => {
+test('未認證網關無品牌、腳本、外部資源、manifest 或構建信息', async () => {
   const f = await fixture();
   const response = await f.request('/');
   const html = await response.text();
@@ -90,7 +90,7 @@ test('未认证网关无品牌、脚本、外部资源、manifest 或构建信�
   assert.equal(await head.text(), '');
 });
 
-test('常见互联网探测路径、方法与无效凭据均得相同普通 404，不能触达 ASSETS', async () => {
+test('常見互聯網探測路徑、方法與無效憑據均得相同普通 404，不能觸達 ASSETS', async () => {
   const f = await fixture();
   for (const path of ['/assets/main.js', '/assets/main.js.map', '/src/main.js', '/index.html',
     '/logo.svg', '/favicon.ico', '/manifest.json', '/sw.js', '/vendor/vditor/dist/js/lute/lute.min.js',
@@ -114,7 +114,7 @@ test('常见互联网探测路径、方法与无效凭据均得相同普通 404�
   assert.equal(f.accessed.length, 0);
 });
 
-test('网关登录成功才能读正式页面、静态资源和随机 API，Cookie 不出现在 HTML', async () => {
+test('網關登錄成功才能讀正式頁面、靜態資源和隨機 API，Cookie 不出現在 HTML', async () => {
   const f = await fixture();
   const response = await f.request(f.settings.loginPath, {
     method: 'POST',
@@ -138,7 +138,7 @@ test('网关登录成功才能读正式页面、静态资源和随机 API，Cook
   assert.equal((await f.request('/api/auth/session', { headers: { cookie } })).status, 200);
 });
 
-test('错误账号、错误密码、封禁账号只显示相同通用登录失败', async () => {
+test('錯誤賬號、錯誤密碼、封禁賬號只顯示相同通用登錄失敗', async () => {
   const f = await fixture();
   const responses = [];
   for (const credentials of ['username=nobody&password=test-password', 'username=admin&password=wrong']) {
@@ -161,7 +161,7 @@ test('错误账号、错误密码、封禁账号只显示相同通用登录失�
   assert.equal(responses[0], responses[1]);
 });
 
-test('网关拒绝跨站提交、错误编码与超限流请求，不产生会话', async () => {
+test('網關拒絕跨站提交、錯誤編碼與超限流請求，不產生會話', async () => {
   const f = await fixture();
   assert.equal((await f.request(f.settings.loginPath, {
     method: 'POST', headers: { Origin: 'https://other.test', 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -178,7 +178,7 @@ test('网关拒绝跨站提交、错误编码与超限流请求，不产生会�
   assert.equal(f.env.SESSIONS.values.size, 0);
 });
 
-test('Cookie 写入与 WS 需要同源；有效 Bearer 客户端保持兼容', async () => {
+test('Cookie 寫入與 WS 需要同源；有效 Bearer 客戶端保持兼容', async () => {
   const cookie = '__Host-session=valid';
   assert.equal(cookieToken(new Request(origin, { headers: { cookie } })), 'valid');
   for (const headers of [{ cookie }, { cookie, Origin: 'https://other.test' }]) {
@@ -190,7 +190,7 @@ test('Cookie 写入与 WS 需要同源；有效 Bearer 客户端保持兼容', a
   assert.match(sessionCookie(new Request(origin), ''), /Max-Age=0; Secure/);
 });
 
-test('会话撤销、封禁或 session_version 变化后不能继续读脚本与页面', async () => {
+test('會話撤銷、封禁或 session_version 變化後不能繼續讀腳本與頁面', async () => {
   for (const change of [
     (f) => f.env.SESSIONS.values.clear(),
     (f) => { f.database.run('UPDATE users SET is_super_admin = 1 WHERE id = 2'); f.database.run('UPDATE users SET is_disabled = 1 WHERE id = 1'); },
@@ -204,7 +204,7 @@ test('会话撤销、封禁或 session_version 变化后不能继续读脚本与
   }
 });
 
-test('仅管理员可切换隐身开关，随机标识跨切换稳定，不同实例独立', async () => {
+test('僅管理員可切換隱身開關，隨機標識跨切換穩定，不同實例獨立', async () => {
   const f = await fixture();
   const memberCookie = await f.cookie(2);
   assert.equal((await f.request('/api/admin/stealth', { headers: { cookie: memberCookie } })).status, 403);
@@ -236,7 +236,7 @@ test('仅管理员可切换隐身开关，随机标识跨切换稳定，不同�
   assert.notDeepEqual(f.settings.appearance, other.settings.appearance);
 });
 
-test('旧实例自动保存页面组合，保留路径与开关；并发读取采用同一持久化结果', async () => {
+test('舊實例自動保存頁面組合，保留路徑與開關；併發讀取採用同一持久化結果', async () => {
   const f = await fixture();
   const { appearance, ...legacy } = f.settings;
   f.database.run("UPDATE site_settings SET setting_value = ? WHERE setting_key = 'stealth_mode'", [JSON.stringify(legacy)]);
@@ -251,14 +251,14 @@ test('旧实例自动保存页面组合，保留路径与开关；并发读取�
   assert.equal(await gatePage(await getStealthSettings(f.env.DB)).text(), html);
 });
 
-test('同时首次配置不会生成不同的实例页面或入口', async () => {
+test('同時首次配置不會生成不同的實例頁面或入口', async () => {
   const f = await fixture(false);
   const saved = await Promise.all(Array.from({ length: 8 }, () => saveStealthSettings(f.env.DB, true)));
   for (const settings of saved) assert.deepEqual(settings, saved[0]);
   assert.equal(saved[0].enabled, true);
 });
 
-test('损坏或越界页面配置只修复外观，不改入口；配置不作为任意 HTML 执行', async () => {
+test('損壞或越界頁面配置只修復外觀，不改入口；配置不作為任意 HTML 執行', async () => {
   const f = await fixture();
   const invalid = { ...f.settings, appearance: { ...f.settings.appearance, layout: 99, usernameId: '"><script>' } };
   assert.equal(isGateAppearance(invalid.appearance), false);
@@ -272,7 +272,7 @@ test('损坏或越界页面配置只修复外观，不改入口；配置不作�
   assert.match(html, /&quot;/);
 });
 
-test('登出删除 KV Session 并清 Cookie，此后无法再次下载资源', async () => {
+test('登出刪除 KV Session 並清 Cookie，此後無法再次下載資源', async () => {
   const f = await fixture();
   const cookie = await f.cookie();
   const response = await f.request(`${f.settings.apiPrefix}/auth/logout`, { method: 'POST', headers: { cookie, Origin: origin } });
@@ -281,7 +281,7 @@ test('登出删除 KV Session 并清 Cookie，此后无法再次下载资源', a
   assert.equal((await f.request('/assets/main.js', { headers: { cookie } })).status, 404);
 });
 
-test('Telegram 有效凭据照常回调，无凭据/伪造凭据只得到普通 404', async () => {
+test('Telegram 有效憑據照常回調，無憑據/偽造憑據只得到普通 404', async () => {
   const f = await fixture();
   await saveTelegramBridgeConfig(f.env, {
     botToken: '123456:test', webhookSecret: 'test-secret', botUsername: 'test_bot',
@@ -298,7 +298,7 @@ test('Telegram 有效凭据照常回调，无凭据/伪造凭据只得到普通 
   }
 });
 
-test('伪造跨实例请求不暴露协议错误，签名后的业务错误仍交还可信对端', async () => {
+test('偽造跨實例請求不暴露協議錯誤，簽名後的業務錯誤仍交還可信對端', async () => {
   const f = await fixture();
   const invalid = await f.request('/api/integrations/instance-bridge/v1', {
     method: 'POST', headers: { 'x-edgechat-signature': 'fake' }, body: '{}',
@@ -313,7 +313,7 @@ test('伪造跨实例请求不暴露协议错误，签名后的业务错误仍�
   assert.equal(await signed.text(), 'signed error');
 });
 
-test('设置读取异常时 fail closed，不公开 SPA 或内部错误', async () => {
+test('設置讀取異常時 fail closed，不公開 SPA 或內部錯誤', async () => {
   const f = await fixture();
   f.env.DB = { prepare() { throw new Error('secret SQL stack'); } };
   const previous = console.error;
@@ -326,7 +326,7 @@ test('设置读取异常时 fail closed，不公开 SPA 或内部错误', async 
   } finally { console.error = previous; }
 });
 
-test('页面模块的两两组合保持小体积、无外部资源、固定表单能力和通用错误', async () => {
+test('頁面模塊的兩兩組合保持小體積、無外部資源、固定表單能力和通用錯誤', async () => {
   const f = await fixture();
   const entries = Object.entries(appearanceOptions);
   const base = createGateAppearance();
@@ -353,7 +353,7 @@ test('页面模块的两两组合保持小体积、无外部资源、固定表�
   }
 });
 
-test('生产与 CI 模板强制 Worker-first', () => {
+test('生產與 CI 模板強制 Worker-first', () => {
   const config = readFileSync(new URL('../wrangler.example.toml', import.meta.url), 'utf8');
   assert.match(config, /binding = "ASSETS"/);
   assert.match(config, /run_worker_first = true/);

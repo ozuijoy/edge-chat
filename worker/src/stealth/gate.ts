@@ -6,7 +6,7 @@ import { renderGate } from './appearance.ts';
 export const privateHeaders = {
   'Cache-Control': 'private, no-store',
   'X-Content-Type-Options': 'nosniff',
-  // no-referrer 会让浏览器表单 POST 的 Origin 变为 null；same-origin 隐藏外站来源且保留同源校验。
+  // no-referrer 會讓瀏覽器表單 POST 的 Origin 變為 null；same-origin 隱藏外站來源且保留同源校驗。
   'Referrer-Policy': 'same-origin',
 };
 
@@ -32,7 +32,7 @@ export function gatePage(settings: StealthSettings, failed = false, status = 200
 }
 
 async function readForm(request: Request) {
-  // 实际流读取也限额，不能只信 Content-Length；登录表单无需接受大体积或 multipart 上传。
+  // 實際流讀取也限額，不能只信 Content-Length；登錄表單無需接受大體積或 multipart 上傳。
   if (!request.headers.get('content-type')?.startsWith('application/x-www-form-urlencoded')) return null;
   if (!request.body) return null;
   const reader = request.body.getReader();

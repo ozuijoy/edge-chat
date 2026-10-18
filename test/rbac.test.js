@@ -41,7 +41,7 @@ async function harness() {
   return { database, env, root, delegate, regular, request, grant };
 }
 
-test('RBAC：只读子管理员、普通用户与仅用户权限的模块隔离', async () => {
+test('RBAC：只讀子管理員、普通用戶與僅用戶權限的模塊隔離', async () => {
   const h = await harness(); await h.grant();
   const snapshot = (await h.request('/me/authorization', null, { token: h.delegate.token })).body.authorization;
   assert.equal(snapshot.isSuperAdmin, false); assert.equal(snapshot.canAccessAdmin, true); assert.deepEqual(snapshot.permissions, ['users.read']);
@@ -57,7 +57,7 @@ test('RBAC：只读子管理员、普通用户与仅用户权限的模块隔离'
   assert.equal((await h.request('/admin/users', null, { token: '', headers: { Cookie: `__Host-session=${h.regular.token}` } })).status, 403);
 });
 
-test('RBAC：普通组不可修改、未知权限和缺少依赖拒绝、全选不产生超管', async () => {
+test('RBAC：普通組不可修改、未知權限和缺少依賴拒絕、全選不產生超管', async () => {
   const h = await harness();
   for (const permissions of [['*'], ['unknown.write'], ['users.ban']]) assert.equal((await h.request('/admin/rbac/roles', { name: 'bad', description: '', permissions })).status, 400);
   const role = await h.grant(PERMISSION_KEYS);
@@ -70,7 +70,7 @@ test('RBAC：普通组不可修改、未知权限和缺少依赖拒绝、全选�
   assert.deepEqual(togglePermission(['users.read', 'users.ban'], 'users.read', false), []);
 });
 
-test('RBAC：用户字段白名单、混合动作权限与受保护历史账号', async () => {
+test('RBAC：用戶字段白名單、混合動作權限與受保護歷史賬號', async () => {
   const h = await harness(); await h.grant(['users.read', 'users.create', 'users.ban', 'users.login_history.read']);
   for (const field of ['isAdmin', 'is_admin', 'is_super_admin', 'management_protected', 'permissions', 'authz_version', 'roleId']) {
     const result = await h.request('/admin/users', { username: `injected-${field}`, displayName: 'bad', password: 'bad', [field]: field === 'roleId' ? 2 : true }, { token: h.delegate.token });
@@ -85,7 +85,7 @@ test('RBAC：用户字段白名单、混合动作权限与受保护历史账号'
   assert.equal((await h.request('/me/profile', { is_super_admin: true, displayName: 'evil' }, { method: 'PATCH', token: h.delegate.token })).status, 400);
 });
 
-test('RBAC：撤权对旧 Bearer 和 Cookie 生效，不踢出合法聊天会话', async () => {
+test('RBAC：撤權對舊 Bearer 和 Cookie 生效，不踢出合法聊天會話', async () => {
   const h = await harness(); const role = await h.grant(['users.read', 'users.ban']);
   const edit = { name: role.name, description: '', enabled: false, permissions: role.permissions, expectedRevision: role.revision };
   assert.equal((await h.request(`/admin/rbac/roles/${role.id}`, edit, { method: 'PATCH' })).status, 200);
@@ -96,7 +96,7 @@ test('RBAC：撤权对旧 Bearer 和 Cookie 生效，不踢出合法聊天会话
   assert.equal((await h.env.DB.prepare('SELECT session_version FROM users WHERE id = 2').first()).session_version, 0);
 });
 
-test('RBAC：用户组与分配版本冲突、自我保护及最后有效超管不变量', async () => {
+test('RBAC：用戶組與分配版本衝突、自我保護及最後有效超管不變量', async () => {
   const h = await harness(); const role = await h.grant();
   assert.equal((await h.request('/admin/rbac/users/2/role', { roleId: 1, expectedAuthzVersion: 0 }, { method: 'PUT' })).status, 409);
   const data = { name: role.name, description: '', enabled: true, permissions: [], expectedRevision: role.revision };
@@ -108,7 +108,7 @@ test('RBAC：用户组与分配版本冲突、自我保护及最后有效超管�
   for (const sql of ['UPDATE users SET is_super_admin = 0 WHERE id = 1', "UPDATE users SET disabled_until = datetime('now', '+1 hour') WHERE id = 1", 'DELETE FROM users WHERE id = 1']) assert.throws(() => h.database.run(sql), /rbac_last_super|FOREIGN KEY/);
 });
 
-test('RBAC：事务内撤权、目标提权与审计失败均阻断整批写入', async () => {
+test('RBAC：事務內撤權、目標提權與審計失敗均阻斷整批寫入', async () => {
   const h = await harness(); const role = await h.grant(['users.read', 'users.ban']);
   const authorization = await readAuthorization(h.env.DB, 2);
   const context = { session: { ...h.delegate, ...authorization }, policy: resolvePolicy('PATCH', '/api/admin/users/3', { isDisabled: true }), target: 3 };
@@ -129,7 +129,7 @@ test('RBAC：事务内撤权、目标提权与审计失败均阻断整批写入'
   assert.equal((await h.env.DB.prepare('SELECT display_name FROM users WHERE id = 3').first()).display_name, 'bound-value');
 });
 
-test('RBAC：聚合概况不带明细、邀请只读不带凭据且注册不能提权', async () => {
+test('RBAC：聚合概況不帶明細、邀請只讀不帶憑據且註冊不能提權', async () => {
   const h = await harness(); await h.grant(['dashboard.read', 'invites.read']);
   const overview = await h.request('/admin/overview', null, { token: h.delegate.token });
   assert.equal(overview.status, 200); assert.deepEqual(Object.keys(overview.body).sort(), ['site', 'stats']);
@@ -142,7 +142,7 @@ test('RBAC：聚合概况不带明细、邀请只读不带凭据且注册不能�
   assert.deepEqual(row, { is_super_admin: 0, role_id: 1 });
 });
 
-test('RBAC：超级管理员创建子管理员原子分组，登录记录仍是独立敏感权限', async () => {
+test('RBAC：超級管理員創建子管理員原子分組，登錄記錄仍是獨立敏感權限', async () => {
   const h = await harness(); const role = await h.grant(['users.read', 'users.login_history.read']);
   assert.equal((await h.request('/admin/users', { username: 'new-admin', displayName: 'new-admin', password: 'new-password', roleId: role.id })).status, 200);
   const row = await h.env.DB.prepare('SELECT u.is_super_admin, u.management_protected, ur.role_id FROM users u JOIN rbac_user_roles ur ON ur.user_id = u.id WHERE username = ?').bind('new-admin').first();
@@ -155,7 +155,7 @@ test('RBAC：超级管理员创建子管理员原子分组，登录记录仍是�
   assert.equal((await h.env.DB.prepare('SELECT COUNT(*) AS n FROM users').first()).n, before);
 });
 
-test('RBAC：后台身份不放行私有房间，缺少分组不会回退旧 is_admin', async () => {
+test('RBAC：後臺身份不放行私有房間，缺少分組不會回退舊 is_admin', async () => {
   const h = await harness();
   h.database.run("INSERT INTO channels (id, name, kind, created_by) VALUES (10, 'secret', 'private', 3)");
   h.database.run("INSERT INTO channel_members (channel_id, user_id, role) VALUES (10, 3, 'owner')");
@@ -169,7 +169,7 @@ test('RBAC：后台身份不放行私有房间，缺少分组不会回退旧 is_
   assert.equal((await h.request('/admin/users')).status, 403);
 });
 
-test('RBAC：所有后台路由均登记策略，新权限不会自动授予已有组', () => {
+test('RBAC：所有後臺路由均登記策略，新權限不會自動授予已有組', () => {
   for (const file of readdirSync(new URL('../worker/src/api/', import.meta.url)).filter((name) => /\.(?:js|ts)$/.test(name))) {
     const source = readFileSync(new URL(`../worker/src/api/${file}`, import.meta.url), 'utf8');
     for (const match of source.matchAll(/app\.(get|post|put|patch|delete)\(['"](\/api\/admin\/[^'"]+)['"]/g)) {
@@ -181,8 +181,8 @@ test('RBAC：所有后台路由均登记策略，新权限不会自动授予已�
   assert.equal(ADMIN_PERMISSIONS.length, 21);
 });
 
-test('RBAC：旧实例一次性迁移保留管理员与普通用户，不解封或覆盖数据', async () => {
-  const oldSchema = schema.slice(0, schema.indexOf('CREATE TABLE IF NOT EXISTS rbac_roles')) + schema.slice(schema.indexOf('-- 每个用户最多三次登录'));
+test('RBAC：舊實例一次性遷移保留管理員與普通用戶，不解封或覆蓋數據', async () => {
+  const oldSchema = schema.slice(0, schema.indexOf('CREATE TABLE IF NOT EXISTS rbac_roles')) + schema.slice(schema.indexOf('-- 每個用戶最多三次登錄'));
   const old = oldSchema.replace(/^  (is_super_admin|management_protected|authz_version) .*\r?\n/gm, '');
   const database = new SQL.Database(); database.exec(old);
   database.run("INSERT INTO users (username, display_name, password_hash, password_salt, is_admin, is_disabled) VALUES ('admin', 'admin', 'hash', 'salt', 1, 1), ('member', 'member', 'hash', 'salt', 0, 0)");
@@ -193,7 +193,7 @@ test('RBAC：旧实例一次性迁移保留管理员与普通用户，不解封�
   assert.deepEqual(database.exec('PRAGMA foreign_key_check'), []);
 });
 
-test('RBAC：Cookie 同源、管理 query token 与授权基础设施失败', async () => {
+test('RBAC：Cookie 同源、管理 query token 與授權基礎設施失敗', async () => {
   const h = await harness();
   const cookie = { token: '', headers: { Cookie: `__Host-session=${h.root.token}` } };
   assert.equal((await h.request('/admin/rbac/roles', { name: 'cross-site', permissions: [] }, cookie)).status, 403);
@@ -206,7 +206,7 @@ test('RBAC：Cookie 同源、管理 query token 与授权基础设施失败', as
   assert.equal(result.status, 503); assert.doesNotMatch(JSON.stringify(result.body), /offline details|stack/);
 });
 
-test('RBAC：桥接候选、映射 ID 与写事务采用同一群主范围', async () => {
+test('RBAC：橋接候選、映射 ID 與寫事務採用同一群主範圍', async () => {
   const h = await harness(); await h.grant(['telegram.read', 'telegram.mappings.manage', 'instance_bridge.read', 'instance_bridge.manage']);
   h.database.run("INSERT INTO channels (id, name, kind, created_by) VALUES (10, 'mine', 'private', 2), (11, 'other', 'private', 3)");
   h.database.run("INSERT INTO channel_members (channel_id, user_id, role) VALUES (10, 2, 'owner'), (11, 3, 'owner')");
@@ -225,7 +225,7 @@ test('RBAC：桥接候选、映射 ID 与写事务采用同一群主范围', asy
   assert.equal((await h.env.DB.prepare('SELECT enabled FROM telegram_mappings WHERE id = 1').first()).enabled, 0);
 });
 
-test('RBAC：存储只读快照、扫描限速与撤权后继续扫描拒绝', async () => {
+test('RBAC：存儲只讀快照、掃描限速與撤權後繼續掃描拒絕', async () => {
   const h = await harness(); const role = await h.grant(['storage.read', 'storage.scan']);
   let lists = 0;
   h.env.FILES = { list: async () => { lists++; return { objects: [{ key: '3/secret.txt', size: 20, uploaded: new Date() }], truncated: false }; } };
@@ -242,7 +242,7 @@ test('RBAC：存储只读快照、扫描限速与撤权后继续扫描拒绝', a
   assert.equal(lists, 1);
 });
 
-test('RBAC：显式恢复使旧会话失效并保留普通组，审计渐进限量清理', async () => {
+test('RBAC：顯式恢復使舊會話失效並保留普通組，審計漸進限量清理', async () => {
   const h = await harness(); await h.grant();
   h.database.exec(await generateRecoverySql(2, 'replacement-password'));
   const user = await h.env.DB.prepare('SELECT is_super_admin, session_version, authz_version FROM users WHERE id = 2').first();
@@ -256,7 +256,7 @@ test('RBAC：显式恢复使旧会话失效并保留普通组，审计渐进限�
   assert.equal((await h.env.DB.prepare('SELECT COUNT(*) AS n FROM admin_audit_log').first()).n, 9901);
 });
 
-test('RBAC：升级前休眠连接不继承 isAdmin 快照，公开 verified 头不能绕过成员边界', async () => {
+test('RBAC：升級前休眠連接不繼承 isAdmin 快照，公開 verified 頭不能繞過成員邊界', async () => {
   const h = await harness();
   h.database.run("INSERT INTO channels (id, name, kind, created_by) VALUES (10, 'secret', 'private', 3)");
   h.database.run("INSERT INTO channel_members (channel_id, user_id, role) VALUES (10, 3, 'owner')");
@@ -269,7 +269,7 @@ test('RBAC：升级前休眠连接不继承 isAdmin 快照，公开 verified 头
   assert.equal(result.status, 403);
 });
 
-test('RBAC：重复初始化不提升、解封、重设密码或覆盖已有分组', async () => {
+test('RBAC：重複初始化不提升、解封、重設密碼或覆蓋已有分組', async () => {
   const h = await harness(); const role = await h.grant();
   const before = await h.env.DB.prepare('SELECT * FROM users WHERE id = 2').first();
   const result = spawnSync(process.execPath, ['.github/scripts/generate-admin-bootstrap-sql.mjs'], { cwd: new URL('..', import.meta.url), env: { ...process.env,

@@ -35,7 +35,7 @@ export async function forwardVerifiedRequest({
 		headers: createVerifiedPrincipalHeaders(request.headers, principal),
 	};
 	if (!["GET", "HEAD"].includes(request.method)) {
-		// 先把请求体固化为可重放字节，避免跨运行时转发 ReadableStream 时依赖 Node 专属 duplex 配置。
+		// 先把請求體固化為可重放字節，避免跨運行時轉發 ReadableStream 時依賴 Node 專屬 duplex 配置。
 		init.body = await request.arrayBuffer();
 	}
 	return stub.fetch(new Request(url.toString(), init));

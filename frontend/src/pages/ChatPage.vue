@@ -274,7 +274,7 @@ const {
     closeMemberPanel();
     void router.push('/').then(() => nextTick(() => {
       messageComposer.value?.focus();
-      // 被拉黑会话的输入区不可聚焦时，仍把焦点移到目标会话而非旧头像。
+      // 被拉黑會話的輸入區不可聚焦時，仍把焦點移到目標會話而非舊頭像。
       if (!document.activeElement?.closest('.message-composer')) profileTargetHeader.value?.focus();
     }));
   }
@@ -505,7 +505,7 @@ onBeforeUnmount(() => {
   disconnectSocket();
   stopViewportSync();
 });
-// 首次使用后保留弹窗实例，关闭时才能完成退场动画并恢复触发按钮焦点。
+// 首次使用後保留彈窗實例，關閉時才能完成退場動畫並恢復觸發按鈕焦點。
 const visitedOverlays = reactive(new Set());
 watch(
   () => ({
@@ -536,7 +536,7 @@ watch(
       'chat-layout--contacts': isContactsView
     }"
   >
-    <!-- 导航与会话列表保持独立，切换通讯录时不破坏现有聊天工作区。 -->
+    <!-- 導航與會話列表保持獨立，切換通訊錄時不破壞現有聊天工作區。 -->
     <aside class="right-sidebar">
       <div class="right-sidebar-inner">
         <div class="right-sidebar-section right-sidebar-actions">
@@ -619,7 +619,7 @@ watch(
       </div>
     </aside>
 
-	    <!-- 会话区保持固定视觉层级，让标题与列表在不同宽度下都有稳定位置。 -->
+	    <!-- 會話區保持固定視覺層級，讓標題與列表在不同寬度下都有穩定位置。 -->
     <aside class="left-sidebar">
       <div class="sidebar-inner">
         <div class="sidebar-header">
@@ -1403,7 +1403,7 @@ watch(
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  /* 超宽屏保持对话集中，避免左右气泡相距过远；窄屏沿用安全区留白。 */
+  /* 超寬屏保持對話集中，避免左右氣泡相距過遠；窄屏沿用安全區留白。 */
   padding: 24px max(28px, calc((100% - 960px) / 2));
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
@@ -1511,7 +1511,7 @@ watch(
 }
 
 .room-management-layer {
-  /* 成员面板覆盖聊天区而非挤压它，打开面板不会改变消息与输入栏的宽度。 */
+  /* 成員面板覆蓋聊天區而非擠壓它，打開面板不會改變消息與輸入欄的寬度。 */
   position: absolute;
   inset: 76px 0 0;
   z-index: 30;
@@ -1530,7 +1530,7 @@ watch(
   box-shadow: var(--chat-shadow-panel);
 }
 
-/* 中等宽度只压缩次要按钮文字，不牺牲标题或触摸面积。 */
+/* 中等寬度只壓縮次要按鈕文字，不犧牲標題或觸摸面積。 */
 @media (min-width: 961px) and (max-width: 1280px) {
   .chat-header__button {
     width: var(--chat-control);

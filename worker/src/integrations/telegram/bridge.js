@@ -209,9 +209,9 @@ export async function ingestTelegramMessage(env, { mapping, telegramMessage, bot
 
 	const attachmentNotice =
 		imported.skipReason === TELEGRAM_FILE_SKIP_REASON.TOO_LARGE
-			? "附件超过 16 MB，未同步"
+			? "附件超過 16 MB，未同步"
 			: imported.skipReason === TELEGRAM_FILE_SKIP_REASON.STORAGE_UNAVAILABLE
-				? "当前部署未启用文件存储，附件未同步"
+				? "當前部署未啟用文件存儲，附件未同步"
 				: "";
 	const content = [telegramMessage.content, attachmentNotice].filter(Boolean).join("\n\n");
 	try {
@@ -232,7 +232,7 @@ export async function ingestTelegramMessage(env, { mapping, telegramMessage, bot
 				replyToSenderId: reply?.senderId || null,
 			});
 		if (!response.ok) {
-			throw new Error(`Telegram 入站消息提交失败：${response.status}`);
+			throw new Error(`Telegram 入站消息提交失敗：${response.status}`);
 		}
 		const result = await response.json();
 		if (!result.created) {
@@ -240,7 +240,7 @@ export async function ingestTelegramMessage(env, { mapping, telegramMessage, bot
 		}
 		return result;
 	} catch (error) {
-		// DO 响应中断时先按去重键复查，避免删除已经被正式消息引用的 R2 对象。
+		// DO 響應中斷時先按去重鍵複查，避免刪除已經被正式消息引用的 R2 對象。
 		const persisted = await getMessageBySource(
 			env,
 			"telegram",

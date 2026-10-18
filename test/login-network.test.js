@@ -27,7 +27,7 @@ function mockPeer(mode = 'completed') {
   return { Peer, peers };
 }
 
-test('WebRTC 探测：只收 STUN 地址、去重限量并释放，无媒体或 TURN', async () => {
+test('WebRTC 探測：只收 STUN 地址、去重限量並釋放，無媒體或 TURN', async () => {
   const { Peer, peers } = mockPeer();
   const result = await probeWebRtc({ signal: new AbortController().signal, PeerConnection: Peer });
   assert.deepEqual(result, { status: 'completed', ips: ['192.0.2.10', '2001:db8::10', '192.0.2.11', '192.0.2.12'] });
@@ -36,7 +36,7 @@ test('WebRTC 探测：只收 STUN 地址、去重限量并释放，无媒体或 
   assert.equal(peers[0].onicecandidate, null);
 });
 
-test('WebRTC 探测：超时、协商失败、构造失败和不支持不阻断', async () => {
+test('WebRTC 探測：超時、協商失敗、構造失敗和不支持不阻斷', async () => {
   for (const mode of ['timeout', 'failed']) {
     const { Peer, peers } = mockPeer(mode);
     assert.deepEqual(await probeWebRtc({ signal: new AbortController().signal, PeerConnection: Peer, timeoutMs: 5 }), { status: mode, ips: [] });
@@ -47,7 +47,7 @@ test('WebRTC 探测：超时、协商失败、构造失败和不支持不阻断'
   assert.deepEqual(await probeWebRtc({ signal: new AbortController().signal, PeerConnection: null }), { status: 'unsupported', ips: [] });
 });
 
-test('WebRTC 探测：登出取消和已取消请求均释放，不迟到采集', async () => {
+test('WebRTC 探測：登出取消和已取消請求均釋放，不遲到採集', async () => {
   const { Peer, peers } = mockPeer('timeout');
   const controller = new AbortController();
   const pending = probeWebRtc({ signal: controller.signal, PeerConnection: Peer });
@@ -58,7 +58,7 @@ test('WebRTC 探测：登出取消和已取消请求均释放，不迟到采集'
   assert.equal(peers.length, 1);
 });
 
-test('WebRTC 触发契约：按需分包、登录 ID 去重、demo 和 Android 不探测', () => {
+test('WebRTC 觸發契約：按需分包、登錄 ID 去重、demo 和 Android 不探測', () => {
   const store = readFileSync(new URL('../frontend/src/store.js', import.meta.url), 'utf8');
   const probe = readFileSync(new URL('../frontend/src/login-network.ts', import.meta.url), 'utf8');
   assert.match(store, /import\('\.\/login-network.ts'\)/);

@@ -4,7 +4,7 @@
     <application
         android:usesCleartextTraffic="true"
         tools:replace="android:usesCleartextTraffic">
-        <!-- Compose instrumentation 使用该通用 Activity；允许它越过锁屏，避免测试语义树随宿主暂停而消失。 -->
+        <!-- Compose instrumentation 使用該通用 Activity；允許它越過鎖屏，避免測試語義樹隨宿主暫停而消失。 -->
         <activity
             android:name="androidx.activity.ComponentActivity"
             android:showWhenLocked="true"

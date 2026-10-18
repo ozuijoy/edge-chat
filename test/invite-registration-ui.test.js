@@ -13,7 +13,7 @@ import { createD1Adapter, createKvAdapter } from './support/d1.js';
 const page = readFileSync(new URL('../frontend/src/pages/RegisterPage.vue', import.meta.url), 'utf8');
 const { descriptor } = parse(page);
 const { scriptSetupAst } = compileScript(descriptor, { id: 'invite-registration-test' });
-// 执行页面原始逻辑而不是复制提交函数，避免测试与真实表单再次出现契约偏差。
+// 執行頁面原始邏輯而不是複製提交函數，避免測試與真實表單再次出現契約偏差。
 const setupSource = scriptSetupAst.filter((node) => node.type !== 'ImportDeclaration')
   .map((node) => descriptor.scriptSetup.content.slice(node.start, node.end)).join('\n');
 
@@ -38,7 +38,7 @@ function registrationPage(registerWithInvite = async () => ({ ok: true })) {
   return { ...state, calls, navigations };
 }
 
-test('邀请注册：确认密码不一致时不请求，改正后只提交注册字段', async () => {
+test('邀請註冊：確認密碼不一致時不請求，改正後只提交註冊字段', async () => {
   const state = registrationPage();
   state.form.confirmPassword = 'different';
   await state.submit();
@@ -56,7 +56,7 @@ test('邀请注册：确认密码不一致时不请求，改正后只提交注�
   assert.deepEqual(JSON.parse(JSON.stringify(state.navigations)), [{ name: 'login', query: { registered: '1' } }]);
 });
 
-test('邀请注册：请求失败保留表单，允许修改和重试', async () => {
+test('邀請註冊：請求失敗保留表單，允許修改和重試', async () => {
   let fail = true;
   const state = registrationPage(async () => {
     if (fail) throw new Error('network unavailable');
@@ -74,7 +74,7 @@ test('邀请注册：请求失败保留表单，允许修改和重试', async ()
   assert.equal(state.navigations.length, 1);
 });
 
-test('邀请注册：实际页面提交通过 Worker 校验，创建普通账号并仅消耗一次邀请', async () => {
+test('邀請註冊：實際頁面提交通過 Worker 校驗，創建普通賬號並僅消耗一次邀請', async () => {
   const SQL = await initSqlJs();
   const database = new SQL.Database();
   try {

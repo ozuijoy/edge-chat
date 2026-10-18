@@ -48,7 +48,7 @@ function getMessageByteLength(message) {
     return message.byteLength;
   }
 
-  // 未知 WebSocket 消息类型无法可靠解析，按超大处理，避免绕过大小限制。
+  // 未知 WebSocket 消息類型無法可靠解析，按超大處理，避免繞過大小限制。
   return Number.MAX_SAFE_INTEGER;
 }
 
@@ -195,14 +195,14 @@ export class ChannelRoom {
     } catch (error) {
       const stopped = String(error).includes('BRIDGE_NOT_RECEIVING');
       return Response.json({ error: { code: stopped ? 'not_receiving' : 'internal_error',
-        message: stopped ? '跨实例绑定当前不接收消息' : '外部消息提交失败' } }, { status: stopped ? 409 : 500 });
+        message: stopped ? '跨實例綁定當前不接收消息' : '外部消息提交失敗' } }, { status: stopped ? 409 : 500 });
     }
   }
 
   async receiveClientAction(request) {
     if (!isVerifiedInternalRequest(request)) {
       return Response.json(
-        { error: { code: 'authentication_required', message: '请先登录' } },
+        { error: { code: 'authentication_required', message: '請先登錄' } },
         { status: 401 }
       );
     }
@@ -216,7 +216,7 @@ export class ChannelRoom {
       : { ok: false };
     if (!access.ok) {
       return Response.json(
-        { error: { code: 'forbidden', message: '无权访问该会话' } },
+        { error: { code: 'forbidden', message: '無權訪問該會話' } },
         { status: 403 }
       );
     }
@@ -268,7 +268,7 @@ export class ChannelRoom {
         error: error instanceof Error ? error.message : String(error)
       }));
       return Response.json(
-        { error: { code: 'internal_error', message: '消息操作失败' } },
+        { error: { code: 'internal_error', message: '消息操作失敗' } },
         { status: 500 }
       );
     }
@@ -343,7 +343,7 @@ export class ChannelRoom {
     }
 
     if (getMessageByteLength(message) > MESSAGE_SIZE_LIMIT) {
-      sendSocketError(ws, `消息过大，最大 ${Math.round(MESSAGE_SIZE_LIMIT / 1024)}KB`);
+      sendSocketError(ws, `消息過大，最大 ${Math.round(MESSAGE_SIZE_LIMIT / 1024)}KB`);
       return;
     }
 
@@ -386,7 +386,7 @@ export class ChannelRoom {
         payload
       );
       await this.broadcast(packet);
-      // 未读与外部桥接都属于提交后投影，异步执行以缩短 WebSocket 发送链路。
+      // 未讀與外部橋接都屬於提交後投影，異步執行以縮短 WebSocket 發送鏈路。
       this.runMessageProjections(currentMeta.room, saved);
     } catch (error) {
       if (
@@ -402,7 +402,7 @@ export class ChannelRoom {
         roomId: Number(meta.room?.id || 0),
         error: error instanceof Error ? error.message : String(error)
       }));
-      sendSocketError(ws, '消息操作失败');
+      sendSocketError(ws, '消息操作失敗');
     }
   }
 

@@ -15,12 +15,12 @@ export function registerUserBlockRoutes(app: Hono) {
 		const session = c.get("session");
 		const userId = targetUserId(c);
 		if (!Number.isInteger(userId) || userId < 1 || userId === session.userId) {
-			return errorResponse("请选择有效用户");
+			return errorResponse("請選擇有效用戶");
 		}
 
 		const status = await getUserBlockStatus(c.env.DB, session.userId, userId);
 		if (!status.targetExists) {
-			return errorResponse("目标用户不存在", 404);
+			return errorResponse("目標用戶不存在", 404);
 		}
 		await setUserBlocked(c.env.DB, session.userId, userId, true);
 		return c.json({ blockedByMe: true });
@@ -30,12 +30,12 @@ export function registerUserBlockRoutes(app: Hono) {
 		const session = c.get("session");
 		const userId = targetUserId(c);
 		if (!Number.isInteger(userId) || userId < 1 || userId === session.userId) {
-			return errorResponse("请选择有效用户");
+			return errorResponse("請選擇有效用戶");
 		}
 
 		const status = await getUserBlockStatus(c.env.DB, session.userId, userId);
 		if (!status.targetExists && !status.blockedByMe) {
-			return errorResponse("目标用户不存在", 404);
+			return errorResponse("目標用戶不存在", 404);
 		}
 		await setUserBlocked(c.env.DB, session.userId, userId, false);
 		return c.json({ blockedByMe: false });

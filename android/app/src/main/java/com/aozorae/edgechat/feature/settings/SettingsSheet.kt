@@ -94,10 +94,10 @@ fun SettingsSheet(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(onClick = onDismiss) {
-                    Icon(Icons.Outlined.Close, contentDescription = if (language == "zh-CN") "关闭设置" else "Close settings")
+                    Icon(Icons.Outlined.Close, contentDescription = if (language == "zh-TW") "關閉設置" else "Close settings")
                 }
                 Text(
-                    text = if (language == "zh-CN") "设置" else "Settings",
+                    text = if (language == "zh-TW") "設置" else "Settings",
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleMedium,
                     color = colors.textPrimary,
@@ -129,7 +129,7 @@ fun SettingsSheet(
                         ) {
                             Icon(
                                 Icons.Outlined.Edit,
-                                contentDescription = if (language == "zh-CN") "更换头像" else "Change avatar",
+                                contentDescription = if (language == "zh-TW") "更換頭像" else "Change avatar",
                                 modifier = Modifier.size(18.dp),
                             )
                         }
@@ -139,13 +139,13 @@ fun SettingsSheet(
                     Text("@${session.username}", style = MaterialTheme.typography.bodyMedium, color = colors.textSecondary)
                 }
 
-                SettingsSectionTitle(if (language == "zh-CN") "个人资料" else "Profile")
+                SettingsSectionTitle(if (language == "zh-TW") "個人資料" else "Profile")
                 Column(Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
                     OutlinedTextField(
                         value = displayName,
                         onValueChange = { displayName = it },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text(if (language == "zh-CN") "显示名称" else "Display name") },
+                        label = { Text(if (language == "zh-TW") "顯示名稱" else "Display name") },
                         singleLine = true,
                         shape = MaterialTheme.shapes.large,
                     )
@@ -156,18 +156,18 @@ fun SettingsSheet(
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                         shape = MaterialTheme.shapes.extraLarge,
                     ) {
-                        Text(if (language == "zh-CN") "保存资料" else "Save profile")
+                        Text(if (language == "zh-TW") "保存資料" else "Save profile")
                     }
                 }
 
-                SettingsSectionTitle(if (language == "zh-CN") "安全" else "Security")
+                SettingsSectionTitle(if (language == "zh-TW") "安全" else "Security")
                 Column(Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
                     OutlinedTextField(
                         value = currentPassword,
                         onValueChange = { currentPassword = it },
                         modifier = Modifier.fillMaxWidth(),
                         visualTransformation = PasswordVisualTransformation(),
-                        label = { Text(if (language == "zh-CN") "当前密码" else "Current password") },
+                        label = { Text(if (language == "zh-TW") "當前密碼" else "Current password") },
                         singleLine = true,
                         shape = MaterialTheme.shapes.large,
                     )
@@ -177,7 +177,7 @@ fun SettingsSheet(
                         onValueChange = { newPassword = it },
                         modifier = Modifier.fillMaxWidth(),
                         visualTransformation = PasswordVisualTransformation(),
-                        label = { Text(if (language == "zh-CN") "新密码" else "New password") },
+                        label = { Text(if (language == "zh-TW") "新密碼" else "New password") },
                         singleLine = true,
                         shape = MaterialTheme.shapes.large,
                     )
@@ -192,15 +192,15 @@ fun SettingsSheet(
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                         shape = MaterialTheme.shapes.extraLarge,
                     ) {
-                        Text(if (language == "zh-CN") "修改密码" else "Change password")
+                        Text(if (language == "zh-TW") "修改密碼" else "Change password")
                     }
                 }
 
-                SettingsSectionTitle(if (language == "zh-CN") "语言" else "Language")
+                SettingsSectionTitle(if (language == "zh-TW") "語言" else "Language")
                 SingleChoiceSegmentedButtonRow(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
                 ) {
-                    listOf("zh-CN" to "中文", "en-US" to "English").forEachIndexed { index, item ->
+                    listOf("zh-TW" to "繁體中文", "en-US" to "English").forEachIndexed { index, item ->
                         SegmentedButton(
                             selected = language == item.first,
                             onClick = { if (language != item.first) onLanguage(item.first) },
@@ -211,17 +211,17 @@ fun SettingsSheet(
                     }
                 }
 
-                SettingsSectionTitle(if (language == "zh-CN") "数据与支持" else "Data and support")
+                SettingsSectionTitle(if (language == "zh-TW") "數據與支持" else "Data and support")
                 SettingsActionRow(
                     icon = Icons.Outlined.Cached,
-                    title = if (language == "zh-CN") "清理本地缓存" else "Clear local cache",
-                    subtitle = if (language == "zh-CN") "重新同步会话与消息" else "Resync conversations and messages",
+                    title = if (language == "zh-TW") "清理本地緩存" else "Clear local cache",
+                    subtitle = if (language == "zh-TW") "重新同步會話與消息" else "Resync conversations and messages",
                     onClick = onClearCache,
                 )
                 SettingsActionRow(
                     icon = Icons.Outlined.Share,
-                    title = if (language == "zh-CN") "导出诊断日志" else "Export diagnostics",
-                    subtitle = if (language == "zh-CN") "分享本机诊断信息" else "Share diagnostics from this device",
+                    title = if (language == "zh-TW") "導出診斷日誌" else "Export diagnostics",
+                    subtitle = if (language == "zh-TW") "分享本機診斷信息" else "Share diagnostics from this device",
                     onClick = {
                         val intent = Intent(Intent.ACTION_SEND)
                             .setType("text/plain")
@@ -232,8 +232,8 @@ fun SettingsSheet(
                 )
                 SettingsActionRow(
                     icon = Icons.AutoMirrored.Outlined.Logout,
-                    title = if (language == "zh-CN") "注销" else "Sign out",
-                    subtitle = if (language == "zh-CN") "退出账号并清理本地缓存" else "Sign out and clear local cache",
+                    title = if (language == "zh-TW") "註銷" else "Sign out",
+                    subtitle = if (language == "zh-TW") "退出賬號並清理本地緩存" else "Sign out and clear local cache",
                     critical = true,
                     onClick = onLogout,
                 )

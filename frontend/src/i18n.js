@@ -1,46 +1,32 @@
 import { computed, readonly, ref } from 'vue';
 
-export const SIMPLIFIED_CHINESE_LOCALE = 'zh-CN';
 export const TRADITIONAL_CHINESE_LOCALE = 'zh-TW';
 export const ENGLISH_LOCALE = 'en-US';
-// 保留旧名称，避免现有调用方把“简体中文”误当成全部中文后产生兼容改动。
-export const CHINESE_LOCALE = SIMPLIFIED_CHINESE_LOCALE;
 export const LOCALE_OPTIONS = Object.freeze([
-  { value: SIMPLIFIED_CHINESE_LOCALE, label: '简体中文' },
   { value: TRADITIONAL_CHINESE_LOCALE, label: '繁體中文' },
   { value: ENGLISH_LOCALE, label: 'English' }
 ]);
 
 const STORAGE_KEY = 'edgechat.locale';
-const TRADITIONAL_CHINESE_REGIONS = new Set(['tw', 'hk', 'mo']);
 const localeLoaders = {
-  [SIMPLIFIED_CHINESE_LOCALE]: () => import('./locales/zh-CN.js'),
   [TRADITIONAL_CHINESE_LOCALE]: () => import('./locales/zh-TW.js'),
   [ENGLISH_LOCALE]: () => import('./locales/en-US.js')
 };
 
 function normalizeLocale(value) {
-  return Object.hasOwn(localeLoaders, value) ? value : ENGLISH_LOCALE;
+  if (Object.hasOwn(localeLoaders, value)) return value;
+  // 舊版儲存的 zh-CN 等中文標籤一律升級為正體中文。
+  return /^zh(?:-|$)/i.test(String(value || '')) ? TRADITIONAL_CHINESE_LOCALE : ENGLISH_LOCALE;
 }
 
 export function detectBrowserLocale(value) {
   const language = String(value || '').replaceAll('_', '-');
-  if (!/^zh(?:-|$)/i.test(language)) return ENGLISH_LOCALE;
-  const subtags = language.toLowerCase().split('-').slice(1);
-
-  // 脚本标签代表用户明确选择的字形，优先级高于设备地区；CHT/CHS 兼容旧版浏览器标签。
-  if (subtags.includes('hant') || subtags.includes('cht')) return TRADITIONAL_CHINESE_LOCALE;
-  if (subtags.includes('hans') || subtags.includes('chs')) return SIMPLIFIED_CHINESE_LOCALE;
-
-  // 未声明脚本时，台湾、香港、澳门使用繁体，其余中文地区与裸 zh 默认简体。
-  return subtags.some((subtag) => TRADITIONAL_CHINESE_REGIONS.has(subtag))
-    ? TRADITIONAL_CHINESE_LOCALE
-    : SIMPLIFIED_CHINESE_LOCALE;
+  return /^zh(?:-|$)/i.test(language) ? TRADITIONAL_CHINESE_LOCALE : ENGLISH_LOCALE;
 }
 
 function initialLocale() {
   const storedLocale = typeof localStorage === 'undefined' ? '' : localStorage.getItem(STORAGE_KEY);
-  if (Object.hasOwn(localeLoaders, storedLocale)) return storedLocale;
+  if (storedLocale) return normalizeLocale(storedLocale);
   const browserLanguage = globalThis.navigator?.languages?.[0] || globalThis.navigator?.language;
   return detectBrowserLocale(browserLanguage);
 }
@@ -96,7 +82,7 @@ const SQLITE_UTC_DATE_TIME_PATTERN = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\
 
 export function parseDateValue(value) {
   if (value instanceof Date) return value;
-  // D1 的 CURRENT_TIMESTAMP 是 UTC，但返回值没有时区标记；补成 ISO UTC 后才能按浏览器时区正确展示。
+  // D1 的 CURRENT_TIMESTAMP 是 UTC，但返回值沒有時區標記；補成 ISO UTC 後才能按瀏覽器時區正確展示。
   const normalizedValue =
     typeof value === 'string' && SQLITE_UTC_DATE_TIME_PATTERN.test(value)
       ? `${value.replace(' ', 'T')}Z`
@@ -104,7 +90,7 @@ export function parseDateValue(value) {
   return new Date(normalizedValue);
 }
 
-// 只缓存三个固定展示格式；自定义 options 保持原语义，不引入无限增长的全局缓存。
+// 只緩存三個固定展示格式；自定義 options 保持原語義，不引入無限增長的全局緩存。
 const dateTimeFormatter = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeStyle: 'short' }));
 const dateFormatter = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }));
 const timeFormatter = computed(() => new Intl.DateTimeFormat(locale.value, { hour: '2-digit', minute: '2-digit' }));

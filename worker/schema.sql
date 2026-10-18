@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS rbac_roles (
   updated_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-INSERT OR IGNORE INTO rbac_roles (id, key, name) VALUES (1, 'ordinary', '普通用户');
+INSERT OR IGNORE INTO rbac_roles (id, key, name) VALUES (1, 'ordinary', '普通用戶');
 CREATE TABLE IF NOT EXISTS rbac_role_permissions (
   role_id INTEGER NOT NULL REFERENCES rbac_roles(id) ON DELETE CASCADE,
   permission_key TEXT NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS admin_audit_log (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_admin_audit_time ON admin_audit_log(created_at, id);
--- 与增量迁移保持同一保留规则，单次清理限量，避免审计写入扩大请求成本。
+-- 與增量遷移保持同一保留規則，單次清理限量，避免審計寫入擴大請求成本。
 CREATE TRIGGER IF NOT EXISTS limit_admin_audit AFTER INSERT ON admin_audit_log BEGIN
   DELETE FROM admin_audit_log WHERE id IN (SELECT id FROM admin_audit_log
     WHERE created_at < datetime('now', '-90 days') OR id <= NEW.id - 10000 ORDER BY id LIMIT 100);
@@ -89,7 +89,7 @@ WHEN OLD.is_super_admin = 1 AND OLD.deleted_at IS NULL AND OLD.is_disabled = 0
     AND is_disabled = 0 AND (disabled_until IS NULL OR disabled_until <= CURRENT_TIMESTAMP))
 BEGIN SELECT RAISE(ABORT, 'rbac_last_super'); END;
 
--- 每个用户最多三次登录；数据库自动淘汰最旧记录，避免依赖定时扫描和前端清理。
+-- 每個用戶最多三次登錄；數據庫自動淘汰最舊記錄，避免依賴定時掃描和前端清理。
 CREATE TABLE IF NOT EXISTS user_login_info (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS channel_members (
 INSERT OR IGNORE INTO channels (name, description, kind, created_by)
 VALUES ('general', '', 'public', NULL);
 
--- schema 可能会重复执行，幂等回填可顺手修复历史账号缺失的 general 成员关系。
+-- schema 可能會重複執行，冪等回填可順手修復歷史賬號缺失的 general 成員關係。
 INSERT OR IGNORE INTO channel_members (channel_id, user_id, role, invited_by)
 SELECT c.id, u.id, 'member', NULL
 FROM channels c
@@ -148,7 +148,7 @@ WHERE c.name = 'general'
   AND c.deleted_at IS NULL
   AND u.deleted_at IS NULL;
 
--- 从数据库入口覆盖所有未来的建号路径，防止新入口忘记同步系统群成员关系。
+-- 從數據庫入口覆蓋所有未來的建號路徑，防止新入口忘記同步系統群成員關係。
 CREATE TRIGGER IF NOT EXISTS add_new_user_to_general
 AFTER INSERT ON users
 WHEN NEW.deleted_at IS NULL
@@ -161,7 +161,7 @@ BEGIN
     AND deleted_at IS NULL;
 END;
 
--- general 必须永久保留全部成员，数据库层兜底阻止任何遗漏的删除路径破坏不变量。
+-- general 必須永久保留全部成員，數據庫層兜底阻止任何遺漏的刪除路徑破壞不變量。
 CREATE TRIGGER IF NOT EXISTS prevent_general_member_removal
 BEFORE DELETE ON channel_members
 WHEN EXISTS (
@@ -180,7 +180,7 @@ BEGIN
   SELECT RAISE(ABORT, 'GENERAL_MEMBERSHIP_REQUIRED');
 END;
 
--- 名称、公开属性和存活状态共同标识系统群，禁止绕过 API 改名、转私有或软删除。
+-- 名稱、公開屬性和存活狀態共同標識系統群，禁止繞過 API 改名、轉私有或軟刪除。
 CREATE TRIGGER IF NOT EXISTS protect_general_channel
 BEFORE UPDATE OF name, kind, deleted_at ON channels
 WHEN OLD.name = 'general'
@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS registration_invite_uses (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- 校验和计数必须留在数据库事务内，防止并发注册同时消耗最后一次额度。
+-- 校驗和計數必須留在數據庫事務內，防止併發註冊同時消耗最後一次額度。
 CREATE TRIGGER IF NOT EXISTS validate_registration_invite_use
 BEFORE INSERT ON registration_invite_uses
 BEGIN
@@ -378,7 +378,7 @@ CREATE TABLE IF NOT EXISTS message_event_compaction (
   FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE CASCADE
 );
 
--- 由数据库在消息写入事务内生成同步游标，HTTP 与 WebSocket 两条提交入口不会产生不同步的事件。
+-- 由數據庫在消息寫入事務內生成同步游標，HTTP 與 WebSocket 兩條提交入口不會產生不同步的事件。
 CREATE TRIGGER IF NOT EXISTS record_message_created_event
 AFTER INSERT ON messages
 BEGIN
@@ -394,7 +394,7 @@ BEGIN
   VALUES (NEW.channel_id, NEW.id, 'deleted');
 END;
 
--- 软删除后立即移除置顶引用；消息保留期仍由 GC 独立决定，不因置顶而延长。
+-- 軟刪除後立即移除置頂引用；消息保留期仍由 GC 獨立決定，不因置頂而延長。
 CREATE TRIGGER IF NOT EXISTS clear_pin_after_message_soft_delete
 AFTER UPDATE OF deleted_at ON messages
 WHEN OLD.deleted_at IS NULL AND NEW.deleted_at IS NOT NULL
@@ -411,7 +411,7 @@ CREATE TABLE IF NOT EXISTS pending_r2_delete (
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- GC 按创建时间分页，并对仍在使用的附件和头像执行点查。
+-- GC 按創建時間分頁，並對仍在使用的附件和頭像執行點查。
 CREATE INDEX IF NOT EXISTS idx_gc_uploaded_created
 ON uploaded_files(created_at, object_key);
 
@@ -427,7 +427,7 @@ CREATE INDEX IF NOT EXISTS idx_gc_channel_avatar
 ON channels(avatar_key)
 WHERE deleted_at IS NULL;
 
--- 本地引用必须在写入瞬间仍有上传登记且未进入清理；外部 Bridge 附件没有本地上传归属，仅拦截 pending。
+-- 本地引用必須在寫入瞬間仍有上傳登記且未進入清理；外部 Bridge 附件沒有本地上傳歸屬，僅攔截 pending。
 CREATE TRIGGER IF NOT EXISTS prevent_pending_message_attachment_insert
 BEFORE INSERT ON messages
 WHEN NEW.attachment_key IS NOT NULL
@@ -794,7 +794,7 @@ CREATE TABLE IF NOT EXISTS bridge_receipts (
 );
 CREATE INDEX IF NOT EXISTS idx_bridge_receipts_expiry ON bridge_receipts(expires_at);
 
--- 在真实 INSERT 事务内登记，HTTP/WS/移动 API 都不会遗漏，也不会把旧历史补入队列。
+-- 在真實 INSERT 事務內登記，HTTP/WS/移動 API 都不會遺漏，也不會把舊歷史補入隊列。
 CREATE TRIGGER IF NOT EXISTS enqueue_instance_bridge_message
 AFTER INSERT ON messages
 WHEN NEW.sender_kind = 'local' AND NEW.source = 'edgechat'
@@ -810,7 +810,7 @@ BEGIN
     AND (SELECT COUNT(*) FROM bridge_outbox WHERE binding_id = b.id) < 1000;
 END;
 
--- 接收资格与 receipt 在消息事务中确认，封堵暂停/解绑/重复请求的先查后写竞态。
+-- 接收資格與 receipt 在消息事務中確認，封堵暫停/解綁/重複請求的先查後寫競態。
 CREATE TRIGGER IF NOT EXISTS validate_instance_bridge_message
 BEFORE INSERT ON messages WHEN NEW.source = 'instance-bridge'
 BEGIN
@@ -828,7 +828,7 @@ BEGIN
   VALUES (NEW.bridge_binding_id, NEW.bridge_event_id, NEW.bridge_sent_at + 172800000);
 END;
 
--- generation 变更与清空积压同事务；并发重复控制不能再清掉之后产生的新消息。
+-- generation 變更與清空積壓同事務；併發重複控制不能再清掉之後產生的新消息。
 CREATE TRIGGER IF NOT EXISTS cancel_instance_bridge_generation
 AFTER UPDATE OF revision, peer_revision, status ON instance_bindings
 WHEN NEW.revision != OLD.revision OR NEW.peer_revision != OLD.peer_revision OR NEW.status = 'revoked'

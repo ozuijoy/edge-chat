@@ -242,7 +242,7 @@ export function useChatRoom({
 	}
 
 	function pauseRoom() {
-		// 离开聊天内容时只终止在途读取与实时连接，草稿和现有消息留给返回后的恢复流程。
+		// 離開聊天內容時只終止在途讀取與實時連接，草稿和現有消息留給返回後的恢復流程。
 		messageLoadGeneration += 1;
 		loading.value = false;
 		disconnectSocket();

@@ -25,7 +25,7 @@ function harness() {
   return { database, env, query, request };
 }
 
-test('首次安装：只有 schema 无法登录，初始化后能登录、访问后台并创建注册邀请', async () => {
+test('首次安裝：只有 schema 無法登錄，初始化後能登錄、訪問後臺並創建註冊邀請', async () => {
   const h = harness();
   const credentials = { username: 'admin', password: 'operator-chosen-password' };
   assert.equal((await h.request('/auth/login', credentials)).status, 401);
@@ -44,7 +44,7 @@ test('首次安装：只有 schema 无法登录，初始化后能登录、访问
   assert.equal((await h.request('/auth/login', { ...credentials, password: 'wrong' })).status, 401);
 });
 
-test('初始化 SQL 转义用户名和显示名，密码只保留随机盐和哈希', async () => {
+test('初始化 SQL 轉義用戶名和顯示名，密碼只保留隨機鹽和哈希', async () => {
   const h = harness();
   const credentials = { username: "root'one", displayName: "Owner's site", password: 'secret-not-in-generated-sql' };
   const sql = await generateBootstrapSql(credentials);
@@ -56,7 +56,7 @@ test('初始化 SQL 转义用户名和显示名，密码只保留随机盐和哈
   assert.equal(await verifyPassword(credentials.password, user.password_hash, user.password_salt), true);
 });
 
-test('重复初始化保留现有密码及身份，不会创建重复账号', async () => {
+test('重複初始化保留現有密碼及身份，不會創建重複賬號', async () => {
   const h = harness();
   h.database.exec(await generateBootstrapSql({ username: 'admin', password: 'original' }));
   const before = await h.query('SELECT * FROM users');
@@ -65,7 +65,7 @@ test('重复初始化保留现有密码及身份，不会创建重复账号', as
   await verifyAdminBootstrap(h.query);
 });
 
-test('同名普通账号不能经初始化被提权或重置密码', async () => {
+test('同名普通賬號不能經初始化被提權或重置密碼', async () => {
   const h = harness();
   const hashed = await hashPassword('existing-password');
   h.database.run('INSERT INTO users (username, display_name, password_hash, password_salt) VALUES (?, ?, ?, ?)', ['admin', 'existing', hashed.hash, hashed.salt]);
@@ -76,13 +76,13 @@ test('同名普通账号不能经初始化被提权或重置密码', async () =>
 });
 
 for (const [state, fields, valid] of [
-  ['普通账号', '0, 0, NULL, NULL', false],
+  ['普通賬號', '0, 0, NULL, NULL', false],
   ['永久封禁超管', '1, 1, NULL, NULL', false],
-  ['临时封禁超管', "1, 0, datetime('now', '+1 hour'), NULL", false],
-  ['软删除超管', "1, 0, NULL, CURRENT_TIMESTAMP", false],
+  ['臨時封禁超管', "1, 0, datetime('now', '+1 hour'), NULL", false],
+  ['軟刪除超管', "1, 0, NULL, CURRENT_TIMESTAMP", false],
   ['封禁到期超管', "1, 0, datetime('now', '-1 hour'), NULL", true],
 ]) {
-  test(`部署校验：${state}`, async () => {
+  test(`部署校驗：${state}`, async () => {
     const h = harness();
     h.database.run(`INSERT INTO users (username, display_name, password_hash, password_salt, is_super_admin, is_disabled, disabled_until, deleted_at)
       VALUES ('operator', 'operator', 'hash', 'salt', ${fields})`);
@@ -91,7 +91,7 @@ for (const [state, fields, valid] of [
   });
 }
 
-test('初始化缺少任一凭据时给出明确配置名，数据库查询失败不会被当作已初始化', async () => {
+test('初始化缺少任一憑據時給出明確配置名，數據庫查詢失敗不會被當作已初始化', async () => {
   await assert.rejects(generateBootstrapSql({ username: '', password: 'provided' }), /EDGECHAT_ADMIN_USERNAME/);
   await assert.rejects(generateBootstrapSql({ username: 'admin', password: '' }), /EDGECHAT_ADMIN_PASSWORD/);
   await assert.rejects(verifyAdminBootstrap(async () => { throw new Error('D1 unavailable'); }), /D1 unavailable/);

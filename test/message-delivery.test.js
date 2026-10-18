@@ -7,7 +7,7 @@ import {
 } from "../worker/src/message-submission.js";
 import { createUnreadProjection } from "../worker/src/unread-projection.js";
 
-test("消息提交 module 统一持久化参数与广播 packet", async () => {
+test("消息提交 module 統一持久化參數與廣播 packet", async () => {
 	const calls = [];
 	const message = { id: 11, content: "hello" };
 	const submit = createMessageSubmission({
@@ -37,7 +37,7 @@ test("消息提交 module 统一持久化参数与广播 packet", async () => {
 	assert.deepEqual(JSON.parse(result.packet), { protocolVersion: 1, type: "message", message });
 });
 
-test("消息提交只转换可预期的空消息错误", async () => {
+test("消息提交只轉換可預期的空消息錯誤", async () => {
 	const submitEmpty = createMessageSubmission({
 		async persistMessage() {
 			throw new Error("Message content cannot be empty");
@@ -45,7 +45,7 @@ test("消息提交只转换可预期的空消息错误", async () => {
 	});
 	await assert.rejects(
 		submitEmpty({}, { room: {}, principal: {} }, {}),
-		(error) => error instanceof MessageSubmissionError && error.message === "消息内容不能为空",
+		(error) => error instanceof MessageSubmissionError && error.message === "消息內容不能為空",
 	);
 
 	const original = new Error("database unavailable");
@@ -57,7 +57,7 @@ test("消息提交只转换可预期的空消息错误", async () => {
 	await assert.rejects(submitFailure({}, { room: {}, principal: {} }, {}), original);
 });
 
-test("未读投影排除发送者，并行投影所有收件人", async () => {
+test("未讀投影排除發送者，並行投影所有收件人", async () => {
 	const countCalls = [];
 	const notifications = [];
 	const resolvers = new Map();
@@ -131,7 +131,7 @@ test("未读投影排除发送者，并行投影所有收件人", async () => {
 	]);
 });
 
-test("单个未读收件人失败被隔离，成员查询失败也不阻塞提交链路", async () => {
+test("單個未讀收件人失敗被隔離，成員查詢失敗也不阻塞提交鏈路", async () => {
 	const notifications = [];
 	const failures = [];
 	const project = createUnreadProjection({
@@ -175,7 +175,7 @@ test("单个未读收件人失败被隔离，成员查询失败也不阻塞提�
 	assert.equal(outerFailures[0].message, "unread projection failed");
 });
 
-test("回复原作者会触发与提及同级的有人@我投影", async () => {
+test("回覆原作者會觸發與提及同級的有人@我投影", async () => {
 	const notifications = [];
 	const counted = [];
 	const project = createUnreadProjection({
@@ -218,7 +218,7 @@ test("回复原作者会触发与提及同级的有人@我投影", async () => {
 	assert.equal(notifications.find((item) => item.userId === 3).payload.replyToMe, false);
 });
 
-test("外部通知只投递私信和明确提及，不投递普通群消息或自己的消息", async () => {
+test("外部通知只投遞私信和明確提及，不投遞普通群消息或自己的消息", async () => {
 	const pushed = [];
 	const project = createUnreadProjection({
 		async listMemberIds() { return [1, 2, 3]; },

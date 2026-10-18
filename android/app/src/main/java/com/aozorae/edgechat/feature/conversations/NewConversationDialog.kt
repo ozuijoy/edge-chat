@@ -53,7 +53,7 @@ fun NewConversationDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = colors.canvas,
-        title = { Text(if (language == "zh-CN") "新建会话" else "New conversation") },
+        title = { Text(if (language == "zh-TW") "新建會話" else "New conversation") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
@@ -65,8 +65,8 @@ fun NewConversationDialog(
                         ) {
                             Text(
                                 if (isGroup) {
-                                    if (language == "zh-CN") "群组" else "Group"
-                                } else if (language == "zh-CN") "私信" else "Direct"
+                                    if (language == "zh-TW") "群組" else "Group"
+                                } else if (language == "zh-TW") "私信" else "Direct"
                             )
                         }
                     }
@@ -77,27 +77,27 @@ fun NewConversationDialog(
                         onValueChange = { name = it },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        label = { Text(if (language == "zh-CN") "群组名称" else "Group name") },
+                        label = { Text(if (language == "zh-TW") "群組名稱" else "Group name") },
                     )
                     OutlinedTextField(
                         value = description,
                         onValueChange = { description = it },
                         modifier = Modifier.fillMaxWidth(),
                         maxLines = 3,
-                        label = { Text(if (language == "zh-CN") "描述" else "Description") },
+                        label = { Text(if (language == "zh-TW") "描述" else "Description") },
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            if (language == "zh-CN") "仅受邀成员可见" else "Invite-only group",
+                            if (language == "zh-TW") "僅受邀成員可見" else "Invite-only group",
                             modifier = Modifier.weight(1f),
                         )
                         Switch(checked = privateGroup, onCheckedChange = { privateGroup = it })
                     }
                 }
-                Text(if (language == "zh-CN") "选择成员" else "Choose people")
+                Text(if (language == "zh-TW") "選擇成員" else "Choose people")
                 LazyColumn(Modifier.fillMaxWidth().heightIn(max = 280.dp)) {
                     items(users, key = { it.id }) { user ->
                         Row(
@@ -132,9 +132,9 @@ fun NewConversationDialog(
                 Button(
                     enabled = name.isNotBlank(),
                     onClick = { onCreateGroup(name, description, if (privateGroup) "private" else "public", selectedUsers.toList()) },
-                ) { Text(if (language == "zh-CN") "创建" else "Create") }
+                ) { Text(if (language == "zh-TW") "創建" else "Create") }
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(if (language == "zh-CN") "取消" else "Cancel") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(if (language == "zh-TW") "取消" else "Cancel") } },
     )
 }

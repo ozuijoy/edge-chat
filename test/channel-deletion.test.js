@@ -30,7 +30,7 @@ function createHarness(isAdmin = false) {
 		await next();
 	});
 	app.onError((error, c) => c.json(
-		{ error: error instanceof ApiError ? error.message : "服务器开小差了" },
+		{ error: error instanceof ApiError ? error.message : "服務器開小差了" },
 		error instanceof ApiError ? error.status : 500,
 	));
 	registerChannelRoutes(app);
@@ -77,14 +77,14 @@ function addRelatedRecords(database, id) {
 
 for (const kind of ["public", "private"]) {
 	for (const admin of [false, true]) {
-		test(`${kind} 群组经${admin ? "管理员" : "群主"}硬删除后可同名创建且没有旧群数据`, async () => {
+		test(`${kind} 群組經${admin ? "管理員" : "群主"}硬刪除後可同名創建且沒有舊群數據`, async () => {
 			const harness = createHarness(admin);
 			const { database, env } = harness;
 			const id = await createGroup(harness, "重建群", kind);
 			addRelatedRecords(database, id);
 			const duplicate = await harness.request("/api/channels", "POST", { name: "重建群", kind });
 			assert.equal(duplicate.status, 400);
-			assert.deepEqual(await duplicate.json(), { error: "群组名称已存在" });
+			assert.deepEqual(await duplicate.json(), { error: "群組名稱已存在" });
 
 			const path = admin ? `/api/admin/channels/${id}` : `/api/channels/${id}`;
 			assert.equal((await harness.request(path, "DELETE")).status, 200);
@@ -104,7 +104,7 @@ for (const kind of ["public", "private"]) {
 	}
 }
 
-test("硬删除事务失败会同时回滚文件队列、消息及成员", async () => {
+test("硬刪除事務失敗會同時回滾文件隊列、消息及成員", async () => {
 	const harness = createHarness();
 	const id = await createGroup(harness);
 	addRelatedRecords(harness.database, id);
@@ -121,7 +121,7 @@ test("硬删除事务失败会同时回滚文件队列、消息及成员", async
 	assert.deepEqual(harness.database.exec("PRAGMA foreign_key_check"), []);
 });
 
-test("删除入口拒绝普通成员，底层不会删除 general 或私聊", async () => {
+test("刪除入口拒絕普通成員，底層不會刪除 general 或私聊", async () => {
 	const harness = createHarness();
 	const id = await createGroup(harness);
 	harness.database.run("UPDATE channel_members SET role = 'member' WHERE channel_id = ?", [id]);
@@ -135,7 +135,7 @@ test("删除入口拒绝普通成员，底层不会删除 general 或私聊", as
 	}
 });
 
-test("GC 复用硬删除清理历史群组，文件失败重试且保留共享引用", async () => {
+test("GC 複用硬刪除清理歷史群組，文件失敗重試且保留共享引用", async () => {
 	const harness = createHarness();
 	const { database, env, deletedFiles } = harness;
 	const id = await createGroup(harness);

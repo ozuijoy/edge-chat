@@ -12,11 +12,11 @@ export function demoInstanceBridge(path, method, body) {
   if (path === '/admin/instance-bridge' && method === 'GET') return state();
   if (path === '/admin/instance-bridge/invitations' || path === '/admin/instance-bridge/accept') {
     const channel = channels.find((c) => c.id === Number(body.channelId));
-    if (!channel || bindings.some((b) => b.channelId === channel.id && b.status !== 'revoked')) throw new Error('请选择未绑定的群组');
+    if (!channel || bindings.some((b) => b.channelId === channel.id && b.status !== 'revoked')) throw new Error('請選擇未綁定的群組');
     const creating = path.endsWith('/invitations');
     const id = crypto.randomUUID();
     const expiresAt = Date.now() + 600_000;
-    // 只演示管理员交互，不解析真实凭据，也不对输入中的任何地址发请求。
+    // 只演示管理員交互，不解析真實憑據，也不對輸入中的任何地址發請求。
     bindings.unshift({ id, channelId: channel.id, channelName: channel.name,
       role: creating ? 'inviter' : 'joiner', status: creating ? 'pending' : 'active',
       peerOrigin: 'https://peer.edgechat.demo', peerChannelName: 'EdgeChat Community', peerInstanceId: 'demo-peer',
@@ -26,7 +26,7 @@ export function demoInstanceBridge(path, method, body) {
   const match = path.match(/^\/admin\/instance-bridge\/([^/]+)\/actions$/);
   if (match) {
     const b = bindings.find((entry) => entry.id === match[1]);
-    if (!b) throw new Error('绑定不存在');
+    if (!b) throw new Error('綁定不存在');
     if (body.action === 'confirm') b.status = 'active';
     if (body.action === 'pause' || body.action === 'resume') b.localPaused = body.action === 'pause';
     if (body.action === 'unlink') b.status = 'revoked';

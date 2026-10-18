@@ -11,10 +11,10 @@ export function isReservedGeneralChannelName(name) {
 export async function ensureGeneralChannelMembership(db, userId) {
 	const normalizedUserId = Number(userId);
 	if (!Number.isInteger(normalizedUserId) || normalizedUserId <= 0) {
-		throw new TypeError("general 群组成员必须是有效用户");
+		throw new TypeError("general 群組成員必須是有效用戶");
 	}
 
-	// 运行时继续做幂等修复，避免漏跑迁移或历史异常数据让当前用户失去系统群访问权。
+	// 運行時繼續做冪等修復，避免漏跑遷移或歷史異常數據讓當前用戶失去系統群訪問權。
 	await db.batch([
 		db
 			.prepare(

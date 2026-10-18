@@ -12,7 +12,7 @@ function ticketContext(tokenHash) {
 
 export async function issueRealtimeTicket(env, session, target) {
   if (!session?.deviceSessionId || session.sessionKind !== 'mobile') {
-    throw new ApiError('当前会话不支持实时票据', 400, 'mobile_session_required');
+    throw new ApiError('當前會話不支持實時票據', 400, 'mobile_session_required');
   }
   const ticket = randomToken(32);
   const tokenHash = await hashOpaqueToken(ticket);

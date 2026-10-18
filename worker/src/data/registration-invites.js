@@ -16,7 +16,7 @@ function toInvite(row) {
     createdAt: row.created_at,
     consumedAt: row.consumed_at || null,
     deletedAt: row.deleted_at || null,
-    creatorDisplayName: row.creator_display_name || '管理员',
+    creatorDisplayName: row.creator_display_name || '管理員',
     consumerDisplayName: row.consumer_display_name || '',
     isAvailable: !row.deleted_at && usedCount < maxUses
   };
@@ -126,10 +126,10 @@ export async function createUserWithRegistrationInvite(db, user) {
   } catch (error) {
     const message = String(error?.message || error);
     if (message.includes('REGISTRATION_INVITE_UNAVAILABLE')) {
-      throw new ApiError('注册链接已失效');
+      throw new ApiError('註冊鏈接已失效');
     }
     if (message.includes('UNIQUE')) {
-      throw new ApiError('用户名已存在');
+      throw new ApiError('用戶名已存在');
     }
     throw error;
   }

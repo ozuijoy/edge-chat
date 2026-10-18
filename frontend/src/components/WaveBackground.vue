@@ -35,7 +35,7 @@ let horizonColor;
 let depthRgb;
 
 function readPalette() {
-  // Canvas 不会自动继承 CSS 颜色，挂载时读取主题令牌，避免每帧触发计算样式。
+  // Canvas 不會自動繼承 CSS 顏色，掛載時讀取主題令牌，避免每幀觸發計算樣式。
   const style = getComputedStyle(document.documentElement);
   const color = (name, fallback) => style.getPropertyValue(name).trim() || fallback;
   waveColors = waves.map((wave, i) => [

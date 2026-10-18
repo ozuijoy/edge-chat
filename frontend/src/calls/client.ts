@@ -54,8 +54,8 @@ export function createVoiceCallClient({ api, userId, onChange, onError,
     const roomId = call.roomId;
     const payload = { type, callId: call.callId, clientId, ...extra };
     const pending = actionQueue.then(() => api.callAction(roomId, payload)).catch(error => {
-      // 重协商已推进时，旧候选/SDP 只需丢弃，不能把新连接一起挂断。
-      if (['ice', 'offer', 'answer'].includes(type) && error.status === 409 && error.rawMessage === '通话协商已更新') return;
+      // 重協商已推進時，舊候選/SDP 只需丟棄，不能把新連接一起掛斷。
+      if (['ice', 'offer', 'answer'].includes(type) && error.status === 409 && error.rawMessage === '通話協商已更新') return;
       throw error;
     });
     actionQueue = pending.catch(() => {});
@@ -97,7 +97,7 @@ export function createVoiceCallClient({ api, userId, onChange, onError,
   }
   async function acquireMedia(epoch) {
     const media = await getMedia();
-    // 用户可在授权弹窗仍打开时取消，迟到的媒体流不能留在后台采集。
+    // 用戶可在授權彈窗仍打開時取消，遲到的媒體流不能留在後臺採集。
     if (epoch !== generation) { media.getTracks().forEach(track => { track.stop(); }); return false; }
     stream = media;
     return true;

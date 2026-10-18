@@ -6,7 +6,7 @@ import com.getcapacitor.BridgeActivity
 
 class MainActivity : BridgeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 插件在 Bridge 创建前注册，保证冷启动通知也能把目标会话交给网页层。
+        // 插件在 Bridge 創建前註冊，保證冷啟動通知也能把目標會話交給網頁層。
         registerPlugin(EdgeChatNativePlugin::class.java)
         super.onCreate(savedInstanceState)
     }

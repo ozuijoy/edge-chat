@@ -37,7 +37,7 @@ after(async () => {
 	await vite?.close();
 });
 
-test("会话流程统一按 kind 和 id 查找并在打开后切换聊天视图", async () => {
+test("會話流程統一按 kind 和 id 查找並在打開後切換聊天視圖", async () => {
 	const calls = [];
 	const conversationItems = ref([
 		{ id: 7, kind: "private", source: { id: 7 } },
@@ -68,7 +68,7 @@ test("会话流程统一按 kind 和 id 查找并在打开后切换聊天视图"
 	]);
 });
 
-test("消息菜单允许所有会话成员通过右键和触摸长按打开回复操作", () => {
+test("消息菜單允許所有會話成員通過右鍵和觸摸長按打開回復操作", () => {
 	const menu = useMessageContextMenu();
 	let prevented = false;
 	menu.openMessageContextMenu(
@@ -132,7 +132,7 @@ test("消息菜单允许所有会话成员通过右键和触摸长按打开回�
 	}
 });
 
-test("私信拉黑先确认，并同步当前会话与侧栏状态", async () => {
+test("私信拉黑先確認，並同步當前會話與側欄狀態", async () => {
 	const activeRoom = ref({
 		id: 10,
 		kind: "dm",
@@ -176,10 +176,10 @@ test("私信拉黑先确认，并同步当前会话与侧栏状态", async () =>
 	assert.equal(userBlock.isBlockedByMe.value, true);
 	userBlock.applyBlockState(2, false);
 	assert.equal(userBlock.isBlockedByMe.value, false);
-	assert.equal(dms.value[0].isBlockedByMe, false, "通讯录解除同步隐藏的当前私聊与侧栏");
+	assert.equal(dms.value[0].isBlockedByMe, false, "通訊錄解除同步隱藏的當前私聊與側欄");
 });
 
-test("刷新后打开私信保留服务端返回的拉黑状态", () => {
+test("刷新後打開私信保留服務端返回的拉黑狀態", () => {
 	const activeRoom = ref(null);
 	const { selectDm } = useActiveRoom({ activeRoom });
 	selectDm({

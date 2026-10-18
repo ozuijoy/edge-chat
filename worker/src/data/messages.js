@@ -406,7 +406,7 @@ async function persistMessage(env, {
 	const isExternal = externalSender !== null;
 	const normalizedSenderId = isExternal ? null : Number(senderId);
 	const hasAttachment = attachment !== undefined && attachment !== null;
-	// 外部附件只能从已验证的内部 Bridge 入口进入；本地客户端仍必须通过上传归属校验。
+	// 外部附件只能從已驗證的內部 Bridge 入口進入；本地客戶端仍必須通過上傳歸屬校驗。
 	const cleanAttachment = pickAttachment(
 		attachment,
 		isExternal ? {} : { ownerUserId: normalizedSenderId },

@@ -35,7 +35,7 @@ async function harness() {
   return { database, env, request, alice };
 }
 
-test('登录信息：管理员限定、按需响应、未记录与删除/无效 ID', async () => {
+test('登錄信息：管理員限定、按需響應、未記錄與刪除/無效 ID', async () => {
   const { request, alice, database } = await harness();
   assert.equal((await request('/admin/users/2/details', { token: '' })).response.status, 401);
   assert.equal((await request('/admin/users/2/details', { token: alice.token })).response.status, 403);
@@ -52,7 +52,7 @@ test('登录信息：管理员限定、按需响应、未记录与删除/无效 
   assert.equal(JSON.stringify(list.payload).includes('loginHistory'), false);
 });
 
-test('登录信息：失败不采集、只信 CF 来源、恢复会话不写库', async () => {
+test('登錄信息：失敗不採集、只信 CF 來源、恢復會話不寫庫', async () => {
   const { request, database } = await harness();
   await request('/auth/login', { token: '', body: { username: 'alice', password: 'wrong' }, headers: { 'CF-Connecting-IP': '192.0.2.1' } });
   assert.equal(database.exec('SELECT count(*) FROM user_login_info')[0].values[0][0], 0);
@@ -72,7 +72,7 @@ test('登录信息：失败不采集、只信 CF 来源、恢复会话不写库'
   assert.equal((await request('/admin/users/3/details')).payload.user.loginHistory[0].ip, '');
 });
 
-test('隐身与 v1 登录共用快照，UA 限长与账号硬删除级联清理', async () => {
+test('隱身與 v1 登錄共用快照，UA 限長與賬號硬刪除級聯清理', async () => {
   const { database, env, request } = await harness();
   const settings = { loginPath: '/login', formId: 'test', appearance: createGateAppearance() };
   const gate = await submitGate(new Request('https://edgechat.test/login', {
@@ -93,13 +93,13 @@ test('隐身与 v1 登录共用快照，UA 限长与账号硬删除级联清理'
   assert.equal(database.exec('SELECT count(*) FROM user_login_info')[0].values[0][0], 0);
 });
 
-test('辅助采集写入故障不暴露信息，也不阻断登录', async (context) => {
+test('輔助採集寫入故障不暴露信息，也不阻斷登錄', async (context) => {
   const log = context.mock.method(console, 'error', () => {});
   await recordLoginInfo({ prepare() { throw new Error('private SQL'); } }, 1, new Request('https://edgechat.test'));
   assert.deepEqual(log.mock.calls[0].arguments, ['user_login_info_write_failed']);
 });
 
-test('浏览器推断使用按需解析器，不把缩减 UA 当作真实型号', () => {
+test('瀏覽器推斷使用按需解析器，不把縮減 UA 當作真實型號', () => {
   assert.deepEqual(describeUserAgent(''), { browser: '', system: '', model: '' });
   assert.equal(describeUserAgent(ua).browser, 'Chrome 140.0.0.0');
   assert.equal(describeUserAgent(ua).system, 'Windows NT 10.0');
@@ -108,7 +108,7 @@ test('浏览器推断使用按需解析器，不把缩减 UA 当作真实型号'
   assert.equal(describeUserAgent('Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD1) AppleWebKit/537.36 Chrome/90.0.0.0 Mobile Safari/537.36').model, 'Pixel 2');
 });
 
-test('用户详情分包、生命周期与三语言文案契约', () => {
+test('用戶詳情分包、生命週期與雙語文案契約', () => {
   const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
   const page = read('frontend/src/pages/AdminUsersPage.vue');
   const dialog = read('frontend/src/components/admin/UserDetailsDialog.vue');
@@ -119,7 +119,7 @@ test('用户详情分包、生命周期与三语言文案契约', () => {
   assert.match(dialog, /controller\?\.abort\(\)/);
   assert.match(dialog, /current === generation/);
   assert.match(dialog, /role="dialog"/);
-  for (const locale of ['zh-CN', 'zh-TW', 'en-US']) {
+  for (const locale of ['zh-TW', 'en-US']) {
     const source = read(`frontend/src/locales/${locale}.js`);
     assert.match(source, /users.details.webrtcIps/);
     assert.match(source, /users.details.history/);
@@ -133,7 +133,7 @@ test('用户详情分包、生命周期与三语言文案契约', () => {
   assert.doesNotMatch(renderGate({ loginPath: '/login', formId: 'test', appearance: createGateAppearance() }, false), /record source IP|<script/);
 });
 
-test('WebRTC 上报：认证、参数校验、一次消费、对应登录隔离及限时', async () => {
+test('WebRTC 上報：認證、參數校驗、一次消費、對應登錄隔離及限時', async () => {
   const { request, database, alice } = await harness();
   const login = async () => (await request('/auth/login', { token: '', body: { username: 'alice', password: 'password' } })).payload;
   const first = await login();
@@ -171,7 +171,7 @@ test('WebRTC 上报：认证、参数校验、一次消费、对应登录隔离�
   assert.ok((await request('/admin/users/2/details')).payload.user.loginHistory[0].webrtcCheckedAt);
 });
 
-test('三次保留：连续和同秒登录仅留最后三条，账号独立，历史数据整体淘汰', async () => {
+test('三次保留：連續和同秒登錄僅留最後三條，賬號獨立，歷史數據整體淘汰', async () => {
   const { request, database } = await harness();
   for (let i = 1; i <= 8; i++) {
     const { payload } = await request('/auth/login', { token: '', body: { username: 'alice', password: 'password' },
@@ -194,7 +194,7 @@ test('三次保留：连续和同秒登录仅留最后三条，账号独立，�
   assert.equal(database.exec('SELECT count(*) FROM user_login_info')[0].values[0][0], 1);
 });
 
-test('WebRTC 历史：迟到补充只更新对应登录，淘汰后上报不复活记录', async () => {
+test('WebRTC 歷史：遲到補充只更新對應登錄，淘汰後上報不復活記錄', async () => {
   const { request, database } = await harness();
   const login = async (ip) => (await request('/auth/login', { token: '', body: { username: 'alice', password: 'password' }, headers: { 'CF-Connecting-IP': ip } })).payload;
   const first = await login('192.0.2.1');
@@ -214,7 +214,7 @@ test('WebRTC 历史：迟到补充只更新对应登录，淘汰后上报不复�
   assert.ok(second.session.loginProbeId);
 });
 
-test('三次保留：数据库直接插入也自动淘汰，并限定每条信息长度', async () => {
+test('三次保留：數據庫直接插入也自動淘汰，並限定每條信息長度', async () => {
   const { database } = await harness();
   for (let i = 0; i < 100; i++) {
     database.run("INSERT INTO user_login_info (user_id, ip, user_agent, login_at) VALUES (?, ?, ?, '2026-10-05 00:00:00')", [2, `192.0.2.${i}`, 'x'.repeat(1024)]);
@@ -231,7 +231,7 @@ test('三次保留：数据库直接插入也自动淘汰，并限定每条信�
   }
 });
 
-test('历史迁移：保存可用首末信息、无重复首条、无虚构 UA、移除旧快照', async () => {
+test('歷史遷移：保存可用首末信息、無重複首條、無虛構 UA、移除舊快照', async () => {
   const { database } = await harness();
   database.run('DROP TRIGGER limit_user_login_info');
   database.run('DROP TABLE user_login_info');

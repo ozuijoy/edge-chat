@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import test, { beforeEach } from "node:test";
 
 import { useChatSidebar } from "../frontend/src/composables/useChatSidebar.js";
-import { CHINESE_LOCALE, setLocale } from "../frontend/src/i18n.js";
+import { TRADITIONAL_CHINESE_LOCALE, setLocale } from "../frontend/src/i18n.js";
 
 beforeEach(async () => {
-	await setLocale(CHINESE_LOCALE);
+	await setLocale(TRADITIONAL_CHINESE_LOCALE);
 });
 
-test("general 在私信和其他群组之前永久置顶", () => {
+test("general 在私信和其他群組之前永久置頂", () => {
 	const sidebar = useChatSidebar({
 		applyActiveChannel() {},
 		selectDm() {},
@@ -35,7 +35,7 @@ test("general 在私信和其他群组之前永久置顶", () => {
 		},
 		{
 			id: 4,
-			name: "公开讨论",
+			name: "公開討論",
 			kind: "public",
 			isGeneral: false,
 			isMember: false,
@@ -56,12 +56,12 @@ test("general 在私信和其他群组之前永久置顶", () => {
 		sidebar.conversationItems.value.map((item) => item.key),
 		["public:1", "dm:3", "private:2"],
 	);
-	assert.equal(sidebar.conversationItems.value[0].subtitle, "全员群组");
+	assert.equal(sidebar.conversationItems.value[0].subtitle, "全員群組");
 	assert.deepEqual(
 		sidebar.publicGroupItems.value.map((item) => item.key),
 		["public:4"],
 	);
-	assert.equal(sidebar.publicGroupItems.value[0].subtitle, "3 位成员");
+	assert.equal(sidebar.publicGroupItems.value[0].subtitle, "3 位成員");
 	sidebar.channels.value[1].unreadCount = 4;
 	sidebar.channels.value[1].mentionUnreadCount = 2;
 	assert.equal(sidebar.conversationItems.value.find((item) => item.id === 2).mentionUnreadCount, 2);
@@ -70,7 +70,7 @@ test("general 在私信和其他群组之前永久置顶", () => {
 	assert.equal(sidebar.channels.value[1].mentionUnreadCount, 0);
 });
 
-test("未加入公开群确认加入后才进入普通会话列表", async () => {
+test("未加入公開群確認加入後才進入普通會話列表", async () => {
 	const calls = [];
 	const sidebar = useChatSidebar({
 		applyActiveChannel() {},
@@ -87,7 +87,7 @@ test("未加入公开群确认加入后才进入普通会话列表", async () =>
 	});
 	const channel = {
 		id: 8,
-		name: "开发交流",
+		name: "開發交流",
 		kind: "public",
 		isGeneral: false,
 		isMember: false,

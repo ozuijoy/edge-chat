@@ -73,15 +73,15 @@ export function registerChannelRoutes(app) {
     const kind = String(payload.kind || 'public').trim();
 
     if (!name) {
-      return errorResponse('群组名称不能为空');
+      return errorResponse('群組名稱不能為空');
     }
 
     if (!['public', 'private'].includes(kind)) {
-      return errorResponse('群组类型无效');
+      return errorResponse('群組類型無效');
     }
 
     if (isReservedGeneralChannelName(name)) {
-      return errorResponse('general 是系统群组名称');
+      return errorResponse('general 是系統群組名稱');
     }
 
     const inviteUserIds = normalizeMemberIds(payload).filter((userId) => userId !== session.userId);
@@ -94,7 +94,7 @@ export function registerChannelRoutes(app) {
       .run()
       .catch((error) => {
         if (String(error.message).includes('UNIQUE')) {
-          throw new ApiError('群组名称已存在');
+          throw new ApiError('群組名稱已存在');
         }
         throw error;
       });
@@ -142,12 +142,12 @@ export function registerChannelRoutes(app) {
     const session = c.get('session');
     const channelId = Number(c.req.param('channelId'));
     if (!Number.isFinite(channelId)) {
-      return errorResponse('群组不存在', 404);
+      return errorResponse('群組不存在', 404);
     }
 
     const channel = await getChannelById(c.env.DB, channelId);
     if (!channel || channel.kind !== 'public') {
-      return errorResponse('公开群组不存在', 404);
+      return errorResponse('公開群組不存在', 404);
     }
 
     await c.env.DB.prepare(
@@ -165,12 +165,12 @@ export function registerChannelRoutes(app) {
     const channelId = Number(c.req.param('channelId'));
     const channel = await getChannelById(c.env.DB, channelId);
     if (!channel || channel.kind === 'dm') {
-      return errorResponse('群组不存在', 404);
+      return errorResponse('群組不存在', 404);
     }
 
     const access = await authorizeRoom(c.env.DB, session, channel.kind, channelId);
     if (!access.ok) {
-      return errorResponse('无权查看群组成员', 403);
+      return errorResponse('無權查看群組成員', 403);
     }
 
     const membership = await getChannelMembership(c.env.DB, channelId, session.userId);
@@ -195,7 +195,7 @@ export function registerChannelRoutes(app) {
     const session = c.get('session');
     const channelId = Number(c.req.param('channelId'));
     if (!Number.isFinite(channelId)) {
-      return errorResponse('群组不存在', 404);
+      return errorResponse('群組不存在', 404);
     }
 
     const payload = await parseJsonRequest(c.req.raw);
@@ -203,12 +203,12 @@ export function registerChannelRoutes(app) {
       payload.name === undefined ? undefined : String(payload.name || '').trim();
 
     if (name !== undefined && !name) {
-      return errorResponse('群组名称不能为空');
+      return errorResponse('群組名稱不能為空');
     }
 
     const management = await authorizeChannelManagement(c.env.DB, session, channelId);
     if (!management.ok) {
-      return errorResponse('只有群主或管理员可以编辑群组', 403);
+      return errorResponse('只有群主或管理員可以編輯群組', 403);
     }
 
     if (
@@ -216,7 +216,7 @@ export function registerChannelRoutes(app) {
       name !== undefined &&
       name !== 'general'
     ) {
-      return errorResponse('general 系统群组不能改名');
+      return errorResponse('general 系統群組不能改名');
     }
 
     const avatarUpdate = await resolveAvatarKeyUpdate(c.env.DB, session.userId, payload);
@@ -248,10 +248,10 @@ export function registerChannelRoutes(app) {
         .run();
     } catch (error) {
       if (isR2ObjectUnavailableError(error)) {
-        return errorResponse('头像文件不存在或正在清理，请重新上传');
+        return errorResponse('頭像文件不存在或正在清理，請重新上傳');
       }
       if (String(error.message).includes('UNIQUE')) {
-        return errorResponse('群组名称已存在');
+        return errorResponse('群組名稱已存在');
       }
       throw error;
     }
@@ -273,13 +273,13 @@ export function registerChannelRoutes(app) {
     const payload = await parseJsonRequest(c.req.raw);
     const management = await authorizeChannelManagement(c.env.DB, session, channelId);
     if (!management.ok) {
-      return errorResponse('只有群主或管理员可以邀请成员', 403);
+      return errorResponse('只有群主或管理員可以邀請成員', 403);
     }
 
     const userIds = normalizeMemberIds(payload).filter((userId) => userId !== session.userId);
     const validInvitees = await ensureValidInvitees(c.env.DB, userIds);
     if (!validInvitees.length) {
-      return errorResponse('没有可邀请的用户');
+      return errorResponse('沒有可邀請的用戶');
     }
 
     const statements = validInvitees.map((userId) =>
@@ -304,20 +304,20 @@ export function registerChannelRoutes(app) {
     const userId = Number(c.req.param('userId'));
     const management = await authorizeChannelManagement(c.env.DB, session, channelId);
     if (!management.ok) {
-      return errorResponse('只有群主或管理员可以移除成员', 403);
+      return errorResponse('只有群主或管理員可以移除成員', 403);
     }
 
     if (isGeneralChannel(management.channel)) {
-      return errorResponse('general 系统群组必须保留所有成员');
+      return errorResponse('general 系統群組必須保留所有成員');
     }
 
     const targetMembership = await getChannelMembership(c.env.DB, channelId, userId);
     if (!targetMembership) {
-      return errorResponse('成员不存在', 404);
+      return errorResponse('成員不存在', 404);
     }
 
     if (targetMembership.role === 'owner') {
-      return errorResponse('不能移除群主，请直接删除群组');
+      return errorResponse('不能移除群主，請直接刪除群組');
     }
 
     await c.env.DB.prepare(
@@ -339,11 +339,11 @@ export function registerChannelRoutes(app) {
     const channelId = Number(c.req.param('channelId'));
     const management = await authorizeChannelManagement(c.env.DB, session, channelId);
     if (!management.ok) {
-      return errorResponse('只有群主或管理员可以删除群组', 403);
+      return errorResponse('只有群主或管理員可以刪除群組', 403);
     }
 
     if (isGeneralChannel(management.channel)) {
-      return errorResponse('general 系统群组不能删除');
+      return errorResponse('general 系統群組不能刪除');
     }
 
     await hardDeleteChannel(c.env.DB, channelId);
@@ -362,10 +362,10 @@ export function registerChannelRoutes(app) {
     const channelId = Number(c.req.param('channelId'));
     const channel = await getChannelById(c.env.DB, channelId);
     if (!channel) {
-      return errorResponse('群组不存在', 404);
+      return errorResponse('群組不存在', 404);
     }
     if (isGeneralChannel(channel)) {
-      return errorResponse('general 系统群组不能删除');
+      return errorResponse('general 系統群組不能刪除');
     }
 
     await hardDeleteChannel(c.env.DB, channelId);

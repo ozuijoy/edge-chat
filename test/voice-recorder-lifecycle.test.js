@@ -53,7 +53,7 @@ function installRecorderGlobals(getUserMedia) {
 	globalThis.MediaRecorder = FakeMediaRecorder;
 }
 
-test("录音启动去重，取消授权等待后不会再请求媒体流", async () => {
+test("錄音啟動去重，取消授權等待後不會再請求媒體流", async () => {
 	const permission = deferred();
 	let permissionCalls = 0;
 	let mediaCalls = 0;
@@ -77,7 +77,7 @@ test("录音启动去重，取消授权等待后不会再请求媒体流", async
 	assert.equal(recorder.starting.value, false);
 });
 
-test("取消等待中的 getUserMedia 会释放迟到的媒体流", async () => {
+test("取消等待中的 getUserMedia 會釋放遲到的媒體流", async () => {
 	const media = deferred();
 	let stopCalls = 0;
 	globalThis.__nativePermission = async () => {};
@@ -93,7 +93,7 @@ test("取消等待中的 getUserMedia 会释放迟到的媒体流", async () => 
 	assert.equal(recorder.recording.value, false);
 });
 
-test("组件卸载会取消等待并释放迟到的媒体流", async () => {
+test("組件卸載會取消等待並釋放遲到的媒體流", async () => {
 	const media = deferred();
 	let stopCalls = 0;
 	globalThis.__nativePermission = async () => {};

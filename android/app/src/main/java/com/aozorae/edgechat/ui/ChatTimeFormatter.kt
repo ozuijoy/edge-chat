@@ -21,8 +21,8 @@ fun formatConversationTime(value: String?, language: String): String {
     val today = LocalDate.now(ZoneId.systemDefault())
     return when (time.toLocalDate()) {
         today -> time.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale(language)))
-        today.minusDays(1) -> if (language == "zh-CN") "昨天" else "Yesterday"
-        else -> time.format(DateTimeFormatter.ofPattern(if (language == "zh-CN") "M/d" else "MMM d", locale(language)))
+        today.minusDays(1) -> if (language == "zh-TW") "昨天" else "Yesterday"
+        else -> time.format(DateTimeFormatter.ofPattern(if (language == "zh-TW") "M/d" else "MMM d", locale(language)))
     }
 }
 
@@ -30,8 +30,8 @@ fun formatDayLabel(value: String, language: String): String {
     val date = parseTimestamp(value).atZone(ZoneId.systemDefault()).toLocalDate()
     val today = LocalDate.now(ZoneId.systemDefault())
     return when (date) {
-        today -> if (language == "zh-CN") "今天" else "Today"
-        today.minusDays(1) -> if (language == "zh-CN") "昨天" else "Yesterday"
+        today -> if (language == "zh-TW") "今天" else "Today"
+        today.minusDays(1) -> if (language == "zh-TW") "昨天" else "Yesterday"
         else -> date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale(language)))
     }
 }
@@ -42,4 +42,4 @@ private fun parseTimestamp(value: String): Instant = runCatching { Instant.parse
     .recoverCatching { OffsetDateTime.parse(value).toInstant() }
     .getOrElse { LocalDateTime.parse(value, databaseTimestamp).atZone(ZoneId.of("UTC")).toInstant() }
 
-private fun locale(language: String): Locale = if (language == "zh-CN") Locale.SIMPLIFIED_CHINESE else Locale.ENGLISH
+private fun locale(language: String): Locale = if (language == "zh-TW") Locale.TRADITIONAL_CHINESE else Locale.ENGLISH

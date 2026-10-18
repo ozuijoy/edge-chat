@@ -20,7 +20,7 @@ function fileDb({ accessible, metadata = true }) {
             async all() {
               if (sql.includes('SELECT filename, content_type, size')) {
                 return metadata
-                  ? { results: [{ filename: '报告.bin', content_type: 'application/octet-stream', size: 4 }] }
+                  ? { results: [{ filename: '報告.bin', content_type: 'application/octet-stream', size: 4 }] }
                   : { results: [] };
               }
               return { results: accessible ? [{ found: 1 }] : [] };
@@ -53,7 +53,7 @@ test('attachment upload reports when the deployment has no R2 binding', async ()
 
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), {
-    error: '当前部署没有绑定 R2，无法上传附件'
+    error: '當前部署沒有綁定 R2，無法上傳附件'
   });
 });
 
@@ -92,7 +92,7 @@ test('authorized attachment download decrypts bytes and disables shared caching'
   assert.equal(response.status, 200);
   assert.deepEqual(new Uint8Array(await response.arrayBuffer()), plaintext);
   assert.equal(response.headers.get('cache-control'), 'private, no-store');
-  assert.match(response.headers.get('content-disposition'), /%E6%8A%A5%E5%91%8A\.bin/);
+  assert.match(response.headers.get('content-disposition'), /%E5%A0%B1%E5%91%8A\.bin/);
 });
 
 test('unauthorized attachment download is rejected before reading R2', async () => {
@@ -131,7 +131,7 @@ test('authorized attachment download reports when the deployment has no R2 bindi
 
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), {
-    error: '当前部署没有绑定 R2，无法读取附件'
+    error: '當前部署沒有綁定 R2，無法讀取附件'
   });
 });
 

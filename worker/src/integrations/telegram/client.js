@@ -13,7 +13,7 @@ export class TelegramApiError extends Error {
 function validateBotToken(botToken) {
 	const token = String(botToken || "").trim();
 	if (!/^\d+:[A-Za-z0-9_-]+$/.test(token)) {
-		throw new TelegramApiError("Telegram Bot Token 格式无效");
+		throw new TelegramApiError("Telegram Bot Token 格式無效");
 	}
 	return token;
 }
@@ -21,7 +21,7 @@ function validateBotToken(botToken) {
 async function parseTelegramResponse(response) {
 	const result = await response.json().catch(() => null);
 	if (!response.ok || !result?.ok) {
-		throw new TelegramApiError(result?.description || `Telegram API 请求失败：${response.status}`, {
+		throw new TelegramApiError(result?.description || `Telegram API 請求失敗：${response.status}`, {
 			status: result?.error_code || response.status,
 			retryAfter: Number(result?.parameters?.retry_after) || 0,
 		});
@@ -103,19 +103,19 @@ export async function downloadTelegramFile(botToken, filePath, maxBytes) {
 	const token = validateBotToken(botToken);
 	const cleanPath = String(filePath || "").replace(/^\/+/, "");
 	if (!cleanPath) {
-		throw new TelegramApiError("Telegram 文件路径无效");
+		throw new TelegramApiError("Telegram 文件路徑無效");
 	}
 	const response = await fetch(`${TELEGRAM_FILE_ROOT}/bot${token}/${cleanPath}`);
 	if (!response.ok) {
-		throw new TelegramApiError(`Telegram 文件下载失败：${response.status}`);
+		throw new TelegramApiError(`Telegram 文件下載失敗：${response.status}`);
 	}
 	const contentLength = Number(response.headers.get("content-length") || 0);
 	if (contentLength > maxBytes) {
-		throw new TelegramApiError("Telegram 文件超过 Bridge 大小限制");
+		throw new TelegramApiError("Telegram 文件超過 Bridge 大小限制");
 	}
 	const bytes = new Uint8Array(await response.arrayBuffer());
 	if (bytes.byteLength > maxBytes) {
-		throw new TelegramApiError("Telegram 文件超过 Bridge 大小限制");
+		throw new TelegramApiError("Telegram 文件超過 Bridge 大小限制");
 	}
 	return bytes;
 }

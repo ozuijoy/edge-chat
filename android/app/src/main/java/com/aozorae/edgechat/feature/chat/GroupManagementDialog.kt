@@ -60,20 +60,20 @@ fun GroupManagementDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = colors.canvas,
-        title = { Text(if (language == "zh-CN") "群组管理" else "Group management") },
+        title = { Text(if (language == "zh-TW") "群組管理" else "Group management") },
         text = {
             Column(verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(10.dp)) {
                 OutlinedTextField(
                     name,
                     { name = it },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(if (language == "zh-CN") "群组名称" else "Group name") },
+                    label = { Text(if (language == "zh-TW") "群組名稱" else "Group name") },
                     shape = androidx.compose.material3.MaterialTheme.shapes.large,
                 )
                 Button(onClick = { onRename(name) }, enabled = name.isNotBlank(), modifier = Modifier.fillMaxWidth()) {
-                    Text(if (language == "zh-CN") "保存名称" else "Save name")
+                    Text(if (language == "zh-TW") "保存名稱" else "Save name")
                 }
-                Text(if (language == "zh-CN") "成员" else "Members", modifier = Modifier.padding(top = 16.dp))
+                Text(if (language == "zh-TW") "成員" else "Members", modifier = Modifier.padding(top = 16.dp))
                 LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp)) {
                     items(members, key = { it.id }) { member ->
                         Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -85,7 +85,7 @@ fun GroupManagementDialog(
                             }
                             Text(member.role, style = androidx.compose.material3.MaterialTheme.typography.labelSmall, color = colors.textSecondary)
                             if (member.role != "owner") IconButton(onClick = { onRemove(member.id) }) {
-                                Icon(Icons.Outlined.Delete, contentDescription = if (language == "zh-CN") "移除成员" else "Remove member", tint = colors.critical)
+                                Icon(Icons.Outlined.Delete, contentDescription = if (language == "zh-TW") "移除成員" else "Remove member", tint = colors.critical)
                             }
                         }
                         HorizontalDivider(color = colors.separator)
@@ -107,18 +107,18 @@ fun GroupManagementDialog(
                 }
                 if (selectedUsers.isNotEmpty()) {
                     Button(onClick = { onInvite(selectedUsers.toList()); selectedUsers = emptySet() }) {
-                        Icon(Icons.Outlined.PersonAdd, contentDescription = if (language == "zh-CN") "邀请成员" else "Invite members")
-                        Text(if (language == "zh-CN") "邀请所选用户" else "Invite selected")
+                        Icon(Icons.Outlined.PersonAdd, contentDescription = if (language == "zh-TW") "邀請成員" else "Invite members")
+                        Text(if (language == "zh-TW") "邀請所選用戶" else "Invite selected")
                     }
                 }
                 if (!conversation.isGeneral) {
                     OutlinedButton(onClick = onDelete, modifier = Modifier.padding(top = 12.dp).fillMaxWidth()) {
-                        Icon(Icons.Outlined.Delete, contentDescription = if (language == "zh-CN") "删除群组" else "Delete group", tint = colors.critical)
-                        Text(if (language == "zh-CN") "删除群组" else "Delete group")
+                        Icon(Icons.Outlined.Delete, contentDescription = if (language == "zh-TW") "刪除群組" else "Delete group", tint = colors.critical)
+                        Text(if (language == "zh-TW") "刪除群組" else "Delete group")
                     }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(if (language == "zh-CN") "完成" else "Done") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(if (language == "zh-TW") "完成" else "Done") } },
     )
 }

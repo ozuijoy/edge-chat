@@ -34,7 +34,7 @@ export class InstanceBridge {
   async alarm() {
     const id = await this.state.storage.get("bindingId");
     if (!id) return;
-    // 先持久化救援 alarm，进程在 D1 或网络 await 中退出也不会遗失后续调度。
+    // 先持久化救援 alarm，進程在 D1 或網絡 await 中退出也不會遺失後續調度。
     await this.state.storage.setAlarm(Date.now() + 60_000);
     await deliverBinding(this.env, id);
     const next = await nextDeliveryAt(this.env, id);

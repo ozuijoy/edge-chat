@@ -37,7 +37,7 @@ export interface UserBlockStatus {
 }
 
 export async function listBlockedUsers(db: Database, userId: number): Promise<UserSummary[]> {
-	// 拉黑管理不按账号状态过滤，否则封禁或软删除后就无法从自己的列表移除。
+	// 拉黑管理不按賬號狀態過濾，否則封禁或軟刪除後就無法從自己的列表移除。
 	const { results } = await db.prepare(
 		`SELECT u.id, u.username, u.display_name AS displayName, u.avatar_key
 		 FROM user_blocks b JOIN users u ON u.id = b.blocked_id

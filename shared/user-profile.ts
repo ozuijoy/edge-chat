@@ -28,9 +28,9 @@ export function bioLength(value: string): number {
 }
 
 export function validateBio(value: unknown): string {
-	if (typeof value !== "string") throw new Error("个人简介必须是文本");
+	if (typeof value !== "string") throw new Error("個人簡介必須是文本");
 	const bio = normalizeBio(value);
-	if (bioLength(bio) > BIO_MAX_LENGTH) throw new Error("个人简介不能超过 200 个字符");
+	if (bioLength(bio) > BIO_MAX_LENGTH) throw new Error("個人簡介不能超過 200 個字符");
 	return bio;
 }
 

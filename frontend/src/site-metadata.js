@@ -24,7 +24,7 @@ export function applySiteMetadata(site) {
       const attributes = siteIconUrl
         ? { href: resolveServerAssetUrl(siteIconUrl), type: null, sizes: null }
         : defaultIconAttributes.get(link);
-      // 所有候选图标必须同步，且不能把上传的 PNG/ICO 继续声明为 SVG。
+      // 所有候選圖標必須同步，且不能把上傳的 PNG/ICO 繼續聲明為 SVG。
       for (const [name, value] of Object.entries(attributes)) {
         if (value === null) link.removeAttribute(name);
         else link.setAttribute(name, value);

@@ -1,47 +1,47 @@
-# 定时同步稳定版与安全更新
+# 定時同步穩定版與安全更新
 
-`Sync Upstream` 每天 UTC 01:17、13:17（北京时间 09:17、21:17）检查 `aozorae/Edgechat` 默认分支；GitHub 调度可能延迟。上游主仓跳过自身，fork/源码副本更新自己的默认分支。
+`Sync Upstream` 每天 UTC 01:17、13:17（北京時間 09:17、21:17）檢查 `aozorae/Edgechat` 默認分支；GitHub 調度可能延遲。上游主倉跳過自身，fork/源碼副本更新自己的默認分支。
 
 ## 部署者首次配置
 
-1. 先手动同步一次，确保默认分支已有 `.github/workflows/sync-upstream.yml`。
-2. 在 Actions 中启用工作流。GitHub 默认禁用新 fork 的定时任务；公开仓库 60 天无活动也可能暂停定时运行，需要重新启用。
-3. 推荐添加 Repository Secret `EDGECHAT_SYNC_TOKEN`：使用仅授权当前 fork 的 fine-grained PAT，授予 **Contents: Read and write**、**Workflows: Read and write**。它仅用于 checkout/推送；派发部署使用内置 `GITHUB_TOKEN` 的 Actions 写权限。Classic PAT 对应 `repo` 和 `workflow` 权限，但范围更大，不推荐。
-4. 保留原有 Cloudflare Secrets/仓库变量，允许工作流写入默认分支。分支保护、组织策略及令牌过期可能阻止同步，不会强推绕过保护。
-5. 手动运行一次 `Actions -> Sync Upstream -> Run workflow` 检查配置，之后由定时任务执行。要停用自动更新，直接 Disable workflow。
+1. 先手動同步一次，確保默認分支已有 `.github/workflows/sync-upstream.yml`。
+2. 在 Actions 中啟用工作流。GitHub 默認禁用新 fork 的定時任務；公開倉庫 60 天無活動也可能暫停定時運行，需要重新啟用。
+3. 推薦添加 Repository Secret `EDGECHAT_SYNC_TOKEN`：使用僅授權當前 fork 的 fine-grained PAT，授予 **Contents: Read and write**、**Workflows: Read and write**。它僅用於 checkout/推送；派發部署使用內置 `GITHUB_TOKEN` 的 Actions 寫權限。Classic PAT 對應 `repo` 和 `workflow` 權限，但範圍更大，不推薦。
+4. 保留原有 Cloudflare Secrets/倉庫變量，允許工作流寫入默認分支。分支保護、組織策略及令牌過期可能阻止同步，不會強推繞過保護。
+5. 手動運行一次 `Actions -> Sync Upstream -> Run workflow` 檢查配置，之後由定時任務執行。要停用自動更新，直接 Disable workflow。
 
-未配置同步令牌时，普通源码更新使用内置令牌；更新涉及 Actions 文件时会明确失败，要求配置上述 Secret，远端分支不变。
+未配置同步令牌時，普通源碼更新使用內置令牌；更新涉及 Actions 文件時會明確失敗，要求配置上述 Secret，遠端分支不變。
 
-## 维护者如何标记提交
+## 維護者如何標記提交
 
-发布时照常更新 `package.json`、`package-lock.json` 和变更记录。发布提交在正文末尾加一个独立 Git trailer（与标题/正文之间留空行）：
+發佈時照常更新 `package.json`、`package-lock.json` 和變更記錄。發佈提交在正文末尾加一個獨立 Git trailer（與標題/正文之間留空行）：
 
 ```bash
-# 稳定版本
+# 穩定版本
 git commit -m "release: stable version" -m "EdgeChat-Update: stable"
 git push origin master
 
-# 必须跟进的安全修复
+# 必須跟進的安全修復
 git commit -m "fix: critical security vulnerability" -m "EdgeChat-Update: security"
 git push origin master
 ```
 
-只识别小写 `stable` 和 `security`，两者都会自动合并、部署。正文里随意提到标记不算参数。标记须最终保留在上游默认分支第一父链的提交里：使用 squash/merge PR 时，把它放在最终 squash/merge commit 的尾部，而不只是 PR 标题或分支内部提交。
+只識別小寫 `stable` 和 `security`，兩者都會自動合併、部署。正文裡隨意提到標記不算參數。標記須最終保留在上游默認分支第一父鏈的提交裡：使用 squash/merge PR 時，把它放在最終 squash/merge commit 的尾部，而不只是 PR 標題或分支內部提交。
 
-检查选择**最新标记提交**，一次合并它及此前全部落后提交，带入该提交中的版本号。标记之后尚未发布的开发提交不会被顺带部署。自定义源码采用普通 merge 保留，冲突必须手动解决；“强制安全更新”不是覆盖用户代码、绕过权限或数据库回滚。
+檢查選擇**最新標記提交**，一次合併它及此前全部落後提交，帶入該提交中的版本號。標記之後尚未發佈的開發提交不會被順帶部署。自定義源碼採用普通 merge 保留，衝突必須手動解決；“強制安全更新”不是覆蓋用戶代碼、繞過權限或數據庫回滾。
 
-## 为什么同步后仍能部署
+## 為什麼同步後仍能部署
 
-内置 `GITHUB_TOKEN` 推送不会触发新的 `push` 工作流，因此脚本显式通过 `workflow_dispatch` 派发 `Deploy Worker`，从更新后的默认分支拉取代码、测试、迁移并部署。自动合并提交带 `[skip ci]`，即使配置 PAT 也不会额外启动 push 部署；该标记不会阻止显式 dispatch。
+內置 `GITHUB_TOKEN` 推送不會觸發新的 `push` 工作流，因此腳本顯式通過 `workflow_dispatch` 派發 `Deploy Worker`，從更新後的默認分支拉取代碼、測試、遷移並部署。自動合併提交帶 `[skip ci]`，即使配置 PAT 也不會額外啟動 push 部署；該標記不會阻止顯式 dispatch。
 
-当前 SHA 已成功部署或有部署正在运行时不重复派发；派发失败、部署失败或取消后，下次检查会补派。部署记录 fork 当前 SHA，不会记录同步前的旧 SHA。请在 Actions 中分别查看 `Sync Upstream` 和 `Deploy Worker`，同步成功不代表后续部署已成功。
+當前 SHA 已成功部署或有部署正在運行時不重複派發；派發失敗、部署失敗或取消後，下次檢查會補派。部署記錄 fork 當前 SHA，不會記錄同步前的舊 SHA。請在 Actions 中分別查看 `Sync Upstream` 和 `Deploy Worker`，同步成功不代表後續部署已成功。
 
-## 自动清除消息天数
+## 自動清除消息天數
 
-Worker 环境变量 `MESSAGE_RETENTION_DAYS` 默认 `7`，请填写正整数（例如 `30`）。GitHub Actions 部署者在 **Settings -> Secrets and variables -> Actions -> Variables** 添加同名 Repository Variable，然后运行 `Deploy Worker`；每次部署都会读取它，因此上游同步不会重置该设置。它不是 Secret。
+Worker 環境變量 `MESSAGE_RETENTION_DAYS` 默認 `7`，請填寫正整數（例如 `30`）。GitHub Actions 部署者在 **Settings -> Secrets and variables -> Actions -> Variables** 添加同名 Repository Variable，然後運行 `Deploy Worker`；每次部署都會讀取它，因此上游同步不會重置該設置。它不是 Secret。
 
-手动部署在 Wrangler 配置的 `[vars]` 中设置 `MESSAGE_RETENTION_DAYS = "30"`，再部署。Cloudflare 面板也可修改 Worker 的同名文本变量并发布，但 Actions 后续部署以 Repository Variable 为准，未配置则恢复 7 天。只在本机导出同名环境变量不会自动传入线上 Worker。
+手動部署在 Wrangler 配置的 `[vars]` 中設置 `MESSAGE_RETENTION_DAYS = "30"`，再部署。Cloudflare 面板也可修改 Worker 的同名文本變量併發布，但 Actions 後續部署以 Repository Variable 為準，未配置則恢復 7 天。只在本機導出同名環境變量不會自動傳入線上 Worker。
 
-每天约 UTC 19:00（北京时间次日 03:00）清理超过保留期的消息与关联附件，按预算分批处理，不保证一轮清完。时间按消息创建时间计算，不按最后查看时间。`0` 不是关闭开关：Worker 对无效值、非正数及小于一天的值回退 7 天；Actions 对非正整数直接报错。缩短保留期会在下一次清理删除更早消息，删除不可恢复，之后改大天数也不能找回。
+每天約 UTC 19:00（北京時間次日 03:00）清理超過保留期的消息與關聯附件，按預算分批處理，不保證一輪清完。時間按消息創建時間計算，不按最後查看時間。`0` 不是關閉開關：Worker 對無效值、非正數及小於一天的值回退 7 天；Actions 對非正整數直接報錯。縮短保留期會在下一次清理刪除更早消息，刪除不可恢復，之後改大天數也不能找回。
 
-参考：[GITHUB_TOKEN 与 dispatch 例外](https://docs.github.com/en/actions/concepts/security/github_token)、[跳过 push 工作流](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs)、[令牌权限](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)。
+參考：[GITHUB_TOKEN 與 dispatch 例外](https://docs.github.com/en/actions/concepts/security/github_token)、[跳過 push 工作流](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs)、[令牌權限](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)。

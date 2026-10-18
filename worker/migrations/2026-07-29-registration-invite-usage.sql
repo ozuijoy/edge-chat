@@ -6,7 +6,7 @@ ALTER TABLE registration_invites
 ALTER TABLE registration_invites
   ADD COLUMN used_count INTEGER NOT NULL DEFAULT 0 CHECK (used_count >= 0);
 
--- 旧邀请仍按一次性链接处理，已使用记录回填为 1，避免迁移后重新变为可用。
+-- 舊邀請仍按一次性鏈接處理，已使用記錄回填為 1，避免遷移後重新變為可用。
 UPDATE registration_invites
 SET used_count = CASE
   WHEN consumed_at IS NOT NULL OR consumed_by_user_id IS NOT NULL THEN 1
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS registration_invite_uses (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- 校验和计数必须留在数据库事务内，防止并发注册同时消耗最后一次额度。
+-- 校驗和計數必須留在數據庫事務內，防止併發註冊同時消耗最後一次額度。
 CREATE TRIGGER IF NOT EXISTS validate_registration_invite_use
 BEFORE INSERT ON registration_invite_uses
 BEGIN

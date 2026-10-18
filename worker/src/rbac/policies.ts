@@ -3,7 +3,7 @@ export type Policy = { id: string; method: string; path: RegExp; permissions: st
 function policy(id: string, method: string, path: string, permissions: string[], options: Partial<Policy> = {}): Policy {
   return { id, method, path: new RegExp(`^/api/admin/${path}$`), permissions, ...options };
 }
-// 路由、字段和目标范围只在这里登记；未知后台入口没有管理员兜底。
+// 路由、字段和目標範圍只在這裡登記；未知後臺入口沒有管理員兜底。
 export const ADMIN_POLICIES = [
   policy('overview', 'GET', 'overview', ['dashboard.read']),
   policy('users.list', 'GET', 'users', ['users.read']),

@@ -5,7 +5,6 @@ import { runInNewContext } from 'node:vm';
 import { computed, ref } from 'vue';
 import { adminNavigation, adminRouteIcons } from '../frontend/src/admin/navigation.ts';
 import en from '../frontend/src/locales/en-US.js';
-import zh from '../frontend/src/locales/zh-CN.js';
 import tw from '../frontend/src/locales/zh-TW.js';
 
 function read(relativePath) {
@@ -41,7 +40,7 @@ const invitesPageStyles = read('../frontend/src/styles/admin/invites-page.css');
 const userCreatorStyles = read('../frontend/src/styles/admin/user-creator.css');
 const inviteManagerStyles = read('../frontend/src/styles/admin/invite-manager.css');
 
-test('后台默认进入仪表盘并新增受保护的注册邀请页', () => {
+test('後臺默認進入儀表盤並新增受保護的註冊邀請頁', () => {
   assert.match(routerSource, /component: \(\) => import\('\.\/pages\/AdminDashboardPage\.vue'\)/);
   assert.match(routerSource, /component: \(\) => import\('\.\/pages\/AdminInvitesPage\.vue'\)/);
   assert.match(routerSource, /redirect: \{ name: 'admin-dashboard' \}/);
@@ -51,7 +50,7 @@ test('后台默认进入仪表盘并新增受保护的注册邀请页', () => {
   assert.match(routerSource, /meta: \{ admin: true/);
 });
 
-test('生产 Web 跨入后台时发起真实文档请求，后台内部仍使用 SPA 导航', () => {
+test('生產 Web 跨入後臺時發起真實文檔請求，後臺內部仍使用 SPA 導航', () => {
   assert.match(routerSource, /router\.beforeEach\(async \(to, from\) =>/);
   assert.match(routerSource, /to\.meta\.admin &&[\s\S]*!from\.meta\.admin/);
   assert.match(routerSource, /from\.matched\.length > 0/);
@@ -61,7 +60,7 @@ test('生产 Web 跨入后台时发起真实文档请求，后台内部仍使用
   assert.match(dashboardSource, /void router\.push\(path\)/);
 });
 
-test('侧栏包含存储统计并移除消息查看入口', () => {
+test('側欄包含存儲統計並移除消息查看入口', () => {
   assert.match(sidebarSource, /t\('admin\.sidebar\.brand'\)/);
   for (const id of ['dashboard', 'users', 'storage', 'invites', 'telegram', 'site']) {
     assert.match(navigationSource, new RegExp(`id: '${id}'`));
@@ -76,7 +75,7 @@ test('侧栏包含存储统计并移除消息查看入口', () => {
   assert.match(sidebarSource, /v-show="isGroupOpen\(item\)"/);
 });
 
-test('仪表盘独立置顶，业务分类与分隔线下的系统入口顺序固定', () => {
+test('儀表盤獨立置頂，業務分類與分隔線下的系統入口順序固定', () => {
   assert.deepEqual(adminNavigation.map((section) => section.items.map((item) => item.id)), [
     ['dashboard'],
     ['rbac', 'channels', 'users', 'invites'],
@@ -93,7 +92,7 @@ test('仪表盘独立置顶，业务分类与分隔线下的系统入口顺序�
   assert.doesNotMatch(adminSidebarStyles, /margin-block-start:\s*auto/);
 });
 
-test('用户相关入口图标彼此区分且顶栏同步同一来源', () => {
+test('用戶相關入口圖標彼此區分且頂欄同步同一來源', () => {
   const items = adminNavigation[1].items;
   assert.equal(new Set(items.map((item) => item.icon)).size, 4);
   for (const item of adminNavigation.flatMap((section) => section.items)) {
@@ -116,7 +115,7 @@ function sidebarNavigation(messages, pages, permissions = []) {
   });
 }
 
-test('侧栏按权限过滤分类和子菜单，隐藏空分类', () => {
+test('側欄按權限過濾分類和子菜單，隱藏空分類', () => {
   const { filteredNavigation } = sidebarNavigation(en, ['invites', 'storage'], ['invites.read']);
   const sections = filteredNavigation.value;
   assert.equal(sections.length, 2);
@@ -127,9 +126,9 @@ test('侧栏按权限过滤分类和子菜单，隐藏空分类', () => {
   assert.equal(sections[1].items[0].id, 'storage');
 });
 
-test('三语言搜索支持分类、页面和子菜单，无结果时不残留空标题', () => {
+test('雙語搜索支持分類、頁面和子菜單，無結果時不殘留空標題', () => {
   const pages = adminNavigation.flatMap((section) => section.items.map((item) => item.id));
-  for (const messages of [en, zh, tw]) {
+  for (const messages of [en, tw]) {
     const { query, filteredNavigation } = sidebarNavigation(messages, pages, ['users.create', 'invites.read']);
     query.value = messages['admin.nav.integrations'];
     assert.equal(filteredNavigation.value.length, 1);
@@ -150,7 +149,7 @@ test('三语言搜索支持分类、页面和子菜单，无结果时不残留�
   assert.match(adminSidebarStyles, /\.admin-nav-item > span\s*\{[\s\S]*?overflow-wrap: anywhere;/);
 });
 
-test('侧栏分组默认收起，主按钮导航且仅箭头负责展开', () => {
+test('側欄分組默認收起，主按鈕導航且僅箭頭負責展開', () => {
   assert.match(sidebarSource, /openGroups\s*=\s*ref\(new Set\(\)\)/);
   assert.doesNotMatch(sidebarSource, /watch\s*\(/);
   assert.match(sidebarSource, /class="admin-nav-item admin-nav-item--group"[\s\S]*@click="navigate\(item\.to\)"/);
@@ -158,33 +157,33 @@ test('侧栏分组默认收起，主按钮导航且仅箭头负责展开', () =>
   assert.match(adminSidebarStyles, /\.admin-nav-group__toggle\s*\{[\s\S]*flex:\s*0 0 44px;/);
 });
 
-test('存储统计由按钮手动刷新且四个统计列均可排序', () => {
+test('存儲統計由按鈕手動刷新且四個統計列均可排序', () => {
   assert.match(routerSource, /component: \(\) => import\('\.\/pages\/AdminStoragePage\.vue'\)/);
   assert.match(routerSource, /path: 'storage'/);
   assert.match(apiSource, /adminStorageScan/);
   const storageApi = readFileSync(new URL('../worker/src/api/storage.ts', import.meta.url), 'utf8');
   assert.match(storageApi, /\/api\/admin\/storage\/scan/);
   assert.match(storageApi, /FILES\.list/);
-  assert.match(storageApi, /没有绑定 R2，无法统计存储空间/);
+  assert.match(storageApi, /沒有綁定 R2，無法統計存儲空間/);
   assert.match(storageSource, /@click="refreshStorage"/);
   assert.doesNotMatch(storageSource, /onMounted\(refreshStorage\)/);
-  assert.doesNotMatch(storageSource, /尚未统计|10 GB|免费存储/);
+  assert.doesNotMatch(storageSource, /尚未統計|10 GB|免費存儲/);
   for (const key of ['objectCount', 'bytes', 'share', 'latestUploadedAt']) {
     assert.match(storageSource, new RegExp(`key: '${key}'`));
   }
   assert.match(storageSource, /@click="changeSort\(column\.key\)"/);
 });
 
-test('用户管理只维护用户列表，创建用户和注册链接集中在注册邀请页', () => {
+test('用戶管理只維護用戶列表，創建用戶和註冊鏈接集中在註冊邀請頁', () => {
   assert.match(usersSource, /t\('users\.list'\)/);
-  assert.doesNotMatch(usersSource, /AdminUserCreator|RegistrationInviteManager|创建用户|注册链接/);
+  assert.doesNotMatch(usersSource, /AdminUserCreator|RegistrationInviteManager|創建用戶|註冊鏈接/);
   assert.match(invitesSource, /import AdminUserCreator/);
   assert.match(invitesSource, /import RegistrationInviteManager/);
   assert.match(invitesSource, /id="create-user"/);
   assert.match(invitesSource, /id="registration-links"/);
 });
 
-test('用户管理通过独立弹窗选择快捷、自定义或永久封禁时长', () => {
+test('用戶管理通過獨立彈窗選擇快捷、自定義或永久封禁時長', () => {
   assert.match(usersSource, /import UserBanDialog/);
   assert.match(usersSource, /banDurationMinutes/);
   assert.match(usersSource, /@confirm="disableUser"/);
@@ -203,7 +202,7 @@ test('用户管理通过独立弹窗选择快捷、自定义或永久封禁时�
   assert.match(adminApiSource, /session_version = session_version \+ 1/);
 });
 
-test('注册邀请页限制内容宽度并用独立卡片组织创建工具与链接列表', () => {
+test('註冊邀請頁限制內容寬度並用獨立卡片組織創建工具與鏈接列表', () => {
   assert.match(invitesSource, /admin-invites-page/);
   assert.match(invitesPageStyles, /max-width: 1120px/);
   assert.match(userCreatorSource, /admin-user-creator__identity-grid/);
@@ -215,14 +214,14 @@ test('注册邀请页限制内容宽度并用独立卡片组织创建工具与�
   assert.doesNotMatch(inviteManagerStyles, /max-height: 320px|border-block-start: 1px solid var\(--admin-border\);\s*border-radius: 0/);
 });
 
-test('网站设置只读取站点配置且不重复展示统计信息', () => {
+test('網站設置只讀取站點配置且不重複展示統計信息', () => {
   assert.match(siteAppearanceSource, /api\.adminSiteSettings\(\)/);
-  assert.doesNotMatch(siteSource, /adminOverview|admin-metric|站内用户|公开群组|私信会话/);
+  assert.doesNotMatch(siteSource, /adminOverview|admin-metric|站內用戶|公開群組|私信會話/);
   assert.match(siteSource, /id="site-appearance"/);
   assert.match(siteSource, /id="version-update"/);
 });
 
-test('仪表盘复用现有概况接口并只展示可验证统计', () => {
+test('儀表盤複用現有概況接口並只展示可驗證統計', () => {
   assert.match(dashboardSource, /api\.adminOverview\(\)/);
   assert.match(dashboardSource, /overview\.value\.stats\.messages/);
   assert.match(dashboardSource, /overview\.value\.stats\.activeUsers/);
@@ -231,7 +230,7 @@ test('仪表盘复用现有概况接口并只展示可验证统计', () => {
   assert.match(dashboardSource, /t\('dashboard\.systemOverview'\)/);
 });
 
-test('Telegram 互通页由管理员路由保护并统一管理公开与私有群组映射', () => {
+test('Telegram 互通頁由管理員路由保護並統一管理公開與私有群組映射', () => {
   assert.match(routerSource, /component: \(\) => import\('\.\/pages\/AdminTelegramPage\.vue'\)/);
   assert.match(routerSource, /path: 'telegram'/);
   assert.match(routerSource, /adminTitleKey: 'admin\.nav\.telegram'/);
@@ -243,7 +242,7 @@ test('Telegram 互通页由管理员路由保护并统一管理公开与私有�
   assert.match(telegramSource, /channel\.kind === 'private'/);
 });
 
-test('仪表盘在中等桌面宽度提前重排且快捷入口文字保持完整', () => {
+test('儀表盤在中等桌面寬度提前重排且快捷入口文字保持完整', () => {
   assert.match(
     dashboardStyles,
     /@media \(max-width: 64rem\)[\s\S]*\.admin-dashboard__body\s*\{\s*grid-template-columns: minmax\(0, 1fr\);/
@@ -259,7 +258,7 @@ test('仪表盘在中等桌面宽度提前重排且快捷入口文字保持完�
   );
 });
 
-test('轻量后台保留按需加载、可访问导航和按权限展示的设置入口', () => {
+test('輕量後臺保留按需加載、可訪問導航和按權限展示的設置入口', () => {
   const topbar = read('../frontend/src/components/admin/AdminTopbar.vue');
   assert.match(topbar, /v-if="canVisit\('site'\)"/);
   assert.match(topbar, /:aria-label="t\('admin\.nav\.site'\)"/);
@@ -271,7 +270,7 @@ test('轻量后台保留按需加载、可访问导航和按权限展示的设�
   assert.doesNotMatch(adminStyles + adminTokens, /@import url|backdrop-filter/);
 });
 
-test('用户列表搜索明确为本页且保留原分页和权限操作', () => {
+test('用戶列表搜索明確為本頁且保留原分頁和權限操作', () => {
   assert.match(usersSource, /filterAdminUsers\(users\.value, query\.value\)/);
   assert.match(usersSource, /t\('users\.searchPage'\)/);
   assert.match(usersSource, /users\.length < 100/);
@@ -282,7 +281,7 @@ test('用户列表搜索明确为本页且保留原分页和权限操作', () =>
   assert.match(dashboardSource, /loading \|\| error \? '—'/);
 });
 
-test('用户组选择位于最右侧操作区，不再增高姓名列', () => {
+test('用戶組選擇位於最右側操作區，不再增高姓名列', () => {
   const identityCell = usersSource.match(/<td class="admin-user-identity">([\s\S]*?)<\/td>/)[1];
   const actionsCell = usersSource.match(/<td class="admin-user-actions"[^>]*>([\s\S]*?)<\/td>/)[1];
   const usersStyles = read('../frontend/src/styles/admin/users.css');
@@ -292,14 +291,14 @@ test('用户组选择位于最右侧操作区，不再增高姓名列', () => {
   assert.match(usersStyles, /\.admin-user-actions \.group-assignment\s*\{[^}]*margin: 0;[^}]*margin-inline-start: auto;/);
 });
 
-test('管理员消息正文查看的页面、客户端调用与服务端接口均已下线', () => {
+test('管理員消息正文查看的頁面、客戶端調用與服務端接口均已下線', () => {
   assert.doesNotMatch(routerSource, /AdminMessagesPage|AdminRoomPage|admin-messages|admin-room/);
   assert.doesNotMatch(apiSource, /adminRoomMessages|searchMessages|\/admin\/messages\/search/);
   assert.doesNotMatch(adminApiSource, /\/api\/admin\/messages|\/api\/admin\/rooms.*messages/);
   assert.doesNotMatch(dashboardSource, /消息查看|\/admin\/messages/);
 });
 
-test('后台视觉令牌匹配参考图并按职责拆分样式文件', () => {
+test('後臺視覺令牌匹配參考圖並按職責拆分樣式文件', () => {
   assert.doesNotMatch(mainSource, /styles\/admin\.css/);
   assert.match(adminPageSource, /import '\.\.\/styles\/admin\.css';/);
   assert.match(adminStyles, /@import '\.\/admin\/tokens\.css';/);
@@ -314,7 +313,7 @@ test('后台视觉令牌匹配参考图并按职责拆分样式文件', () => {
   assert.doesNotMatch(legacyTokens, /admin-shell|admin-grid--two|admin-metric-grid--wide/);
 });
 
-test('后台核心 Vue 文件保持在单一职责的可维护规模', () => {
+test('後臺核心 Vue 文件保持在單一職責的可維護規模', () => {
   for (const [name, source] of [
     ['AdminSidebar', sidebarSource],
     ['AdminDashboardPage', dashboardSource],
@@ -323,11 +322,11 @@ test('后台核心 Vue 文件保持在单一职责的可维护规模', () => {
     ['AdminTelegramPage', telegramSource],
     ['AdminSitePage', siteSource]
   ]) {
-    assert.ok(source.split('\n').length < 260, `${name} 不应重新膨胀为超大文件`);
+    assert.ok(source.split('\n').length < 260, `${name} 不應重新膨脹為超大文件`);
   }
 });
 
-test('移动端后台始终保留独立的纵向滚动区域', () => {
+test('移動端後臺始終保留獨立的縱向滾動區域', () => {
   assert.match(adminLayout, /\.admin-page\s*\{[\s\S]*?height:\s*100dvh;[\s\S]*?overflow:\s*hidden;/);
   assert.match(adminLayout, /\.admin-workspace\s*\{[\s\S]*?min-height:\s*0;/);
   assert.match(adminLayout, /\.admin-content\s*\{[\s\S]*?min-height:\s*0;[\s\S]*?overflow-y:\s*auto;[\s\S]*?touch-action:\s*pan-y;/);

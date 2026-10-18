@@ -1,7 +1,7 @@
 /* Hallmark · macrostructure: Workbench · tone: calm utility · anchor hue: green
- * 视觉自评：层级 4 / 实现 4 / 适配产品 5 / 克制 5；浏览器验收由交接代理完成。
- * 聊天工作区独立使用语义令牌，避免继续把业务配色散落在组件里，
- * 也不改变登录与管理后台已有的玻璃主题。
+ * 視覺自評：層級 4 / 實現 4 / 適配產品 5 / 剋制 5；瀏覽器驗收由交接代理完成。
+ * 聊天工作區獨立使用語義令牌，避免繼續把業務配色散落在組件裡，
+ * 也不改變登錄與管理後臺已有的玻璃主題。
  */
 :root {
   --chat-paper: oklch(100% 0 0);
@@ -26,7 +26,7 @@
   --chat-scrim: oklch(20% 0.025 165 / 0.36);
   --chat-shadow: 0 1px 2px oklch(25% 0.025 165 / 0.08);
   --chat-shadow-panel: 0 12px 36px oklch(25% 0.025 165 / 0.12);
-  /* 中英文均沿用系统无衬线字体，聊天正文不引入外部字体请求。 */
+  /* 中英文均沿用系統無襯線字體，聊天正文不引入外部字體請求。 */
   --chat-font: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   --chat-font-heading: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
   --chat-control: 44px;

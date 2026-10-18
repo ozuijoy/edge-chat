@@ -109,13 +109,13 @@ fun ChatPane(
                 EdgeChatBrandMark(size = 72.dp)
                 Spacer(Modifier.size(20.dp))
                 Text(
-                    text = if (language == "zh-CN") "选择一个会话" else "Choose a conversation",
+                    text = if (language == "zh-TW") "選擇一個會話" else "Choose a conversation",
                     style = MaterialTheme.typography.titleMedium,
                     color = colors.textPrimary,
                 )
                 Spacer(Modifier.size(6.dp))
                 Text(
-                    text = if (language == "zh-CN") "从左侧列表开始聊天" else "Select a chat from the list to begin.",
+                    text = if (language == "zh-TW") "從左側列表開始聊天" else "Select a chat from the list to begin.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = colors.textSecondary,
                 )
@@ -156,7 +156,7 @@ fun ChatPane(
                             IconButton(onClick = onBack) {
                                 Icon(
                                     Icons.AutoMirrored.Outlined.ArrowBack,
-                                    contentDescription = if (language == "zh-CN") "返回会话列表" else "Back to conversations",
+                                    contentDescription = if (language == "zh-TW") "返回會話列表" else "Back to conversations",
                                 )
                             }
                         }
@@ -180,7 +180,7 @@ fun ChatPane(
                                     text = if (conversation.kind == "dm") {
                                         conversation.subtitle
                                     } else {
-                                        "${conversation.memberCount} ${if (language == "zh-CN") "位成员" else "members"}"
+                                        "${conversation.memberCount} ${if (language == "zh-TW") "位成員" else "members"}"
                                     },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = colors.textSecondary,
@@ -193,7 +193,7 @@ fun ChatPane(
                     actions = {
                         if (conversation.canManage) {
                             IconButton(onClick = onManageGroup) {
-                                Icon(Icons.Outlined.Group, contentDescription = if (language == "zh-CN") "管理群组" else "Manage group")
+                                Icon(Icons.Outlined.Group, contentDescription = if (language == "zh-TW") "管理群組" else "Manage group")
                             }
                         }
                         if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
@@ -205,7 +205,7 @@ fun ChatPane(
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(bottomInsets),
     ) { paddingValues ->
-        // Edge-to-edge 下统一消费键盘和导航栏的较大底边，避免输入区被遮挡或重复叠加高度。
+        // Edge-to-edge 下統一消費鍵盤和導航欄的較大底邊，避免輸入區被遮擋或重複疊加高度。
         Column(
             Modifier
                 .fillMaxSize()

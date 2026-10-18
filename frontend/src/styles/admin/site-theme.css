@@ -18,7 +18,7 @@
 .site-theme__swatches i:first-child { border-radius: 5px 0 0 5px; }
 .site-theme__swatches i:nth-child(2) { background: #edf4fc; }
 .site-theme__swatches i:last-child { background: #176bc0; border-radius: 0 5px 5px 0; }
-/* 色卡只表示候选配色，不随当前主题变化，否则无法比较与恢复默认主题。 */
+/* 色卡只表示候選配色，不隨當前主題變化，否則無法比較與恢復默認主題。 */
 [data-palette="cream-sakura"] .site-theme__swatches i { background: #fff8ef; }
 [data-palette="cream-sakura"] .site-theme__swatches i:nth-child(2) { background: #f7e2e8; }
 [data-palette="cream-sakura"] .site-theme__swatches i:last-child { background: #9b4567; }

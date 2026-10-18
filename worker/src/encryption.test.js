@@ -31,7 +31,7 @@ function keyring(activeKeyId = 'v1') {
 const messageContext = { channelId: 7, senderId: 42 };
 
 test('message encryption round-trips unicode with randomized nonces', async () => {
-  const plaintext = '服务端加密\nsecond line';
+  const plaintext = '服務端加密\nsecond line';
   const first = await encryptMessageContent(keyring(), plaintext, messageContext);
   const second = await encryptMessageContent(keyring(), plaintext, messageContext);
 

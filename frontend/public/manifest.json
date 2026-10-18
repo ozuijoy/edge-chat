@@ -1,7 +1,7 @@
 {
   "name": "Edgechat",
   "short_name": "Edgechat",
-  "description": "Edgechat 团队沟通与协作空间",
+  "description": "Edgechat 團隊溝通與協作空間",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

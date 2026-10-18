@@ -15,7 +15,7 @@ export type Envelope = {
 };
 
 export function bridgeError(code: string, status = 400) {
-  return new ApiError(`跨实例绑定：${code}`, status, code);
+  return new ApiError(`跨實例綁定：${code}`, status, code);
 }
 
 export function validId(value: unknown): value is string {
@@ -44,7 +44,7 @@ export function publicIp(value: string) {
       || (a === 192 && (b === 168 || b === 0 || b === 2)) || (a === 198 && [18, 19, 51].includes(b))
       || (a === 203 && b === 0));
   }
-  // 只允许全球单播，排除本地、映射 IPv4、文档及协议保留地址。
+  // 只允許全球單播，排除本地、映射 IPv4、文檔及協議保留地址。
   return isIP(value) === 6 && /^[23]/i.test(value)
     && !/^2001:(?:0:|db8:|[12][0-9a-f]:)/i.test(value) && !/^2002:/i.test(value);
 }

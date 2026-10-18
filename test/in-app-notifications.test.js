@@ -21,18 +21,18 @@ function createTimerHarness() {
 
 function createEvent(overrides = {}) {
 	return {
-		room: { kind: "private", id: 3, name: "产品协作" },
+		room: { kind: "private", id: 3, name: "產品協作" },
 		sender: {
 			displayName: "Alice",
 			username: "alice",
 			avatarUrl: "/files/avatar.png",
 		},
-		contentPreview: "请查看最新的设计稿",
+		contentPreview: "請查看最新的設計稿",
 		...overrides,
 	};
 }
 
-test("应用内通知保留头像、昵称、会话与消息预览", () => {
+test("應用內通知保留頭像、暱稱、會話與消息預覽", () => {
 	const timers = createTimerHarness();
 	const notifications = useInAppNotifications({
 		setTimer: timers.setTimer,
@@ -43,18 +43,18 @@ test("应用内通知保留头像、昵称、会话与消息预览", () => {
 	assert.deepEqual(notifications.inAppNotifications.value, [
 		{
 			id,
-			room: { kind: "private", id: 3, name: "产品协作" },
+			room: { kind: "private", id: 3, name: "產品協作" },
 			senderName: "Alice",
 			senderAvatarUrl: "/files/avatar.png",
-			roomName: "产品协作",
-			preview: "请查看最新的设计稿",
+			roomName: "產品協作",
+			preview: "請查看最新的設計稿",
 			mentionsMe: true,
 			replyToMe: false,
 		},
 	]);
 });
 
-test("空正文使用会话类型提示，通知超时后自动消失", () => {
+test("空正文使用會話類型提示，通知超時後自動消失", () => {
 	const timers = createTimerHarness();
 	const notifications = useInAppNotifications({
 		translate: (key) => `translated:${key}`,
@@ -74,7 +74,7 @@ test("空正文使用会话类型提示，通知超时后自动消失", () => {
 	assert.deepEqual(notifications.inAppNotifications.value, []);
 });
 
-test("应用内通知队列只保留最新三条并支持统一清理", () => {
+test("應用內通知隊列只保留最新三條並支持統一清理", () => {
 	const timers = createTimerHarness();
 	const notifications = useInAppNotifications({
 		maxVisible: 3,
@@ -83,7 +83,7 @@ test("应用内通知队列只保留最新三条并支持统一清理", () => {
 	});
 
 	for (let id = 1; id <= 4; id += 1) {
-		notifications.showInAppNotification(createEvent({ room: { kind: "private", id, name: `群组 ${id}` } }));
+		notifications.showInAppNotification(createEvent({ room: { kind: "private", id, name: `群組 ${id}` } }));
 	}
 	assert.deepEqual(
 		notifications.inAppNotifications.value.map((item) => item.room.id),

@@ -57,7 +57,7 @@ function toolMap(apiClient = createApi(), overrides = {}) {
   return new Map(tools.map((tool) => [tool.name, tool]));
 }
 
-test('WebMCP 第一版只注册五个基础工具并标注读写属性', () => {
+test('WebMCP 第一版只註冊五個基礎工具並標註讀寫屬性', () => {
   const tools = [...toolMap().values()];
   assert.deepEqual(
     tools.map((tool) => tool.name),
@@ -79,7 +79,7 @@ test('WebMCP 第一版只注册五个基础工具并标注读写属性', () => {
   assert.deepEqual(tools[3].inputSchema.required, ['kind', 'roomId', 'content']);
 });
 
-test('WebMCP 注册入口一次性注册全部工具并保持幂等', async () => {
+test('WebMCP 註冊入口一次性註冊全部工具並保持冪等', async () => {
   const registered = [];
   const result = await registerEdgeChatWebMcp({
     registerTool(tool) {
@@ -88,7 +88,7 @@ test('WebMCP 注册入口一次性注册全部工具并保持幂等', async () =
   });
   const repeated = await registerEdgeChatWebMcp({
     registerTool() {
-      throw new Error('不应重复注册');
+      throw new Error('不應重複註冊');
     }
   });
 
@@ -103,7 +103,7 @@ test('WebMCP 注册入口一次性注册全部工具并保持幂等', async () =
   ]);
 });
 
-test('登录复用现有 store 流程且只返回脱敏会话信息', async () => {
+test('登錄複用現有 store 流程且只返回脫敏會話信息', async () => {
   let credentials;
   let session = null;
   const tools = toolMap(createApi(), {
@@ -113,7 +113,7 @@ test('登录复用现有 store 流程且只返回脱敏会话信息', async () =
       session = {
         userId: 8,
         username: input.username,
-        displayName: '演示用户',
+        displayName: '演示用戶',
         isAdmin: false,
         token: 'never-return-this'
       };
@@ -130,7 +130,7 @@ test('登录复用现有 store 流程且只返回脱敏会话信息', async () =
     session: {
       userId: 8,
       username: 'demo',
-      displayName: '演示用户',
+      displayName: '演示用戶',
       isAdmin: false
     }
   });
@@ -138,13 +138,13 @@ test('登录复用现有 store 流程且只返回脱敏会话信息', async () =
   assert.equal(JSON.stringify(result).includes('never-return-this'), false);
 });
 
-test('查询群聊和最近消息直接复用现有只读 API', async () => {
+test('查詢群聊和最近消息直接複用現有隻讀 API', async () => {
   const calls = [];
   const tools = toolMap(
     createApi({
       async getChannels() {
         calls.push(['getChannels']);
-        return { channels: [{ id: 7, kind: 'private', name: '项目组' }] };
+        return { channels: [{ id: 7, kind: 'private', name: '項目組' }] };
       },
       async getRecentMessages(kind, roomId, limit) {
         calls.push(['getRecentMessages', kind, roomId, limit]);
@@ -154,7 +154,7 @@ test('查询群聊和最近消息直接复用现有只读 API', async () => {
   );
 
   assert.deepEqual(await tools.get('edgechat.list_channels').execute({}), {
-    channels: [{ id: 7, kind: 'private', name: '项目组' }]
+    channels: [{ id: 7, kind: 'private', name: '項目組' }]
   });
   assert.deepEqual(
     await tools.get('edgechat.read_messages').execute({ kind: 'private', roomId: 7, limit: 12 }),
@@ -163,7 +163,7 @@ test('查询群聊和最近消息直接复用现有只读 API', async () => {
   assert.deepEqual(calls, [['getChannels'], ['getRecentMessages', 'private', 7, 12]]);
 });
 
-test('发送消息使用既有 v1 幂等提交入口', async () => {
+test('發送消息使用既有 v1 冪等提交入口', async () => {
   const calls = [];
   const tools = toolMap(
     createApi({
@@ -193,7 +193,7 @@ test('发送消息使用既有 v1 幂等提交入口', async () => {
   assert.equal(result.message.id, 18);
 });
 
-test('打开私聊按准确用户名解析目标，并要求当前存在登录会话', async () => {
+test('打開私聊按準確用戶名解析目標，並要求當前存在登錄會話', async () => {
   const opened = [];
   const tools = toolMap(
     createApi({
@@ -215,6 +215,6 @@ test('打开私聊按准确用户名解析目标，并要求当前存在登录�
   const signedOutTools = toolMap(createApi(), { getSession: () => null });
   await assert.rejects(
     signedOutTools.get('edgechat.list_channels').execute({}),
-    /请先登录 EdgeChat/
+    /請先登錄 EdgeChat/
   );
 });

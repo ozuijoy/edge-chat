@@ -44,7 +44,7 @@ function createDm(database, firstUserId, secondUserId) {
 	return channelId;
 }
 
-test("用户拉黑关系按方向保存，并统一阻断双方私信发送", async () => {
+test("用戶拉黑關係按方向保存，並統一阻斷雙方私信發送", async () => {
 	const database = new SQL.Database();
 	database.exec(readFileSync(new URL("../worker/schema.sql", import.meta.url), "utf8"));
 	const aliceId = insertUser(database, "alice");
@@ -82,7 +82,7 @@ test("用户拉黑关系按方向保存，并统一阻断双方私信发送", as
 			error instanceof MessageSubmissionError &&
 			error.code === "blocked_by_recipient" &&
 			error.status === 403 &&
-			error.message === "发送被拒，你已经被拉黑",
+			error.message === "發送被拒，你已經被拉黑",
 	);
 	await assert.rejects(
 		submitRoomMessage(
@@ -98,8 +98,8 @@ test("用户拉黑关系按方向保存，并统一阻断双方私信发送", as
 	const sent = await submitRoomMessage(
 		env,
 		{ room: { id: dmId, kind: "dm" }, principal: { userId: bobId } },
-		{ content: "恢复发送" },
+		{ content: "恢復發送" },
 	);
-	assert.equal(sent.message.content, "恢复发送");
+	assert.equal(sent.message.content, "恢復發送");
 	assert.equal((await listUserDms(env.DB, aliceId))[0].isBlockedByMe, false);
 });

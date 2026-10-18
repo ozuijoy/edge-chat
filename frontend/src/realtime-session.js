@@ -166,7 +166,7 @@ export function createRealtimeSession({
 		const generation = connectionGeneration + 1;
 		connectionGeneration = generation;
 		if (connectingSocket) {
-			// 尚未建立的旧连接没有承载业务消息，切换意图时立即关闭，避免留下无法复用的幽灵连接。
+			// 尚未建立的舊連接沒有承載業務消息，切換意圖時立即關閉，避免留下無法複用的幽靈連接。
 			markSocketForClose(connectingSocket);
 			connectingSocket = null;
 			connectingKey = "";

@@ -18,7 +18,7 @@ const DemoNavigator = globalThis.__EDGECHAT_DEMO__
 </template>
 
 <style>
-/* 页面切换 — 丝滑淡入淡出 */
+/* 頁面切換 — 絲滑淡入淡出 */
 .page-enter-active,
 .page-leave-active {
   transition: opacity 240ms cubic-bezier(0.37, 0, 0.63, 1),

@@ -34,7 +34,7 @@ function createHarness(key = "1/icon.png") {
 	return { database, db: createD1Adapter(database), key };
 }
 
-test("站点图标统一本地 key，保留真正外链并区分未知 origin", () => {
+test("站點圖標統一本地 key，保留真正外鏈並區分未知 origin", () => {
 	assert.equal(normalizeSiteIconForStorage("/files/1%2Ficon.png"), "r2:1/icon.png");
 	assert.equal(
 		normalizeSiteIconForStorage(
@@ -68,11 +68,11 @@ test("站点图标统一本地 key，保留真正外链并区分未知 origin", 
 });
 
 for (const [label, storedValue] of [
-	["历史相对路径", "/files/1%2Ficon.png"],
-	["历史完整 URL", "https://chat.example/files/1%2Ficon.png"],
-	["历史裸 key", "1/icon.png"],
+	["歷史相對路徑", "/files/1%2Ficon.png"],
+	["歷史完整 URL", "https://chat.example/files/1%2Ficon.png"],
+	["歷史裸 key", "1/icon.png"],
 ]) {
-	test(`${label}站点图标不会被孤儿 GC 误删`, async () => {
+	test(`${label}站點圖標不會被孤兒 GC 誤刪`, async () => {
 		const { database, db } = createHarness();
 		database.run(
 			"UPDATE site_settings SET setting_value = ? WHERE setting_key = 'site_icon_url'",
@@ -91,7 +91,7 @@ for (const [label, storedValue] of [
 	});
 }
 
-test("本站完整 URL 保存为原子保护的本地 key，外链不阻止无关孤儿清理", async () => {
+test("本站完整 URL 保存為原子保護的本地 key，外鏈不阻止無關孤兒清理", async () => {
 	const local = createHarness();
 	const saved = await updateSiteSettings(local.db, {
 		siteName: "Edgechat",
@@ -131,7 +131,7 @@ test("本站完整 URL 保存为原子保护的本地 key，外链不阻止无�
 	assert.deepEqual(externalDeletes, ["1/orphan.png"]);
 });
 
-test("可信 origin 已配置时，外域 /files/ URL 不会保护同名本地孤儿", async () => {
+test("可信 origin 已配置時，外域 /files/ URL 不會保護同名本地孤兒", async () => {
 	const external = createHarness();
 	external.database.run(
 		"UPDATE site_settings SET setting_value = 'https://cdn.example/files/1%2Ficon.png' WHERE setting_key = 'site_icon_url'",
@@ -145,7 +145,7 @@ test("可信 origin 已配置时，外域 /files/ URL 不会保护同名本地�
 	assert.deepEqual(deleted, ["1/icon.png"]);
 });
 
-test("站点图标写入在 pending 阶段和删除完成后都拒绝失效 key", async () => {
+test("站點圖標寫入在 pending 階段和刪除完成後都拒絕失效 key", async () => {
 	const { database, db } = createHarness();
 	database.run("INSERT INTO pending_r2_delete (object_key) VALUES ('1/icon.png')");
 	await assert.rejects(
@@ -160,7 +160,7 @@ test("站点图标写入在 pending 阶段和删除完成后都拒绝失效 key"
 	);
 });
 
-test("管理 API 将站点图标竞态映射为明确业务错误", async () => {
+test("管理 API 將站點圖標競態映射為明確業務錯誤", async () => {
 	const { database, db } = createHarness();
 	database.run("INSERT INTO pending_r2_delete (object_key) VALUES ('1/icon.png')");
 	const app = new Hono();
@@ -178,11 +178,11 @@ test("管理 API 将站点图标竞态映射为明确业务错误", async () => 
 	);
 	assert.equal(response.status, 400);
 	assert.deepEqual(await response.json(), {
-		error: "站点图标文件不存在或正在清理，请重新上传",
+		error: "站點圖標文件不存在或正在清理，請重新上傳",
 	});
 });
 
-test("上传图标保存后可匿名读取与解密，替换、清除及隐身模式收回访问", async () => {
+test("上傳圖標保存後可匿名讀取與解密，替換、清除及隱身模式收回訪問", async () => {
 	const { database, db } = createHarness();
 	const objects = new Map();
 	const env = {
@@ -220,7 +220,7 @@ test("上传图标保存后可匿名读取与解密，替换、清除及隐身�
 	database.close();
 });
 
-test("历史本站图标引用可读取，外域同名文件与待删除对象仍禁止访问", async () => {
+test("歷史本站圖標引用可讀取，外域同名文件與待刪除對象仍禁止訪問", async () => {
 	const { database, db, key } = createHarness();
 	const origins = ['https://chat.example'];
 	for (const stored of [`r2:${key}`, key, '/files/1%2Ficon.png', `https://chat.example/files/1%2Ficon.png`]) {
@@ -236,7 +236,7 @@ test("历史本站图标引用可读取，外域同名文件与待删除对象�
 	database.close();
 });
 
-test("站点图标引用不会公开非图片附件或可执行 SVG", async () => {
+test("站點圖標引用不會公開非圖片附件或可執行 SVG", async () => {
 	const { database, db, key } = createHarness();
 	await updateSiteSettings(db, { siteIconUrl: '/files/1%2Ficon.png' });
 	for (const contentType of ['application/pdf', 'text/html', 'image/svg+xml', '']) {

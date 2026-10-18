@@ -70,7 +70,7 @@ function createMeasuredD1(database) {
 	};
 }
 
-test("消息保留期默认七天，支持自定义天数，非法值不会误清新消息", async () => {
+test("消息保留期默認七天，支持自定義天數，非法值不會誤清新消息", async () => {
 	for (const [value, deleted] of [[undefined, 1], ["30", 0], ["1", 2], ["0", 1], ["-1", 1], ["invalid", 1], ["0.5", 1]]) {
 		const database = createDatabase();
 		try {
@@ -88,7 +88,7 @@ test("消息保留期默认七天，支持自定义天数，非法值不会误�
 	}
 });
 
-test("孤儿扫描使用匹配索引，失败对象进入退避且不阻塞后续批次", async () => {
+test("孤兒掃描使用匹配索引，失敗對象進入退避且不阻塞後續批次", async () => {
 	const database = createDatabase();
 	const userId = insertUser(database, "gc-owner");
 	const plan = database.prepare(`EXPLAIN QUERY PLAN ${ORPHAN_UPLOAD_QUERY}`);
@@ -136,7 +136,7 @@ test("孤儿扫描使用匹配索引，失败对象进入退避且不阻塞后�
 	);
 });
 
-test("R2 删除后 D1 完成批次失败时保留任务并写入退避", async () => {
+test("R2 刪除後 D1 完成批次失敗時保留任務並寫入退避", async () => {
 	const database = createDatabase();
 	const userId = insertUser(database, "completion-failure");
 	database.run(
@@ -196,7 +196,7 @@ test("R2 删除后 D1 完成批次失败时保留任务并写入退避", async (
 	);
 });
 
-test("待删除占位原子阻止消息附件与头像重新引用", () => {
+test("待刪除佔位原子阻止消息附件與頭像重新引用", () => {
 	const database = createDatabase();
 	const userId = insertUser(database, "claim-owner");
 	const channelId = scalar(database, "SELECT id FROM channels WHERE name = 'general'");
@@ -232,7 +232,7 @@ test("待删除占位原子阻止消息附件与头像重新引用", () => {
 	);
 });
 
-test("待删除对象不会继续通过文件读取授权", async () => {
+test("待刪除對象不會繼續通過文件讀取授權", async () => {
 	const database = createDatabase();
 	const userId = insertUser(database, "pending-download");
 	database.run(
@@ -249,7 +249,7 @@ test("待删除对象不会继续通过文件读取授权", async () => {
 	assert.equal(await canAccessFile(db, "1/pending-download", userId), false);
 });
 
-test("GC 完成删除并移除占位后，旧请求不能写入失效的本地引用", async () => {
+test("GC 完成刪除並移除佔位後，舊請求不能寫入失效的本地引用", async () => {
 	const database = createDatabase();
 	const userId = insertUser(database, "stale-request");
 	const channelId = scalar(database, "SELECT id FROM channels WHERE name = 'general'");
@@ -290,7 +290,7 @@ test("GC 完成删除并移除占位后，旧请求不能写入失效的本地�
 	);
 });
 
-test("消息预检查后发生完整 GC，实际提交路径返回附件不可用业务错误", async () => {
+test("消息預檢查後發生完整 GC，實際提交路徑返回附件不可用業務錯誤", async () => {
 	const database = createDatabase();
 	const userId = insertUser(database, "submission-race");
 	const channelId = scalar(database, "SELECT id FROM channels WHERE name = 'general'");
@@ -357,14 +357,14 @@ test("消息预检查后发生完整 GC，实际提交路径返回附件不可�
 		),
 		(error) => {
 			assert.equal(error.code, "attachment_unavailable");
-			assert.match(error.message, /附件不存在、无权使用或正在清理/);
+			assert.match(error.message, /附件不存在、無權使用或正在清理/);
 			return true;
 		},
 	);
 	assert.equal(scalar(database, "SELECT COUNT(*) FROM messages"), 0);
 });
 
-test("有效本地文件、文本消息、头像清空与可信外部附件保持可用", () => {
+test("有效本地文件、文本消息、頭像清空與可信外部附件保持可用", () => {
 	const database = createDatabase();
 	const ownerId = insertUser(database, "valid-owner");
 	const otherId = insertUser(database, "other-owner");
@@ -401,7 +401,7 @@ test("有效本地文件、文本消息、头像清空与可信外部附件保�
 	assert.equal(scalar(database, "SELECT COUNT(*) FROM messages"), 3);
 });
 
-test("GC 在共享预算内轮转多个步骤，失败后保留任务并可在下次续跑", async () => {
+test("GC 在共享預算內輪轉多個步驟，失敗後保留任務並可在下次續跑", async () => {
 	const database = createDatabase();
 	const userId = insertUser(database, "budget-owner");
 	const channelId = scalar(database, "SELECT id FROM channels WHERE name = 'general'");
@@ -454,7 +454,7 @@ test("GC 在共享预算内轮转多个步骤，失败后保留任务并可在�
 	assert.ok(scalar(database, "SELECT COUNT(*) FROM uploaded_files") <= remainingBefore);
 });
 
-test("重复发现已经排队的对象不会重置未来重试时间", async () => {
+test("重複發現已經排隊的對象不會重置未來重試時間", async () => {
 	const database = createDatabase();
 	const userId = insertUser(database, "future-retry");
 	database.run(
@@ -478,7 +478,7 @@ test("重复发现已经排队的对象不会重置未来重试时间", async ()
 	assert.deepEqual(after, before);
 });
 
-test("硬删除用户前先持久化其 R2 清理任务", async () => {
+test("硬刪除用戶前先持久化其 R2 清理任務", async () => {
 	const database = createDatabase();
 	const userId = insertUser(database, "deleted-owner", { deleted: true });
 	database.run(
@@ -524,7 +524,7 @@ test("硬删除用户前先持久化其 R2 清理任务", async () => {
 	);
 });
 
-test("GC 可以清理从正常建号流程进入 general 的软删用户", async () => {
+test("GC 可以清理從正常建號流程進入 general 的軟刪用戶", async () => {
 	const database = createDatabase();
 	const userId = insertUser(database, "deleted-general-member");
 	assert.equal(

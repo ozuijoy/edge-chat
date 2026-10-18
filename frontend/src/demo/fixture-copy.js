@@ -1,37 +1,8 @@
 import { ENGLISH_LOCALE, TRADITIONAL_CHINESE_LOCALE } from '../i18n.js';
 
-// demo 预置数据的可读文案按访问者语言提供：海外访客首次打开演示站时，
-// 界面与聊天内容保持同一种语言，避免英文界面里出现整屏中文示例而误判产品不支持英文。
+// demo 預置數據的可讀文案按訪問者語言提供：海外訪客首次打開演示站時，
+// 界面與聊天內容保持同一種語言，避免英文界面裡出現整屏中文示例而誤判產品不支持英文。
 const DEMO_FIXTURE_COPY = {
-  'zh-CN': {
-    adminName: '演示管理员',
-    longName: '负责跨团队协作与超长姓名布局验证的演示用户',
-    longBio: '用于验证长名称在通讯录与资料卡中的自然降级。',
-    generalDescription: '全员公告与日常交流',
-    productName: '产品协作',
-    productDescription: '规划版本与验证交付',
-    telegramName: 'Telegram 联动',
-    telegramDescription: '展示 EdgeChat 与 Telegram 群消息双向同步',
-    publicName: '公开讨论',
-    publicDescription: '任何成员都可以发现并加入',
-    welcome: '欢迎来到 EdgeChat 演示站。这里展示频道、私信、附件与消息管理。',
-    adminTour: '管理员可以从左侧进入后台，查看用户、邀请、站点设置和 Telegram 映射。',
-    imageAttachment: '这是一条图片附件消息，点击图片可以打开预览。',
-    localOnly: '所有演示操作都只保存在当前浏览器页面中。',
-    mutedMember: '我先暂停参与讨论，稍后再跟进。',
-    productUpdate: '新版本的附件授权读取已经验证完成。',
-    productMention: '@admin 收到，我会继续检查移动端消息列表。',
-    telegramOutbound: '这条消息由 EdgeChat 发送，并同步到了 Telegram 群。',
-    telegramInbound: 'Telegram 群里的回复也会回到同一个 EdgeChat 频道。',
-    publicPreview: '这个公开群组尚未加入，点击后会在本地模拟加入。',
-    dmHello: '你好，这里是一对一私信会话。',
-    dmTour: '消息发送、附件上传和删除都可以在 demo 中体验。',
-    inviteNote: '体验邀请注册流程',
-    teamInviteNote: '产品体验成员',
-    telegramChatTitle: 'EdgeChat 演示群',
-    telegramMember: 'Telegram · 演示群成员',
-    telegramAutoReply: 'Telegram 已收到这条消息，并把群内回复同步回 EdgeChat。'
-  },
   'zh-TW': {
     adminName: '演示管理員',
     longName: '負責跨團隊協作與超長姓名版面驗證的演示用戶',
@@ -44,7 +15,7 @@ const DEMO_FIXTURE_COPY = {
     publicName: '公開討論',
     publicDescription: '任何成員都可以發現並加入',
     welcome: '歡迎來到 EdgeChat 演示站。這裡展示頻道、私訊、附件與訊息管理。',
-    adminTour: '管理員可以從左側進入後台，查看用戶、邀請、站點設定和 Telegram 映射。',
+    adminTour: '管理員可以從左側進入後臺，查看用戶、邀請、站點設定和 Telegram 映射。',
     imageAttachment: '這是一則圖片附件訊息，點擊圖片可以開啟預覽。',
     localOnly: '所有演示操作都只保存在目前的瀏覽器頁面中。',
     mutedMember: '我先暫停參與討論，稍後再跟進。',
@@ -93,6 +64,6 @@ const DEMO_FIXTURE_COPY = {
 };
 
 export function getDemoFixtureCopy(locale) {
-  if (locale === ENGLISH_LOCALE || locale === TRADITIONAL_CHINESE_LOCALE) return DEMO_FIXTURE_COPY[locale];
-  return DEMO_FIXTURE_COPY['zh-CN'];
+  if (locale === ENGLISH_LOCALE) return DEMO_FIXTURE_COPY[locale];
+  return DEMO_FIXTURE_COPY[TRADITIONAL_CHINESE_LOCALE];
 }

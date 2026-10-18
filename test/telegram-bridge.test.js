@@ -36,7 +36,7 @@ const keyring = JSON.stringify({
 	},
 });
 
-test("Telegram 文字消息转换为稳定的外部发送者模型", () => {
+test("Telegram 文字消息轉換為穩定的外部發送者模型", () => {
 	assert.deepEqual(
 		parseTelegramMessageUpdate({
 			message: {
@@ -61,10 +61,10 @@ test("Telegram 文字消息转换为稳定的外部发送者模型", () => {
 	assert.equal(parseTelegramMessageUpdate({ message: { text: "bot", from: { is_bot: true } } }), null);
 });
 
-test("Telegram 图片、视频、语音、音频与普通文件保留原始元数据", () => {
+test("Telegram 圖片、視頻、語音、音頻與普通文件保留原始元數據", () => {
 	const base = {
 		message_id: 10,
-		caption: "说明",
+		caption: "說明",
 		chat: { id: -100123, title: "Bridge room" },
 		from: { id: 42, first_name: "Alice", is_bot: false },
 	};
@@ -148,10 +148,10 @@ test("Telegram 图片、视频、语音、音频与普通文件保留原始元�
 		},
 	});
 	assert.equal(document.attachment.kind, "document");
-	assert.equal(document.content, "说明");
+	assert.equal(document.content, "說明");
 });
 
-test("EdgeChat 出站消息使用粗体用户名、紧邻正文的换行和 HTML 转义", () => {
+test("EdgeChat 出站消息使用粗體用戶名、緊鄰正文的換行和 HTML 轉義", () => {
 	assert.equal(
 		formatTelegramMessage('Alice & Bob', '<hello> "world"'),
 		'<b>Alice &amp; Bob:</b>\n&lt;hello&gt; &quot;world&quot;',
@@ -163,7 +163,7 @@ test("EdgeChat 出站消息使用粗体用户名、紧邻正文的换行和 HTML
 	assert.equal(chunks[1], "<b>Alice:</b>\nb");
 });
 
-test("Telegram 媒体上传按类型构造 multipart 请求", async () => {
+test("Telegram 媒體上傳按類型構造 multipart 請求", async () => {
 	const originalFetch = globalThis.fetch;
 	let captured;
 	globalThis.fetch = async (url, init) => {
@@ -213,7 +213,7 @@ test("Telegram 媒体上传按类型构造 multipart 请求", async () => {
 	assert.equal(captured.init.body.get("voice").name, "voice.ogg");
 });
 
-test("Telegram 文字回复使用 reply_parameters 指向同群原消息", async () => {
+test("Telegram 文字回覆使用 reply_parameters 指向同群原消息", async () => {
 	const originalFetch = globalThis.fetch;
 	let captured;
 	globalThis.fetch = async (url, init) => {
@@ -233,7 +233,7 @@ test("Telegram 文字回复使用 reply_parameters 指向同群原消息", async
 	assert.deepEqual(JSON.parse(captured.init.body).reply_parameters, { message_id: 2 });
 });
 
-test("Telegram 入站附件下载后加密写入 R2，超限时不下载", async () => {
+test("Telegram 入站附件下載後加密寫入 R2，超限時不下載", async () => {
 	const originalFetch = globalThis.fetch;
 	const writes = [];
 	let fetchCount = 0;
@@ -327,14 +327,14 @@ test("Telegram 入站附件下载后加密写入 R2，超限时不下载", async
 	);
 });
 
-test("可信 Telegram 外部消息可以直接引用 Bridge 创建的 R2 附件", async () => {
+test("可信 Telegram 外部消息可以直接引用 Bridge 創建的 R2 附件", async () => {
 	let insertBinds;
 	const env = {
 		EDGECHAT_ENCRYPTION_KEYRING: keyring,
 		DB: {
 			prepare(sql) {
 				if (sql.includes("uploaded_files")) {
-					throw new Error("外部附件不应伪造本地上传归属");
+					throw new Error("外部附件不應偽造本地上傳歸屬");
 				}
 				return {
 					bind(...binds) {
@@ -390,7 +390,7 @@ test("可信 Telegram 外部消息可以直接引用 Bridge 创建的 R2 附件"
 	assert.equal(insertBinds[17], "unique-id");
 });
 
-test("Bot Token 与 Webhook Secret 使用用途绑定的服务端密文", async () => {
+test("Bot Token 與 Webhook Secret 使用用途綁定的服務端密文", async () => {
 	const env = { EDGECHAT_ENCRYPTION_KEYRING: keyring };
 	const encrypted = await encryptSecretValue(env, "123:token", "telegram:bot-token");
 	assert.equal(encrypted.includes("123:token"), false);
@@ -401,7 +401,7 @@ test("Bot Token 与 Webhook Secret 使用用途绑定的服务端密文", async 
 	);
 });
 
-test("外部消息密文绑定来源和外部用户 ID", async () => {
+test("外部消息密文綁定來源和外部用戶 ID", async () => {
 	const env = { EDGECHAT_ENCRYPTION_KEYRING: keyring };
 	const encrypted = await encryptMessageContent(env, "telegram message", {
 		channelId: 7,
@@ -427,7 +427,7 @@ test("外部消息密文绑定来源和外部用户 ID", async () => {
 	);
 });
 
-test("消息 projection 保留 Telegram 来源而不伪造 EdgeChat 账号", () => {
+test("消息 projection 保留 Telegram 來源而不偽造 EdgeChat 賬號", () => {
 	assert.deepEqual(
 			mapMessage({
 				id: 12,
@@ -460,7 +460,7 @@ test("消息 projection 保留 Telegram 来源而不伪造 EdgeChat 账号", () 
 	);
 });
 
-test("Telegram 私有群入站使用映射中的真实房间类型", async () => {
+test("Telegram 私有群入站使用映射中的真實房間類型", async () => {
 	let roomName = "";
 	let submittedPayload = null;
 	const env = {
@@ -514,7 +514,7 @@ test("Telegram 私有群入站使用映射中的真实房间类型", async () =>
 	});
 });
 
-test("Telegram webhook 公开接收而后台配置仍要求登录", async () => {
+test("Telegram webhook 公開接收而後臺配置仍要求登錄", async () => {
 	const env = {
 		DB: {
 			prepare() {
@@ -552,5 +552,5 @@ test("Telegram webhook 公开接收而后台配置仍要求登录", async () => 
 	assert.equal(webhookResponse.status, 503);
 	assert.deepEqual(await webhookResponse.json(), { error: "Telegram Bridge 未配置" });
 	assert.equal(adminResponse.status, 401);
-	assert.deepEqual(await adminResponse.json(), { error: "请先登录" });
+	assert.deepEqual(await adminResponse.json(), { error: "請先登錄" });
 });

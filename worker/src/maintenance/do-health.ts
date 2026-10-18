@@ -8,6 +8,6 @@ export function durableObjectHealth(request: Request, service: string): Response
   if (request.method !== 'GET') {
     return Response.json({ error: 'Method Not Allowed' }, { status: 405 });
   }
-  // 健康请求只证明对象代码可达；不接收连接、不读写业务状态、更不启动 alarm。
+  // 健康請求只證明對象代碼可達；不接收連接、不讀寫業務狀態、更不啟動 alarm。
   return Response.json({ ok: true, service });
 }

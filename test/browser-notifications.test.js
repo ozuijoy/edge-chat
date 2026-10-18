@@ -5,10 +5,10 @@ import {
 	browserNotificationRoomKey,
 	useBrowserNotifications,
 } from "../frontend/src/composables/useBrowserNotifications.js";
-import { CHINESE_LOCALE, setLocale } from "../frontend/src/i18n.js";
+import { TRADITIONAL_CHINESE_LOCALE, setLocale } from "../frontend/src/i18n.js";
 
 beforeEach(async () => {
-	await setLocale(CHINESE_LOCALE);
+	await setLocale(TRADITIONAL_CHINESE_LOCALE);
 });
 
 function createStorage() {
@@ -47,7 +47,7 @@ function createNotificationApi() {
 	return { NotificationApi: FakeNotification, notifications };
 }
 
-test("浏览器通知需由用户授权开启，并按账号持久化", async () => {
+test("瀏覽器通知需由用戶授權開啟，並按賬號持久化", async () => {
 	const storage = createStorage();
 	const { NotificationApi } = createNotificationApi();
 	const notifications = useBrowserNotifications({
@@ -58,7 +58,7 @@ test("浏览器通知需由用户授权开启，并按账号持久化", async ()
 	});
 
 	assert.equal(notifications.notificationsEnabled.value, false);
-	assert.equal(notifications.notificationActionLabel.value, "开启通知");
+	assert.equal(notifications.notificationActionLabel.value, "開啟通知");
 	await notifications.toggleNotifications();
 	assert.equal(notifications.notificationsEnabled.value, true);
 	assert.match(storage.getItem("edgechat:browser-notifications:7"), /"enabled":true/);
@@ -81,10 +81,10 @@ test("浏览器通知需由用户授权开启，并按账号持久化", async ()
 	NotificationApi.permission = "denied";
 	restored.syncNotificationPermission();
 	assert.equal(restored.notificationsEnabled.value, false);
-	assert.equal(restored.notificationActionLabel.value, "浏览器已阻止通知");
+	assert.equal(restored.notificationActionLabel.value, "瀏覽器已阻止通知");
 });
 
-test("会话免打扰阻止通知，取消后通知可聚合并打开会话", async () => {
+test("會話免打擾阻止通知，取消後通知可聚合並打開會話", async () => {
 	const storage = createStorage();
 	const { NotificationApi, notifications: shown } = createNotificationApi();
 	let focused = 0;
@@ -112,7 +112,7 @@ test("会话免打扰阻止通知，取消后通知可聚合并打开会话", as
 	assert.equal(shown.length, 1);
 	assert.equal(shown[0].title, "Alice");
 	assert.deepEqual(shown[0].options, {
-		body: "收到一条新私信",
+		body: "收到一條新私信",
 		tag: "edgechat:dm:12",
 		renotify: true,
 	});
@@ -122,19 +122,19 @@ test("会话免打扰阻止通知，取消后通知可聚合并打开会话", as
 	assert.equal(shown[0].closed, true);
 
 	NotificationApi.permission = "granted";
-	const groupRoom = { kind: "public", id: 3, name: "产品协作" };
+	const groupRoom = { kind: "public", id: 3, name: "產品協作" };
 	assert.equal(notifications.notifyRoom(groupRoom), true);
-	assert.equal(shown[1].options.body, "收到一条新群聊消息");
+	assert.equal(shown[1].options.body, "收到一條新群聊消息");
 
 	const mentionEvent = {
 		room: groupRoom,
 		mentionsMe: true,
-		contentPreview: "@admin 请看一下",
+		contentPreview: "@admin 請看一下",
 		sender: { displayName: "Alice" },
 	};
 	assert.equal(notifications.notifyRoom(mentionEvent), true);
-	assert.equal(shown[2].title, "有人在 产品协作 提及你");
-	assert.equal(shown[2].options.body, "Alice: @admin 请看一下");
+	assert.equal(shown[2].title, "有人在 產品協作 提及你");
+	assert.equal(shown[2].options.body, "Alice: @admin 請看一下");
 	notifications.toggleRoomMuted(groupRoom);
 	assert.equal(notifications.shouldNotifyRoom(groupRoom), false);
 	assert.equal(notifications.shouldNotifyRoom(mentionEvent), true);
@@ -144,16 +144,16 @@ test("会话免打扰阻止通知，取消后通知可聚合并打开会话", as
 	const replyEvent = {
 		room: groupRoom,
 		replyToMe: true,
-		contentPreview: "已经处理好了",
+		contentPreview: "已經處理好了",
 		sender: { displayName: "Bob" },
 	};
 	assert.equal(notifications.shouldNotifyRoom(replyEvent), true);
 	assert.equal(notifications.notifyRoom(replyEvent), true);
-	assert.equal(shown[4].title, "有人在 产品协作 回复你");
-	assert.equal(shown[4].options.body, "Bob: 已经处理好了");
+	assert.equal(shown[4].title, "有人在 產品協作 回覆你");
+	assert.equal(shown[4].options.body, "Bob: 已經處理好了");
 });
 
-test("浏览器拒绝通知权限时开关保持禁用", async () => {
+test("瀏覽器拒絕通知權限時開關保持禁用", async () => {
 	const { NotificationApi } = createNotificationApi();
 	NotificationApi.permission = "denied";
 	const notifications = useBrowserNotifications({
@@ -163,12 +163,12 @@ test("浏览器拒绝通知权限时开关保持禁用", async () => {
 	});
 
 	assert.equal(notifications.notificationToggleDisabled.value, true);
-	assert.equal(notifications.notificationActionLabel.value, "浏览器已阻止通知");
+	assert.equal(notifications.notificationActionLabel.value, "瀏覽器已阻止通知");
 	await notifications.toggleNotifications();
 	assert.equal(notifications.notificationsEnabled.value, false);
 });
 
-test("Service Worker 未激活或注册查询失败时使用原有通知", async () => {
+test("Service Worker 未激活或註冊查詢失敗時使用原有通知", async () => {
 	const { NotificationApi, notifications: shown } = createNotificationApi();
 	NotificationApi.permission = "granted";
 	let registration = null;
@@ -217,7 +217,7 @@ test("Service Worker 未激活或注册查询失败时使用原有通知", async
 	assert.deepEqual(swShown[0].options.data, { roomKind: "dm", roomId: 8 });
 });
 
-test("Capacitor 通知复用会话偏好并交给原生插件展示", async () => {
+test("Capacitor 通知複用會話偏好並交給原生插件展示", async () => {
 	const shown = [];
 	const nativeNotifications = {
 		async checkPermission() {
@@ -242,8 +242,8 @@ test("Capacitor 通知复用会话偏好并交给原生插件展示", async () =
 	assert.equal(notifications.notificationsEnabled.value, true);
 	assert.equal(
 		notifications.notifyRoom({
-			room: { kind: "private", id: 6, name: "项目组" },
-			contentPreview: "构建完成",
+			room: { kind: "private", id: 6, name: "項目組" },
+			contentPreview: "構建完成",
 			sender: { displayName: "Alice" },
 		}),
 		true,
@@ -251,8 +251,8 @@ test("Capacitor 通知复用会话偏好并交给原生插件展示", async () =
 	await new Promise((resolve) => setTimeout(resolve, 0));
 	assert.deepEqual(shown, [
 		{
-			title: "项目组",
-			body: "收到一条新群聊消息",
+			title: "項目組",
+			body: "收到一條新群聊消息",
 			tag: "edgechat:private:6",
 			roomKind: "private",
 			roomId: 6,

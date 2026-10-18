@@ -13,13 +13,13 @@ export function registerMessageRoutes(app) {
     const limit = sanitizeLimit(c.req.query('limit'));
 
     if (!isRoomKind(kind) || !Number.isInteger(roomId) || roomId <= 0) {
-      return errorResponse('参数无效');
+      return errorResponse('參數無效');
     }
 
     const access = await authorizeRoom(c.env.DB, session, kind, roomId);
 
     if (!access.ok) {
-      return errorResponse('无权访问该会话', 403);
+      return errorResponse('無權訪問該會話', 403);
     }
 
     const [messages, pinnedMessage] = await Promise.all([
@@ -56,13 +56,13 @@ export function registerMessageRoutes(app) {
       roomId <= 0 ||
       (messageId !== null && (!Number.isInteger(messageId) || messageId <= 0))
     ) {
-      return errorResponse('参数无效');
+      return errorResponse('參數無效');
     }
 
     const access = await authorizeRoom(c.env.DB, session, kind, roomId);
 
     if (!access.ok) {
-      return errorResponse('无权访问该会话', 403);
+      return errorResponse('無權訪問該會話', 403);
     }
 
     const lastReadMessageId = await markRoomRead(c.env.DB, {

@@ -12,7 +12,7 @@ function escapeImageDestination(value: string) {
 }
 
 function imageMarkdown(image: HTMLImageElement) {
-	const label = escapeImageLabel(image.alt || "图片");
+	const label = escapeImageLabel(image.alt || "圖片");
 	const source = image.getAttribute("src") || image.getAttribute("data-src") || "";
 	return source ? `![${label}](${escapeImageDestination(source)})` : label;
 }
@@ -39,7 +39,7 @@ function replaceHtmlBlocksWithCode(root: DocumentFragment) {
 		codeBlock.appendChild(pre);
 		htmlBlock.replaceWith(codeBlock);
 		if (isLastBlock) {
-			// 末尾空段让光标离开整体代码块，避免用户继续输入时把后续正文并入 HTML 源码。
+			// 末尾空段讓光標離開整體代碼塊，避免用戶繼續輸入時把後續正文併入 HTML 源碼。
 			const trailingParagraph = document.createElement("p");
 			trailingParagraph.dataset.block = "0";
 			trailingParagraph.appendChild(document.createElement("br"));
@@ -53,7 +53,7 @@ function removeRemoteContentBeforeMount(html: string) {
 	template.innerHTML = html;
 	replaceHtmlBlocksWithCode(template.content);
 
-	// 未开放的动态预览只显示源码，避免其后续渲染器加载第三方脚本或媒体。
+	// 未開放的動態預覽只顯示源碼，避免其後續渲染器加載第三方腳本或媒體。
 	for (const preview of template.content.querySelectorAll(".vditor-wysiwyg__preview")) {
 		const source = preview.parentElement?.querySelector("pre:not(.vditor-wysiwyg__preview) code");
 		preview.replaceChildren(document.createTextNode(source?.textContent || ""));
@@ -73,7 +73,7 @@ function removeRemoteContentBeforeMount(html: string) {
 export function installVditorContentSafety(lute: VditorLute) {
 	const renderMarkdown = lute.Md2VditorDOM.bind(lute);
 	const normalizeEditorDom = lute.SpinVditorDOM.bind(lute);
-	// Vditor 没有覆盖 WYSIWYG 全部写入路径的图片禁用开关，因此在其统一转换出口前净化。
+	// Vditor 沒有覆蓋 WYSIWYG 全部寫入路徑的圖片禁用開關，因此在其統一轉換出口前淨化。
 	lute.Md2VditorDOM = (markdown) => removeRemoteContentBeforeMount(renderMarkdown(markdown));
 	lute.SpinVditorDOM = (html) => removeRemoteContentBeforeMount(normalizeEditorDom(html));
 }

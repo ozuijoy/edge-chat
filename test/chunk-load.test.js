@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { chunkLoadFailed, installChunkLoadRecovery } from '../frontend/src/chunk-load.ts';
 
-test('按需资源失败给出恢复入口但不自动刷新或吞掉原始错误', () => {
+test('按需資源失敗給出恢復入口但不自動刷新或吞掉原始錯誤', () => {
   const target = new EventTarget();
   const dispose = installChunkLoadRecovery(target);
   chunkLoadFailed.value = false;

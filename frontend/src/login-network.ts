@@ -22,7 +22,7 @@ export function probeWebRtc({ signal, timeoutMs = 2000, PeerConnection = globalT
     };
     const cancel = () => finish('failed');
     try {
-      // 只收集 STUN 返回的地址，不采集局域网 host/mDNS，也不使用媒体或 TURN 中继。
+      // 只收集 STUN 返回的地址，不採集局域網 host/mDNS，也不使用媒體或 TURN 中繼。
       peer = new PeerConnection({ iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }], iceCandidatePoolSize: 0 });
       signal.addEventListener('abort', cancel, { once: true });
       timer = setTimeout(() => finish('timeout'), timeoutMs);

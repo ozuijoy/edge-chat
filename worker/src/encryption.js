@@ -145,22 +145,22 @@ async function getCryptoKey(keyring, keyId) {
 }
 
 function messageAad(channelId, senderId) {
-  // 把密文绑定到原会话与发送者，防止数据库中的密文被挪到另一条消息后仍能通过认证。
+  // 把密文綁定到原會話與發送者，防止數據庫中的密文被挪到另一條消息後仍能通過認證。
   return encoder.encode(`edgechat:message:v1:${Number(channelId)}:${Number(senderId)}`);
 }
 
 function externalMessageAad(channelId, senderContext) {
-  // 外部用户没有本地数值账号，v2 使用来源与外部 ID 绑定密文，同时保留 v1 本地消息兼容性。
+  // 外部用戶沒有本地數值賬號，v2 使用來源與外部 ID 綁定密文，同時保留 v1 本地消息兼容性。
   return encoder.encode(`edgechat:message:v2:${Number(channelId)}:${String(senderContext)}`);
 }
 
 function attachmentAad(objectKey) {
-  // R2 对象键参与认证，避免同一份密文被替换到其他下载地址。
+  // R2 對象鍵參與認證，避免同一份密文被替換到其他下載地址。
   return encoder.encode(`edgechat:attachment:v1:${String(objectKey)}`);
 }
 
 function secretAad(context) {
-  // 配置密文绑定到明确用途，避免数据库中的 Bot Token 与 Webhook Secret 被互换后仍能解密。
+  // 配置密文綁定到明確用途，避免數據庫中的 Bot Token 與 Webhook Secret 被互換後仍能解密。
   return encoder.encode(`edgechat:secret:v1:${String(context)}`);
 }
 
@@ -217,7 +217,7 @@ export async function decryptMessageContent(
   { channelId, senderId, senderContext = '' }
 ) {
   const content = String(value || '');
-  // 历史明文保持原样读取，不做请求内回写，也不触发后台批量迁移。
+  // 歷史明文保持原樣讀取，不做請求內回寫，也不觸發後臺批量遷移。
   if (!isEncryptedMessageContent(content)) {
     return content;
   }
@@ -383,7 +383,7 @@ export async function encryptAttachment(source, value, objectKey) {
 
 export async function decryptAttachment(source, value, objectKey) {
   const bytes = toBytes(value);
-  // 旧附件仍按原始字节返回，只对部署后新上传的加密信封做解密。
+  // 舊附件仍按原始字節返回，只對部署後新上傳的加密信封做解密。
   if (!isEncryptedAttachment(bytes)) {
     return { bytes, encrypted: false, keyId: null };
   }

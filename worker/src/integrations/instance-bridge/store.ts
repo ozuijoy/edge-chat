@@ -18,7 +18,7 @@ export interface Namespace {
   idFromName(name: string): unknown;
   get(id: unknown): { fetch(input: Request | string, init?: RequestInit): Promise<Response> };
 }
-// 保持与现有 JS Worker 的结构化接口兼容，不为桥接引入新的服务容器。
+// 保持與現有 JS Worker 的結構化接口兼容，不為橋接引入新的服務容器。
 export type BridgeEnv = {
   DB: Database;
   INSTANCE_BRIDGE?: Namespace;
@@ -49,7 +49,7 @@ export async function identity(env: BridgeEnv, requestOrigin?: string): Promise<
   let instance = await first<Identity>(env.DB, "SELECT instance_id, origin FROM bridge_instance WHERE singleton = 1");
   if (!instance) throw bridgeError("not_configured", 409);
   if (requestOrigin && instance.origin !== normalizeOrigin(requestOrigin)) {
-    // 无存活关系或未确认撤销通知时才允许换主域名，避免静默改变既有绑定的身份。
+    // 無存活關係或未確認撤銷通知時才允許換主域名，避免靜默改變既有綁定的身份。
     await env.DB.prepare(`UPDATE bridge_instance SET origin = ? WHERE singleton = 1
       AND NOT EXISTS (SELECT 1 FROM instance_bindings WHERE status != 'revoked' OR control_pending = 1)`)
       .bind(normalizeOrigin(requestOrigin)).run();
@@ -93,7 +93,7 @@ export async function requireAdmin(env: BridgeEnv, session: { userId: number }, 
 }
 export async function managedGroup(env: BridgeEnv, session: { userId: number }, channelId: number) {
   const authorization = await requireAdmin(env, session);
-  // 超管保持原有全站桥接运维行为；子管理员必须拥有真实群主关系，不能制造全权聊天身份。
+  // 超管保持原有全站橋接運維行為；子管理員必須擁有真實群主關係，不能製造全權聊天身份。
   if (authorization.isSuperAdmin) {
     const channel = await getChannelById(env.DB, channelId);
     if (!channel || !['public', 'private'].includes(channel.kind)) throw bridgeError('group_unavailable', 403);

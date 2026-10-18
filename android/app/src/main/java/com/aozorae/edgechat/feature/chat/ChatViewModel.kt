@@ -155,7 +155,7 @@ class ChatViewModel @Inject constructor(
 	fun startVoiceRecording() {
 		error.value = null
 		runCatching(voiceRecorder::start)
-			.onFailure { error.value = it.message ?: "无法开始录音" }
+			.onFailure { error.value = it.message ?: "無法開始錄音" }
 	}
 
 	fun cancelVoiceRecording() {
@@ -166,7 +166,7 @@ class ChatViewModel @Inject constructor(
 		val room = selectedRoom.value ?: return
 		val pending = voiceRecorder.finish()
 		if (pending == null) {
-			error.value = "录音时间太短，请重新录制"
+			error.value = "錄音時間太短，請重新錄製"
 			return
 		}
 		action { outboxRepository.enqueue(room, "", pending) }
@@ -250,7 +250,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             busy.value = true
             error.value = null
-            runCatching { block() }.onFailure { error.value = it.message ?: "操作失败" }
+            runCatching { block() }.onFailure { error.value = it.message ?: "操作失敗" }
             busy.value = false
         }
     }

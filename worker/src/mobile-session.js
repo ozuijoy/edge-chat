@@ -23,7 +23,7 @@ function normalizeDevice(device) {
   const name = String(device?.name || '').trim().slice(0, 80);
   const appVersion = String(device?.appVersion || '').trim().slice(0, 32);
   if (!installationId || installationId.length > 128 || !name) {
-    throw new ApiError('设备信息无效', 400, 'invalid_device');
+    throw new ApiError('設備信息無效', 400, 'invalid_device');
   }
   return { installationId, name, appVersion };
 }
@@ -111,7 +111,7 @@ export async function refreshMobileDeviceSession(env, rawRefreshToken, rawInstal
   const refreshToken = String(rawRefreshToken || '').trim();
   const installationId = String(rawInstallationId || '').trim();
   if (!refreshToken || !installationId) {
-    throw new ApiError('刷新凭据无效', 401, 'refresh_token_invalid');
+    throw new ApiError('刷新憑據無效', 401, 'refresh_token_invalid');
   }
 
   const refreshTokenHash = await hashOpaqueToken(refreshToken);
@@ -138,7 +138,7 @@ export async function refreshMobileDeviceSession(env, rawRefreshToken, rawInstal
     isUserDisabled(row) ||
     Number(row.device_session_version || 0) !== Number(row.session_version || 0)
   ) {
-    throw new ApiError('刷新凭据已失效，请重新登录', 401, 'refresh_token_invalid');
+    throw new ApiError('刷新憑據已失效，請重新登錄', 401, 'refresh_token_invalid');
   }
 
   const nextRefreshToken = randomToken(32);
@@ -157,7 +157,7 @@ export async function refreshMobileDeviceSession(env, rawRefreshToken, rawInstal
     .bind(nextRefreshTokenHash, nextExpiresAt, row.device_session_id, refreshTokenHash)
     .run();
   if (Number(update.meta?.changes || 0) !== 1) {
-    throw new ApiError('刷新凭据已被使用，请重新登录', 401, 'refresh_token_reused');
+    throw new ApiError('刷新憑據已被使用，請重新登錄', 401, 'refresh_token_reused');
   }
 
   const user = {

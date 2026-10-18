@@ -39,7 +39,7 @@ function focus() {
 
 defineExpose({ element: textareaEl, focus });
 
-// 等 v-model 写回 DOM 后统一测量，输入与外部清空/恢复草稿都只触发一次布局读取。
+// 等 v-model 寫回 DOM 後統一測量，輸入與外部清空/恢復草稿都只觸發一次佈局讀取。
 watch(() => props.modelValue, syncHeight, { flush: 'post' });
 onMounted(syncHeight);
 </script>

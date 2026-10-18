@@ -61,7 +61,7 @@ export function useVoiceRecorder() {
 			const acquiredStream = await navigator.mediaDevices.getUserMedia({
 				audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
 			});
-			// 权限弹窗期间可以离开会话；迟到的授权结果不能在已关闭的页面继续占用麦克风。
+			// 權限彈窗期間可以離開會話；遲到的授權結果不能在已關閉的頁面繼續佔用麥克風。
 			if (attempt !== generation) {
 				acquiredStream.getTracks().forEach((track) => {
 					track.stop();
@@ -153,7 +153,7 @@ export function useVoiceRecorder() {
 	}
 
 	function handleVisibilityChange() {
-		// 切到后台后不保留不可见的录音；授权弹窗期间尚未录音，不在这里取消系统授权。
+		// 切到後臺後不保留不可見的錄音；授權彈窗期間尚未錄音，不在這裡取消系統授權。
 		if (document.hidden && recording.value) void cancel();
 	}
 

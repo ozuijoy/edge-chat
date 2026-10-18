@@ -34,7 +34,7 @@ function runNotificationClick(clientList) {
   return { completed, opened, closed };
 }
 
-test('通知点击复用窗口时发送目标并聚焦', async () => {
+test('通知點擊複用窗口時發送目標並聚焦', async () => {
   const messages = [];
   let focused = false;
   const client = {
@@ -50,7 +50,7 @@ test('通知点击复用窗口时发送目标并聚焦', async () => {
   assert.equal(messages[0].data.roomId, 42);
 });
 
-test('通知点击冷启动时在 URL 中保留会话，读取后清除参数', async () => {
+test('通知點擊冷啟動時在 URL 中保留會話，讀取後清除參數', async () => {
   const result = runNotificationClick([]);
   await result.completed;
   const openedUrl = new URL(result.opened[0]);
@@ -67,7 +67,7 @@ test('通知点击冷启动时在 URL 中保留会话，读取后清除参数', 
   assert.deepEqual(browserWindow.history.replacement.state, { scroll: 12 });
 });
 
-test('拒绝无效通知目标，仍清除 URL 中的通知参数', () => {
+test('拒絕無效通知目標，仍清除 URL 中的通知參數', () => {
   assert.equal(parseNotificationRoomTarget({ roomKind: 'admin', roomId: 2 }), null);
   assert.equal(parseNotificationRoomTarget({ roomKind: 'dm', roomId: -1 }), null);
   const browserWindow = {

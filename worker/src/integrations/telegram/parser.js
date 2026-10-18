@@ -1,6 +1,6 @@
 function displayName(user) {
 	const name = [user?.first_name, user?.last_name].filter(Boolean).join(" ").trim();
-	return name || user?.username || `Telegram ${user?.id || "用户"}`;
+	return name || user?.username || `Telegram ${user?.id || "用戶"}`;
 }
 
 function parseAttachment(message) {

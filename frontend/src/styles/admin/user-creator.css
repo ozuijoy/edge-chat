@@ -18,7 +18,7 @@
   gap: var(--admin-space-sm);
 }
 
-/* 用户组选择靠左、提交按钮靠右，避免两者挤在一起。 */
+/* 用戶組選擇靠左、提交按鈕靠右，避免兩者擠在一起。 */
 .admin-user-creator__actions .field {
   margin-right: auto;
 }

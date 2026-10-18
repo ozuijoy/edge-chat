@@ -13,11 +13,11 @@ MESSAGE_RETENTION_DAYS = "7"
 SOFT_DELETE_RETENTION_DAYS = "60"
 GC_BATCH_SIZE = "90"
 GC_MAX_BATCHES_PER_RUN = "20"
-# 单次调用的 D1/R2 内部操作合计保留 100 次平台余量；失败写回也计入同一预算。
+# 單次調用的 D1/R2 內部操作合計保留 100 次平臺餘量；失敗寫回也計入同一預算。
 GC_INTERNAL_OPERATION_BUDGET = "900"
 GC_D1_STATEMENT_BUDGET = "1200"
 GC_R2_OPERATION_BUDGET = "300"
-# 逗号分隔的本站 origin，用于识别升级前保存的完整 /files/ 图标 URL；自定义域名应全部列出。
+# 逗號分隔的本站 origin，用於識別升級前保存的完整 /files/ 圖標 URL；自定義域名應全部列出。
 SITE_ORIGINS = ""
 R2_DELETE_MAX_RETRY = "8"
 ORPHAN_UPLOAD_RETENTION_DAYS = "1"
@@ -87,9 +87,9 @@ new_sqlite_classes = ["TelegramNotifications"]
 directory = "./frontend/dist"
 not_found_handling = "single-page-application"
 binding = "ASSETS"
-# 全量先经过 Worker，隐身模式才能在资产命中与 SPA fallback 之前鉴权。
+# 全量先經過 Worker，隱身模式才能在資產命中與 SPA fallback 之前鑑權。
 run_worker_first = true
 
 [triggers]
-# 单一 15 分钟触发器救援实例桥接；Worker 在 UTC 19:00 的轮次同时执行每日 GC，节省账户级 cron 配额。
+# 單一 15 分鐘觸發器救援實例橋接；Worker 在 UTC 19:00 的輪次同時執行每日 GC，節省賬戶級 cron 配額。
 crons = ["*/15 * * * *"]

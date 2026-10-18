@@ -19,7 +19,7 @@ function stopLinkGesture(event: Event) {
 </script>
 
 <template>
-	<!-- 最终 HTML 已由固定 Markdown 配置生成，并经过 DOMPurify 最小白名单净化。 -->
+	<!-- 最終 HTML 已由固定 Markdown 配置生成，並經過 DOMPurify 最小白名單淨化。 -->
 	<div
 		class="message-markdown"
 		@pointerdown="stopLinkGesture"
@@ -37,7 +37,7 @@ function stopLinkGesture(event: Event) {
 	overflow-wrap: anywhere;
 }
 
-/* 为气泡右下角的绝对定位时间戳保留稳定空间。 */
+/* 為氣泡右下角的絕對定位時間戳保留穩定空間。 */
 .message-markdown::after {
 	content: "";
 	display: inline-block;

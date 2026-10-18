@@ -28,14 +28,14 @@ export function createMessageSubmission({
 				);
 				if (blockStatus.blockedByPeer) {
 					throw new MessageSubmissionError(
-						"发送被拒，你已经被拉黑",
+						"發送被拒，你已經被拉黑",
 						"blocked_by_recipient",
 						403,
 					);
 				}
 				if (blockStatus.blockedBySender) {
 					throw new MessageSubmissionError(
-						"请先解除拉黑再发送",
+						"請先解除拉黑再發送",
 						"recipient_blocked",
 						403,
 					);
@@ -83,23 +83,23 @@ export function createMessageSubmission({
 				error?.message === "Attachment is not available"
 			) {
 				throw new MessageSubmissionError(
-					"附件不存在、无权使用或正在清理，请重新上传",
+					"附件不存在、無權使用或正在清理，請重新上傳",
 					"attachment_unavailable",
 			);
 			}
 			if (error?.message === "Message content cannot be empty") {
-				throw new MessageSubmissionError("消息内容不能为空");
+				throw new MessageSubmissionError("消息內容不能為空");
 			}
 			if (error?.message === "Message idempotency key was already consumed") {
 				throw new MessageSubmissionError(
-					"该消息已删除，不能使用相同的 clientMessageId 再次发送",
+					"該消息已刪除，不能使用相同的 clientMessageId 再次發送",
 					"client_message_id_consumed",
 					409,
 				);
 			}
 			if (error?.message === "Reply message is not available") {
 				throw new MessageSubmissionError(
-					"回复的消息不存在或已删除",
+					"回覆的消息不存在或已刪除",
 					"reply_message_unavailable",
 				);
 			}

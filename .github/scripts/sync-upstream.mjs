@@ -35,7 +35,7 @@ async function githubRequest(path, body) {
 }
 
 export function findUpdateCommit(log) {
-	// 用 Git 的 trailer 解析器只读取提交尾部参数，避免正文提到标记就触发发布。
+	// 用 Git 的 trailer 解析器只讀取提交尾部參數，避免正文提到標記就觸發發佈。
 	const fields = log.split("\0");
 	for (let index = 0; index + 1 < fields.length; index += 2) {
 		const kind = fields[index + 1]
@@ -55,7 +55,7 @@ export async function syncUpstream({
 	request = githubRequest,
 }) {
 	if (repository.toLowerCase() === UPSTREAM.toLowerCase()) {
-		console.log("上游主仓无需同步自身。");
+		console.log("上游主倉無需同步自身。");
 		return { updated: false, dispatched: false };
 	}
 	const upstream = await request(`/repos/${UPSTREAM}`);
@@ -76,7 +76,7 @@ export async function syncUpstream({
 		]),
 	);
 	if (!target) {
-		console.log("上游没有 stable/security 发布标记，保持当前版本。");
+		console.log("上游沒有 stable/security 發佈標記，保持當前版本。");
 		return { updated: false, dispatched: false };
 	}
 
@@ -91,7 +91,7 @@ export async function syncUpstream({
 			"user.email",
 			"41898282+github-actions[bot]@users.noreply.github.com",
 		]);
-		// 保留 fork 自己的提交；冲突或分支保护拒绝时直接失败，绝不强推。
+		// 保留 fork 自己的提交；衝突或分支保護拒絕時直接失敗，絕不強推。
 		await git([
 			"merge",
 			"--no-ff",
@@ -110,7 +110,7 @@ export async function syncUpstream({
 		]);
 		if (workflowsChanged && !hasSyncToken) {
 			throw new Error(
-				"更新包含 Actions 文件，请配置具有 Contents/Workflows 写权限的 EDGECHAT_SYNC_TOKEN 后重试。",
+				"更新包含 Actions 文件，請配置具有 Contents/Workflows 寫權限的 EDGECHAT_SYNC_TOKEN 後重試。",
 			);
 		}
 		await git(["push", "origin", `HEAD:refs/heads/${branch}`]);
@@ -126,13 +126,13 @@ export async function syncUpstream({
 		(run) => run.conclusion === "success" || run.status !== "completed",
 	);
 	if (deployedOrRunning) {
-		console.log(`${target.kind}: ${commit} 已部署或正在部署，无需重复派发。`);
+		console.log(`${target.kind}: ${commit} 已部署或正在部署，無需重複派發。`);
 		return { updated, dispatched: false, commit };
 	}
-	// GITHUB_TOKEN 的 push 不会触发 Actions；dispatch 是官方允许的例外。
-	// 即使上次推送后派发/部署失败，下次检查也会对当前 SHA 重新派发。
+	// GITHUB_TOKEN 的 push 不會觸發 Actions；dispatch 是官方允許的例外。
+	// 即使上次推送後派發/部署失敗，下次檢查也會對當前 SHA 重新派發。
 	await request(`${workflowPath}/dispatches`, { ref: branch });
-	console.log(`${target.kind}: ${commit} 已同步，已派发 Deploy Worker。`);
+	console.log(`${target.kind}: ${commit} 已同步，已派發 Deploy Worker。`);
 	return { updated, dispatched: true, commit };
 }
 

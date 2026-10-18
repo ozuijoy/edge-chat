@@ -45,14 +45,14 @@ function insertUser(database, username, displayName = username) {
 	return Number(database.exec("SELECT last_insert_rowid()")[0].values[0][0]);
 }
 
-test("提及文本使用完整用户名边界并去重候选 ID", () => {
+test("提及文本使用完整用戶名邊界並去重候選 ID", () => {
 	assert.equal(contentMentionsUsername("hi @alice, please review", "alice"), true);
 	assert.equal(contentMentionsUsername("mail@example.com", "example.com"), false);
 	assert.equal(contentMentionsUsername("@alice2", "alice"), false);
 	assert.deepEqual(normalizeMentionUserIds([2, "2", 3, 0, -1, "bad"]), [2, 3]);
 });
 
-test("服务端只保留正文真实出现且仍属于当前群的提及", async () => {
+test("服務端只保留正文真實出現且仍屬於當前群的提及", async () => {
 	const { database, env } = createEnvironment();
 	const senderId = insertUser(database, "alice", "Alice");
 	const bobId = insertUser(database, "bob", "Bob");
@@ -68,7 +68,7 @@ test("服务端只保留正文真实出现且仍属于当前群的提及", async
 		channelId,
 		roomKind: "public",
 		senderId,
-		content: "@bob 请看，carol 没有被真实提及",
+		content: "@bob 請看，carol 沒有被真實提及",
 		candidateUserIds: [senderId, bobId, carolId, 999],
 	});
 	assert.deepEqual(mentionUserIds, [bobId]);
@@ -84,7 +84,7 @@ test("服务端只保留正文真实出现且仍属于当前群的提及", async
 	);
 });
 
-test("消息提及随历史消息返回，并基于已读游标清除会话标志", async () => {
+test("消息提及隨歷史消息返回，並基於已讀游標清除會話標誌", async () => {
 	const { database, env } = createEnvironment();
 	const senderId = insertUser(database, "alice", "Alice");
 	const bobId = insertUser(database, "bob", "Bob");

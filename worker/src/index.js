@@ -69,8 +69,8 @@ app.use('/api/*', async (c, next) => {
   const uploadLimit = Number(c.env.MAX_FILE_SIZE || 20971520) + 1024 * 1024;
   const maxBytes = ['/api/upload', '/api/v1/uploads'].includes(path) ? uploadLimit : undefined;
   if (requestBodyTooLarge(c.req.raw, maxBytes)) {
-    // 提前拒绝超大请求体，避免 Worker 在 JSON 解析前消耗过多内存。
-    return errorResponse('请求体过大', 413);
+    // 提前拒絕超大請求體，避免 Worker 在 JSON 解析前消耗過多內存。
+    return errorResponse('請求體過大', 413);
   }
 
   await next();
@@ -95,13 +95,13 @@ registerInstanceBridgePublicRoutes(app);
 app.get('/api/register-links/:token', async (c) => {
   const token = String(c.req.param('token') || '').trim();
   if (!token) {
-    return errorResponse('注册链接不存在', 404);
+    return errorResponse('註冊鏈接不存在', 404);
   }
 
   const site = await getSiteSettings(c.env.DB);
   const invite = await getAvailableRegistrationInvite(c.env.DB, token);
   if (!invite) {
-    return errorResponse('注册链接已失效', 404);
+    return errorResponse('註冊鏈接已失效', 404);
   }
 
   return c.json({
@@ -117,24 +117,24 @@ app.get('/api/register-links/:token', async (c) => {
 app.post('/api/register-links/:token/register', async (c) => {
   const token = String(c.req.param('token') || '').trim();
   const payload = await parseJsonRequest(c.req.raw);
-  if (Object.keys(payload).some((key) => !['username', 'displayName', 'password'].includes(key))) return errorResponse('请求包含不允许修改的字段');
+  if (Object.keys(payload).some((key) => !['username', 'displayName', 'password'].includes(key))) return errorResponse('請求包含不允許修改的字段');
   const username = String(payload.username || '').trim();
   const password = String(payload.password || '');
   const displayName = String(payload.displayName || username).trim();
 
   if (!token) {
-    return errorResponse('注册链接不存在', 404);
+    return errorResponse('註冊鏈接不存在', 404);
   }
   if (!username || !password) {
-    return errorResponse('用户名和密码不能为空');
+    return errorResponse('用戶名和密碼不能為空');
   }
   if (isConfiguredAdminUsername(c.env, username)) {
-    return errorResponse('该用户名不可用于邀请注册');
+    return errorResponse('該用戶名不可用於邀請註冊');
   }
 
   const invite = await getAvailableRegistrationInvite(c.env.DB, token);
   if (!invite) {
-    return errorResponse('注册链接已失效', 400);
+    return errorResponse('註冊鏈接已失效', 400);
   }
 
   const hashed = await hashPassword(password);
@@ -156,12 +156,12 @@ app.post('/api/auth/login', async (c) => {
   const username = String(payload.username || '').trim();
   const password = String(payload.password || '');
   if (!username || !password) {
-    return errorResponse('请输入用户名和密码');
+    return errorResponse('請輸入用戶名和密碼');
   }
 
   const session = await loginWithPassword(c.env, username, password, c.req.raw);
   if (!session) {
-    return errorResponse('账号或密码错误', 401);
+    return errorResponse('賬號或密碼錯誤', 401);
   }
 
   c.header('Set-Cookie', sessionCookie(c.req.raw, session.token));
@@ -190,7 +190,7 @@ app.get('/api/auth/session', async (c) => {
 
   if (!user.results[0] || isUserDisabled(user.results[0])) {
     await deleteSession(c.env, session.token);
-    return errorResponse('账号已不可用', 401);
+    return errorResponse('賬號已不可用', 401);
   }
 
   const freshSession = {
@@ -217,7 +217,7 @@ app.post('/api/auth/change-password', async (c) => {
   const currentPassword = String(payload.currentPassword || '');
   const newPassword = String(payload.newPassword || '');
   if (!currentPassword || !newPassword) {
-    return errorResponse('请填写完整密码');
+    return errorResponse('請填寫完整密碼');
   }
 
   const user = await c.env.DB.prepare(
@@ -231,7 +231,7 @@ app.post('/api/auth/change-password', async (c) => {
     .all();
 
   if (!user.results[0]) {
-    return errorResponse('用户不存在', 404);
+    return errorResponse('用戶不存在', 404);
   }
 
   const valid = await verifyPassword(
@@ -240,7 +240,7 @@ app.post('/api/auth/change-password', async (c) => {
     user.results[0].password_salt
   );
   if (!valid) {
-    return errorResponse('当前密码不正确', 400);
+    return errorResponse('當前密碼不正確', 400);
   }
 
   const hashed = await hashPassword(newPassword);
@@ -308,7 +308,7 @@ app.get('/api/ws/:kind/:id', async (c) => {
   const kind = c.req.param('kind');
   const id = c.req.param('id');
   if (!['public', 'private', 'dm'].includes(kind)) {
-    return errorResponse('无效的会话类型');
+    return errorResponse('無效的會話類型');
   }
 
   return forwardRoomConnection({
@@ -346,16 +346,16 @@ app.onError((error, c) => {
     return errorResponse(error.message, error.status);
   }
   if (isV1) {
-    return v1ErrorResponse(errorCodeForStatus(500), '服务器开小差了', 500);
+    return v1ErrorResponse(errorCodeForStatus(500), '服務器開小差了', 500);
   }
-  return errorResponse('服务器开小差了', 500);
+  return errorResponse('服務器開小差了', 500);
 });
 
 export default {
   fetch: createSiteEntry(app.fetch),
   async scheduled(controller, env, ctx) {
     const tasks = [rescueBridgeDeliveries(env), rescueTelegramNotifications(env)];
-    // 免费账户的 cron 数量是账户级上限；复用 15 分钟触发器，在 UTC 19:00 的轮次追加每日 GC。
+    // 免費賬戶的 cron 數量是賬戶級上限；複用 15 分鐘觸發器，在 UTC 19:00 的輪次追加每日 GC。
     if (shouldRunDailyGc(controller.scheduledTime)) tasks.push(runScheduledGc(env), pruneTelegramNotifications(env));
     ctx.waitUntil(Promise.all(tasks));
   }

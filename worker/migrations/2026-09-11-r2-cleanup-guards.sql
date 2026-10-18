@@ -13,7 +13,7 @@ CREATE INDEX IF NOT EXISTS idx_gc_channel_avatar
 ON channels(avatar_key)
 WHERE deleted_at IS NULL;
 
--- 待删除占位与资源引用写入必须由同一条数据库语句仲裁，避免校验后写入竞态。
+-- 待刪除佔位與資源引用寫入必須由同一條數據庫語句仲裁，避免校驗後寫入競態。
 CREATE TRIGGER IF NOT EXISTS prevent_pending_message_attachment_insert
 BEFORE INSERT ON messages
 WHEN NEW.attachment_key IS NOT NULL

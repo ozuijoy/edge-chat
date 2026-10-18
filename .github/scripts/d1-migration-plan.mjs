@@ -50,7 +50,7 @@ export async function buildD1MigrationPlan({
       continue;
     }
 
-    chunks.push(`-- 执行遗留数据库修复 ${repair.id}。`);
+    chunks.push(`-- 執行遺留數據庫修復 ${repair.id}。`);
     chunks.push((await readSql(repair.file)).trim());
     decisions.push({ id: repair.id, action: "repair" });
   }
@@ -66,7 +66,7 @@ export async function buildD1MigrationPlan({
         continue;
       }
       if (checksums.compatible.has(recordedChecksum)) {
-        chunks.push(`-- 统一 ${migration.id} 的跨平台换行符校验值。`);
+        chunks.push(`-- 統一 ${migration.id} 的跨平臺換行符校驗值。`);
         chunks.push(
           `UPDATE ${D1_MIGRATION_LEDGER}
 SET checksum = ${sqlString(checksums.current)}
@@ -75,7 +75,7 @@ WHERE migration_id = ${sqlString(migration.id)};`,
         decisions.push({ id: migration.id, action: "normalize" });
         continue;
       }
-      throw new Error(`迁移 ${migration.id} 已执行，但文件校验值发生变化`);
+      throw new Error(`遷移 ${migration.id} 已執行，但文件校驗值發生變化`);
     }
 
     const presentArtifacts = migration.artifacts.filter((artifact) => artifacts.has(artifact));
@@ -83,7 +83,7 @@ WHERE migration_id = ${sqlString(migration.id)};`,
     const nonePresent = presentArtifacts.length === 0;
 
     if (allPresent) {
-      chunks.push(`-- 现有数据库已具备 ${migration.id} 的结构，仅登记迁移基线。`);
+      chunks.push(`-- 現有數據庫已具備 ${migration.id} 的結構，僅登記遷移基線。`);
       chunks.push(ledgerInsert(migration, checksums.current));
       decisions.push({ id: migration.id, action: "baseline" });
       continue;
@@ -92,11 +92,11 @@ WHERE migration_id = ${sqlString(migration.id)};`,
     if (!nonePresent && !migration.rerunnable) {
       const missing = migration.artifacts.filter((artifact) => !artifacts.has(artifact));
       throw new Error(
-        `迁移 ${migration.id} 的数据库结构只完成了一部分；已存在：${presentArtifacts.join(", ")}；缺少：${missing.join(", ")}`,
+        `遷移 ${migration.id} 的數據庫結構只完成了一部分；已存在：${presentArtifacts.join(", ")}；缺少：${missing.join(", ")}`,
       );
     }
 
-    chunks.push(`-- 执行迁移 ${migration.id}。`);
+    chunks.push(`-- 執行遷移 ${migration.id}。`);
     chunks.push(sql.trim());
     chunks.push(ledgerInsert(migration, checksums.current));
     decisions.push({ id: migration.id, action: "apply" });

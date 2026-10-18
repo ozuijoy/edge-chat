@@ -14,7 +14,7 @@ export async function generateSchemaManifest() {
   const db = new SQL.Database();
   try {
     const schema = read('worker/schema.sql').replaceAll('\r\n', '\n').replaceAll('\r', '\n');
-    // 使用真实 SQLite 执行完整 schema，避免正则解析 DDL，也不额外维护表/列/索引清单。
+    // 使用真實 SQLite 執行完整 schema，避免正則解析 DDL，也不額外維護表/列/索引清單。
     db.exec(schema);
     const artifacts = await collectSchemaArtifacts(async (sql) => {
       const result = db.exec(sql)[0];

@@ -73,7 +73,7 @@ function createHarness(overrides = {}) {
 	return { management, activeRoom, channels, users, error, calls };
 }
 
-test("创建群组状态和导航由 room management module 统一拥有", async () => {
+test("創建群組狀態和導航由 room management module 統一擁有", async () => {
 	const { management, calls } = createHarness();
 	await management.creation.submit();
 	assert.equal(calls.length, 0);
@@ -95,24 +95,24 @@ test("创建群组状态和导航由 room management module 统一拥有", async
 	});
 });
 
-test("公开群组创建会保留类型并允许不预先邀请成员", async () => {
+test("公開群組創建會保留類型並允許不預先邀請成員", async () => {
 	const { management, calls } = createHarness();
 	management.creation.open();
-	management.creation.form.name = "公开讨论";
+	management.creation.form.name = "公開討論";
 	management.creation.form.kind = "public";
 	await management.creation.submit();
 
 	assert.deepEqual(calls, [
-		["createGroup", { name: "公开讨论", kind: "public", memberUserIds: [] }],
+		["createGroup", { name: "公開討論", kind: "public", memberUserIds: [] }],
 		["refreshAndOpen", { id: 9, kind: "public" }],
 	]);
 });
 
-test("创建失败保留表单与错误提示，关闭或重新打开时清除旧错误", async () => {
+test("創建失敗保留表單與錯誤提示，關閉或重新打開時清除舊錯誤", async () => {
 	const { management, error } = createHarness({
-		roomApi: { async createGroup() { throw new Error("群组名称已存在"); } },
+		roomApi: { async createGroup() { throw new Error("群組名稱已存在"); } },
 	});
-	error.value = "旧错误";
+	error.value = "舊錯誤";
 	management.creation.open();
 	assert.equal(error.value, "");
 	management.creation.form.name = "Team";
@@ -120,12 +120,12 @@ test("创建失败保留表单与错误提示，关闭或重新打开时清除�
 	assert.equal(management.creation.show.value, true);
 	assert.equal(management.creation.form.name, "Team");
 	assert.equal(management.creation.submitting.value, false);
-	assert.equal(error.value, "群组名称已存在");
+	assert.equal(error.value, "群組名稱已存在");
 	management.creation.close();
 	assert.equal(error.value, "");
 });
 
-test("创建请求进行中不会重复提交", async () => {
+test("創建請求進行中不會重複提交", async () => {
 	let resolveCreate;
 	let callCount = 0;
 	const { management } = createHarness({
@@ -144,7 +144,7 @@ test("创建请求进行中不会重复提交", async () => {
 	await pending;
 });
 
-test("成员加载、邀请和移除通过同一 module 接口更新状态", async () => {
+test("成員加載、邀請和移除通過同一 module 接口更新狀態", async () => {
 	const { management, activeRoom, calls } = createHarness();
 	await management.members.toggle();
 	assert.equal(management.members.show.value, true);
@@ -164,7 +164,7 @@ test("成员加载、邀请和移除通过同一 module 接口更新状态", asy
 	]);
 });
 
-test("群设置保存与头像上传同步 active room 和频道 projection", async () => {
+test("群設置保存與頭像上傳同步 active room 和頻道 projection", async () => {
 	const { management, activeRoom, channels, calls } = createHarness();
 	management.settings.open();
 	management.settings.form.name = "  Renamed  ";
@@ -183,7 +183,7 @@ test("群设置保存与头像上传同步 active room 和频道 projection", as
 	assert.equal(management.settings.show.value, false);
 });
 
-test("删除群组统一清理管理状态并通知页面 adapter", async () => {
+test("刪除群組統一清理管理狀態並通知頁面 adapter", async () => {
 	const { management, activeRoom, calls } = createHarness();
 	await management.members.toggle();
 	await management.deleteGroup();
@@ -198,7 +198,7 @@ test("删除群组统一清理管理状态并通知页面 adapter", async () => 
 	]);
 });
 
-test("general 管理动作不会发出移除成员或删除群组请求", async () => {
+test("general 管理動作不會發出移除成員或刪除群組請求", async () => {
 	const { management, activeRoom, calls } = createHarness();
 	activeRoom.value.isGeneral = true;
 
@@ -209,7 +209,7 @@ test("general 管理动作不会发出移除成员或删除群组请求", async 
 	assert.notEqual(activeRoom.value, null);
 });
 
-test("快速切换群组时旧成员请求不会覆盖当前会话", async () => {
+test("快速切換群組時舊成員請求不會覆蓋當前會話", async () => {
 	const resolvers = new Map();
 	const { management, activeRoom } = createHarness({
 		roomApi: {

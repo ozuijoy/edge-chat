@@ -1,4 +1,4 @@
--- 保留旧投递与绑定，只补入队预算索引和共享退避闸门，升级不丢失用户提醒。
+-- 保留舊投遞與綁定，只補入隊預算索引和共享退避閘門，升級不丟失用戶提醒。
 ALTER TABLE telegram_notification_users ADD COLUMN next_notification_at TEXT NOT NULL DEFAULT '1970-01-01 00:00:00';
 ALTER TABLE telegram_notification_outbox ADD COLUMN sender_id INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE telegram_notification_outbox ADD COLUMN created_at TEXT NOT NULL DEFAULT '';

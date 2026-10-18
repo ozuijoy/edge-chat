@@ -118,7 +118,7 @@ fun ChatMessages(
                 }
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    text = if (language == "zh-CN") "这里还没有消息" else "No messages here yet",
+                    text = if (language == "zh-TW") "這裡還沒有消息" else "No messages here yet",
                     style = MaterialTheme.typography.titleSmall,
                     color = colors.textPrimary,
                 )
@@ -175,7 +175,7 @@ fun ChatMessages(
                     TextButton(onClick = onLoadOlder, modifier = Modifier.padding(vertical = 6.dp)) {
                         Icon(Icons.Outlined.Refresh, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text(if (language == "zh-CN") "加载更早消息" else "Load older messages")
+                        Text(if (language == "zh-TW") "加載更早消息" else "Load older messages")
                     }
                 }
             }
@@ -200,7 +200,7 @@ fun ChatMessages(
             ) {
                 Icon(
                     Icons.Outlined.KeyboardArrowDown,
-                    contentDescription = if (language == "zh-CN") "回到最新消息" else "Jump to latest message",
+                    contentDescription = if (language == "zh-TW") "回到最新消息" else "Jump to latest message",
                 )
             }
         }
@@ -306,7 +306,7 @@ private fun MessageItem(
                     IconButton(onClick = { onDelete(message.id) }, modifier = Modifier.size(36.dp)) {
                         Icon(
                             Icons.Outlined.DeleteOutline,
-                            contentDescription = if (language == "zh-CN") "删除消息" else "Delete message",
+                            contentDescription = if (language == "zh-TW") "刪除消息" else "Delete message",
                             modifier = Modifier.size(19.dp),
                             tint = colors.iconSecondary,
                         )
@@ -473,7 +473,7 @@ private fun AttachmentTile(
         shape = MaterialTheme.shapes.small,
         modifier = modifier.clickable(
             role = Role.Button,
-            onClickLabel = if (language == "zh-CN") "打开附件" else "Open attachment",
+            onClickLabel = if (language == "zh-TW") "打開附件" else "Open attachment",
             onClick = onClick,
         ),
     ) {
@@ -515,11 +515,11 @@ private fun PendingMessageItem(
     ) {
         if (item.state == "RETRY") {
             IconButton(onClick = { onRetry(item.clientMessageId) }, modifier = Modifier.size(36.dp)) {
-                Icon(Icons.Outlined.Refresh, contentDescription = if (language == "zh-CN") "重试发送" else "Retry sending")
+                Icon(Icons.Outlined.Refresh, contentDescription = if (language == "zh-TW") "重試發送" else "Retry sending")
             }
         }
         IconButton(onClick = { onCancel(item.clientMessageId) }, modifier = Modifier.size(36.dp)) {
-            Icon(Icons.Outlined.Close, contentDescription = if (language == "zh-CN") "取消发送" else "Cancel sending")
+            Icon(Icons.Outlined.Close, contentDescription = if (language == "zh-TW") "取消發送" else "Cancel sending")
         }
         BoxWithConstraints {
             Surface(
@@ -551,10 +551,10 @@ private fun PendingMessageItem(
                     Spacer(Modifier.height(5.dp))
                     Text(
                         text = when (item.state) {
-                            "UPLOADING" -> if (language == "zh-CN") "正在上传" else "Uploading"
-                            "SENDING" -> if (language == "zh-CN") "正在发送" else "Sending"
-                            "RETRY" -> item.failure ?: if (language == "zh-CN") "发送失败" else "Failed"
-                            else -> if (language == "zh-CN") "等待发送" else "Queued"
+                            "UPLOADING" -> if (language == "zh-TW") "正在上傳" else "Uploading"
+                            "SENDING" -> if (language == "zh-TW") "正在發送" else "Sending"
+                            "RETRY" -> item.failure ?: if (language == "zh-TW") "發送失敗" else "Failed"
+                            else -> if (language == "zh-TW") "等待發送" else "Queued"
                         },
                         modifier = Modifier.align(Alignment.End),
                         style = MaterialTheme.typography.labelSmall,

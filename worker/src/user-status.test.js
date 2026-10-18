@@ -9,14 +9,14 @@ import {
 
 const NOW = Date.parse('2026-08-20T10:00:00.000Z');
 
-test('用户封禁状态同时支持永久、临时与自然到期', () => {
+test('用戶封禁狀態同時支持永久、臨時與自然到期', () => {
   assert.equal(isUserDisabled({ is_disabled: 1, disabled_until: null }, NOW), true);
   assert.equal(isUserDisabled({ is_disabled: 0, disabled_until: '2026-08-20T10:05:00.000Z' }, NOW), true);
   assert.equal(isUserDisabled({ is_disabled: 0, disabled_until: '2026-08-20T09:59:00.000Z' }, NOW), false);
   assert.equal(isUserDisabled({ is_disabled: 0, disabled_until: null }, NOW), false);
 });
 
-test('管理员用户投影不会继续展示已经到期的临时封禁', () => {
+test('管理員用戶投影不會繼續展示已經到期的臨時封禁', () => {
   assert.deepEqual(projectUserBan({ is_disabled: 1, disabled_until: null }, NOW), {
     isDisabled: true,
     isPermanentlyDisabled: true,
@@ -40,7 +40,7 @@ test('管理员用户投影不会继续展示已经到期的临时封禁', () =>
   });
 });
 
-test('封禁截止时间按分钟计算且活跃用户 SQL 使用数据库当前时间', () => {
+test('封禁截止時間按分鐘計算且活躍用戶 SQL 使用數據庫當前時間', () => {
   assert.equal(banExpiryFromMinutes(65, NOW), '2026-08-20T11:05:00.000Z');
   assert.match(activeUserSql('u'), /u\.is_disabled = 0/);
   assert.match(activeUserSql('u'), /datetime\(u\.disabled_until\) <= CURRENT_TIMESTAMP/);

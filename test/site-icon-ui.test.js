@@ -30,7 +30,7 @@ function iconDocument() {
   };
 }
 
-test('真实 HTML 中所有浏览器与触屏图标同步切换，清除后恢复原格式与尺寸', () => {
+test('真實 HTML 中所有瀏覽器與觸屏圖標同步切換，清除後恢復原格式與尺寸', () => {
   const previous = globalThis.document;
   const document = iconDocument();
   globalThis.document = document;
@@ -53,7 +53,7 @@ test('真实 HTML 中所有浏览器与触屏图标同步切换，清除后恢�
   } finally { globalThis.document = previous; }
 });
 
-test('无默认图标声明时创建图标，重复更新不会增加候选数量', () => {
+test('無默認圖標聲明時創建圖標，重複更新不會增加候選數量', () => {
   const previous = globalThis.document;
   const document = iconDocument();
   document.links.length = 0;
@@ -90,7 +90,7 @@ function appearancePage(overrides = {}) {
   return { ...state, saved };
 }
 
-test('上传期间不能保存旧图标，完成后预览带认证而保存 URL 不含 token', async () => {
+test('上傳期間不能保存舊圖標，完成後預覽帶認證而保存 URL 不含 token', async () => {
   let finishUpload;
   const state = appearancePage({ uploadFile: () => new Promise(resolve => { finishUpload = resolve; }) });
   const event = { target: { files: [{ name: 'icon.png' }], value: 'selected' } };

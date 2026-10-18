@@ -6,7 +6,7 @@ import { stripTypeScriptTypes } from "node:module";
 import { createRenderer, h, nextTick, ref } from "vue";
 import { formatTime, setLocale } from "../frontend/src/i18n.js";
 
-// 编译真实 SFC 到 Vue 自定义 renderer；无需给生产或 CI 增加 DOM/浏览器依赖。
+// 編譯真實 SFC 到 Vue 自定義 renderer；無需給生產或 CI 增加 DOM/瀏覽器依賴。
 const componentUrls = new Map();
 async function componentUrl(name) {
 	if (componentUrls.has(name)) return componentUrls.get(name);
@@ -20,7 +20,7 @@ async function componentUrl(name) {
 		if (specifier === "vue") target = import.meta.resolve("vue");
 		else if (specifier.endsWith("/MessageRow.vue")) target = await componentUrl("chat/MessageRow");
 		else if (specifier.endsWith(".vue")) {
-			// 子功能已有独立测试，此处只隔离 DOMPurify/音频等浏览器能力，不替换列表和行。
+			// 子功能已有獨立測試，此處只隔離 DOMPurify/音頻等瀏覽器能力，不替換列表和行。
 			const childName = specifier.split("/").pop().replace(".vue", "");
 			target = `data:text/javascript,${encodeURIComponent(`import { h } from ${JSON.stringify(import.meta.resolve("vue"))}; export default { inheritAttrs: false, render() { return h(${JSON.stringify(childName)}, this.$attrs); } }`)}`;
 		} else target = new URL(specifier, url).href;
@@ -66,7 +66,7 @@ function message(id) {
 	return { id, content: `消息 ${id}`, createdAt: "2026-10-11 02:03:00", sender: { kind: "local", id: 2, displayName: "Alice" } };
 }
 
-test("真实消息列表隔离草稿更新，追加/高亮/嵌套变更只更新受影响消息行", async () => {
+test("真實消息列表隔離草稿更新，追加/高亮/嵌套變更只更新受影響消息行", async () => {
 	const { default: MessageList } = await import(await componentUrl("chat/MessageList"));
 	const messages = ref(Array.from({ length: 500 }, (_, i) => message(i + 1)));
 	const draft = ref("");
@@ -122,7 +122,7 @@ test("真实消息列表隔离草稿更新，追加/高亮/嵌套变更只更新
 	}
 });
 
-test("消息行保留本人/外部身份、私聊姓名隐藏、语言切换及全部交互事件", async () => {
+test("消息行保留本人/外部身份、私聊姓名隱藏、語言切換及全部交互事件", async () => {
 	const { default: MessageList } = await import(await componentUrl("chat/MessageList"));
 	const messages = ref([message(1)]);
 	const isDirect = ref(false);
@@ -181,7 +181,7 @@ test("消息行保留本人/外部身份、私聊姓名隐藏、语言切换及�
 		messages.value[0].sender.kind = "external";
 		await nextTick();
 		assert.equal(byClass(root, "message-row--own").length, 0);
-		for (const locale of ["en-US", "zh-TW", "zh-CN"]) {
+		for (const locale of ["en-US", "zh-TW"]) {
 			await setLocale(locale);
 			await nextTick();
 			assert.equal(byClass(root, "message-time")[0].text, formatTime(messages.value[0].createdAt));
@@ -191,7 +191,7 @@ test("消息行保留本人/外部身份、私聊姓名隐藏、语言切换及�
 	}
 });
 
-test("真实 Textarea 每次输入只读取一次高度，外部清空和恢复草稿仍自动增高", async () => {
+test("真實 Textarea 每次輸入只讀取一次高度，外部清空和恢復草稿仍自動增高", async () => {
 	const { default: Textarea } = await import(await componentUrl("ui/Textarea"));
 	const value = ref("");
 	const root = node("root");
@@ -213,7 +213,7 @@ test("真实 Textarea 每次输入只读取一次高度，外部清空和恢复�
 		assert.equal(reads, 2);
 		assert.equal(textarea.style.height, "30px");
 		assert.equal(textarea.style.overflowY, "hidden");
-		value.value = "恢复草稿";
+		value.value = "恢復草稿";
 		await nextTick();
 		assert.equal(reads, 3);
 		assert.equal(textarea.style.height, "100px");

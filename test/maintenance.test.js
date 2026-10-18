@@ -90,7 +90,7 @@ test("system probes use fixed KV key, R2 limit one, and do not read payloads", a
 
 test("real auth and admin middleware return 401, 403, and allow admins", async () => {
   const app = new Hono();
-  app.onError((error) => Response.json({ error: error.status ? error.message : '服务器开小差了' }, { status: error.status || 500 }));
+  app.onError((error) => Response.json({ error: error.status ? error.message : '服務器開小差了' }, { status: error.status || 500 }));
   app.use("/api/admin/*", authMiddleware, adminMiddleware);
   registerMaintenanceRoutes(app);
   const SQL = await initSqlJs();

@@ -31,7 +31,7 @@ import kotlinx.coroutines.sync.withLock
 data class AppUiState(
     val server: ServerProfile? = null,
     val session: SessionDto? = null,
-    val language: String = "zh-CN",
+    val language: String = "zh-TW",
     val initializing: Boolean = true,
     val loading: Boolean = false,
     val error: String? = null,
@@ -149,7 +149,7 @@ class AppViewModel @Inject constructor(
 
     fun updateAvatar(displayName: String, uri: Uri) = launchAction {
         val attachment = attachmentRepository.import(uri)
-        require(attachment.type.startsWith("image/")) { "头像必须是图片" }
+        require(attachment.type.startsWith("image/")) { "頭像必須是圖片" }
         sessionRepository.updateAvatar(displayName, attachment)
     }
 
@@ -185,7 +185,7 @@ class AppViewModel @Inject constructor(
                 error.value = null
                 runCatching { block() }.onFailure {
                     diagnostics.record("ui_action_failed reason=${it.javaClass.simpleName}")
-                    error.value = it.message ?: "操作失败"
+                    error.value = it.message ?: "操作失敗"
                 }
                 loading.value = false
             }

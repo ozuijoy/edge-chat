@@ -4,7 +4,7 @@ import { resolvePolicy } from '../../../worker/src/rbac/policies.ts';
 
 function fail(message: string, status = 403): never { throw Object.assign(new Error(message), { status }); }
 function roles() {
-  if (!demoState.rbacRoles) demoState.rbacRoles = [{ id: 1, key: 'ordinary', name: '普通用户', description: '', enabled: true, revision: 0, permissions: [], updatedAt: new Date().toISOString() }];
+  if (!demoState.rbacRoles) demoState.rbacRoles = [{ id: 1, key: 'ordinary', name: '普通用戶', description: '', enabled: true, revision: 0, permissions: [], updatedAt: new Date().toISOString() }];
   return demoState.rbacRoles;
 }
 export function demoAuthorization(user) {
@@ -22,23 +22,23 @@ export function demoOwnsGroup(channelId) {
 export function authorizeDemoAdmin(path: string, method: string, body) {
   const policy = resolvePolicy(method, `/api${path}`, body);
   const auth = demoAuthorization(findDemoUser(demoState.session.userId));
-  if (!policy || (policy.superOnly && !auth.isSuperAdmin) || !policy.permissions.every((p) => hasPermission(auth, p))) fail('没有此操作权限');
-  if (policy.fields && Object.keys(body).some((k) => !policy.fields.includes(k))) fail('请求包含不允许修改的字段', 400);
+  if (!policy || (policy.superOnly && !auth.isSuperAdmin) || !policy.permissions.every((p) => hasPermission(auth, p))) fail('沒有此操作權限');
+  if (policy.fields && Object.keys(body).some((k) => !policy.fields.includes(k))) fail('請求包含不允許修改的字段', 400);
   const targetId = policy.path.exec(`/api${path}`)?.[1];
   if (policy.scope === 'user') {
     const target = findDemoUser(targetId);
-    if (!target) fail('用户不存在', 404);
-    if (!auth.isSuperAdmin && demoAuthorization(target).managementProtected) fail('没有此操作权限');
-    if (target.id === demoState.session.userId && (policy.id === 'users.delete' || body.isDisabled)) fail('不能删除或封禁自己的账号');
+    if (!target) fail('用戶不存在', 404);
+    if (!auth.isSuperAdmin && demoAuthorization(target).managementProtected) fail('沒有此操作權限');
+    if (target.id === demoState.session.userId && (policy.id === 'users.delete' || body.isDisabled)) fail('不能刪除或封禁自己的賬號');
   }
-  if (policy.scope === 'group' && !demoOwnsGroup(Number(body.channelId))) fail('没有此操作权限');
+  if (policy.scope === 'group' && !demoOwnsGroup(Number(body.channelId))) fail('沒有此操作權限');
   if (policy.scope === 'telegram') {
     const mapping = demoState.telegram.mappings.find((m) => m.id === Number(targetId));
-    if (!mapping || !demoOwnsGroup(mapping.channelId)) fail('没有此操作权限');
+    if (!mapping || !demoOwnsGroup(mapping.channelId)) fail('沒有此操作權限');
   }
   if (policy.scope === 'bridge') {
     const binding = demoState.instanceBindings?.find((b) => b.id === targetId);
-    if (!binding || !demoOwnsGroup(binding.channelId)) fail('没有此操作权限');
+    if (!binding || !demoOwnsGroup(binding.channelId)) fail('沒有此操作權限');
   }
 }
 export function demoRbac(path: string, method: string, body, offset = 0) {
@@ -48,22 +48,22 @@ export function demoRbac(path: string, method: string, body, offset = 0) {
   const projection = () => list.map((r) => ({ ...r, memberCount: demoState.users.filter((u) => (u.roleId || 1) === r.id).length }));
   if (path === '/admin/rbac/roles' && method === 'GET') return { roles: cloneDemo(projection().slice(offset, offset + 100)) };
   if (path === '/admin/rbac/roles' && method === 'POST') {
-    if (!body.name?.trim() || !validatePermissions(body.permissions)) fail('用户组名称或权限无效', 400);
+    if (!body.name?.trim() || !validatePermissions(body.permissions)) fail('用戶組名稱或權限無效', 400);
     list.push({ id: Math.max(...list.map((r) => r.id)) + 1, key: crypto.randomUUID(), ...body, enabled: true, revision: 0, updatedAt: new Date().toISOString() });
     return { ok: true };
   }
   let match = path.match(/^\/admin\/rbac\/roles\/(\d+)(\/members)?$/);
   if (match) {
     const role = list.find((r) => r.id === Number(match[1]));
-    if (!role) fail('用户组不存在', 404);
+    if (!role) fail('用戶組不存在', 404);
     if (match[2]) return { members: cloneDemo(demoState.users.filter((u) => (u.roleId || 1) === role.id).slice(offset, offset + 100).map((u) => ({ ...u, ...demoAuthorization(u) }))) };
-    if (role.id === 1) fail('普通用户组不可修改', 409);
+    if (role.id === 1) fail('普通用戶組不可修改', 409);
     if (method === 'PATCH') {
-      if (role.revision !== body.expectedRevision) fail('数据已变化，请刷新后重试', 409);
-      if (!body.name?.trim() || !validatePermissions(body.permissions)) fail('用户组名称或权限无效', 400);
+      if (role.revision !== body.expectedRevision) fail('數據已變化，請刷新後重試', 409);
+      if (!body.name?.trim() || !validatePermissions(body.permissions)) fail('用戶組名稱或權限無效', 400);
       Object.assign(role, body, { revision: role.revision + 1, updatedAt: new Date().toISOString() });
     } else if (method === 'DELETE') {
-      if (demoState.users.some((u) => (u.roleId || 1) === role.id)) fail('用户组仍有成员', 409);
+      if (demoState.users.some((u) => (u.roleId || 1) === role.id)) fail('用戶組仍有成員', 409);
       demoState.rbacRoles = list.filter((r) => r.id !== role.id);
     }
     return { ok: true };
@@ -71,11 +71,11 @@ export function demoRbac(path: string, method: string, body, offset = 0) {
   match = path.match(/^\/admin\/rbac\/users\/(\d+)\/(role|unprotect)$/);
   if (match) {
     const user = findDemoUser(match[1]);
-    if (!user || user.isAdmin || (user.authzVersion || 0) !== body.expectedAuthzVersion) fail('数据已变化，请刷新后重试', 409);
+    if (!user || user.isAdmin || (user.authzVersion || 0) !== body.expectedAuthzVersion) fail('數據已變化，請刷新後重試', 409);
     if (match[2] === 'role') {
-      if (!list.some((r) => r.id === body.roleId)) fail('用户组不存在', 404);
+      if (!list.some((r) => r.id === body.roleId)) fail('用戶組不存在', 404);
       user.roleId = body.roleId; if (body.roleId !== 1) user.managementProtected = true;
-    } else { if ((user.roleId || 1) !== 1) fail('管理用户不能解除保护', 409); user.managementProtected = false; }
+    } else { if ((user.roleId || 1) !== 1) fail('管理用戶不能解除保護', 409); user.managementProtected = false; }
     user.authzVersion = (user.authzVersion || 0) + 1;
     return { ok: true, authorization: demoAuthorization(user), remainingResources: { invitations: [], bridges: [] } };
   }

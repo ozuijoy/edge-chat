@@ -46,7 +46,7 @@ function countPins(database) {
 	return Number(database.exec("SELECT COUNT(*) FROM channel_pins")[0].values[0][0]);
 }
 
-test("置顶引用随消息软删除和硬删除清理，但不改变消息保留策略", async () => {
+test("置頂引用隨消息軟刪除和硬刪除清理，但不改變消息保留策略", async () => {
 	const { database, env } = createEnvironment();
 
 	assert.equal(
@@ -66,7 +66,7 @@ test("置顶引用随消息软删除和硬删除清理，但不改变消息保�
 	assert.equal(await getPinnedMessage(env, 2), null);
 });
 
-test("仅群主可置顶群消息，后台管理员、普通成员与私信均被拒绝", async () => {
+test("僅群主可置頂群消息，後臺管理員、普通成員與私信均被拒絕", async () => {
 	const { env } = createEnvironment();
 	const ownerMeta = {
 		room: { id: 2, kind: "private" },
@@ -91,7 +91,7 @@ test("仅群主可置顶群消息，后台管理员、普通成员与私信均�
 			{ room: { id: 2, kind: "private" }, principal: { userId: 3, isAdmin: false } },
 			{ messageId: 10 },
 		),
-		(error) => error instanceof MessagePinningError && error.message === "无权管理置顶消息",
+		(error) => error instanceof MessagePinningError && error.message === "無權管理置頂消息",
 	);
 	await assert.rejects(
 		pinRoomMessage(
@@ -99,11 +99,11 @@ test("仅群主可置顶群消息，后台管理员、普通成员与私信均�
 			{ room: { id: 3, kind: "dm" }, principal: { userId: 1, isAdmin: true } },
 			{ messageId: 12 },
 		),
-		(error) => error instanceof MessagePinningError && error.message === "无权管理置顶消息",
+		(error) => error instanceof MessagePinningError && error.message === "無權管理置頂消息",
 	);
 });
 
-test("取消置顶只作用于客户端看到的当前置顶消息", async () => {
+test("取消置頂只作用於客戶端看到的當前置頂消息", async () => {
 	const { env } = createEnvironment();
 	const meta = {
 		room: { id: 2, kind: "private" },
@@ -114,7 +114,7 @@ test("取消置顶只作用于客户端看到的当前置顶消息", async () =>
 
 	await assert.rejects(
 		unpinRoomMessage(env, meta, { messageId: 10 }),
-		(error) => error instanceof MessagePinningError && error.message === "该消息已不再置顶",
+		(error) => error instanceof MessagePinningError && error.message === "該消息已不再置頂",
 	);
 	const unpinned = await unpinRoomMessage(env, meta, { messageId: 11 });
 	assert.deepEqual(JSON.parse(unpinned.packet), {

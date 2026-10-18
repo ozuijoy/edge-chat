@@ -54,18 +54,18 @@ interface WebMcpDependencies {
 const ROOM_KIND_SCHEMA = {
   type: 'string',
   enum: ['public', 'private', 'dm'],
-  description: '会话类型：公开群、私有群或私聊'
+  description: '會話類型：公開群、私有群或私聊'
 };
 
 const ROOM_ID_SCHEMA = {
   type: 'integer',
   minimum: 1,
-  description: '会话 ID，可先通过 edgechat.list_channels 获取群聊 ID'
+  description: '會話 ID，可先通過 edgechat.list_channels 獲取群聊 ID'
 };
 
 function requireSession(getSession: () => EdgeChatSession | null) {
   if (!getSession()) {
-    throw new Error('请先登录 EdgeChat 后再使用站点工具');
+    throw new Error('請先登錄 EdgeChat 後再使用站點工具');
   }
 }
 
@@ -88,7 +88,7 @@ export function createEdgeChatWebMcpTools(
     {
       name: 'edgechat.login',
       description:
-        '使用现有 EdgeChat 登录流程创建当前浏览器会话。账号密码属于敏感信息，仅在用户明确授权后调用。',
+        '使用現有 EdgeChat 登錄流程創建當前瀏覽器會話。賬號密碼屬於敏感信息，僅在用戶明確授權後調用。',
       inputSchema: {
         type: 'object',
         properties: {
@@ -96,13 +96,13 @@ export function createEdgeChatWebMcpTools(
             type: 'string',
             minLength: 1,
             maxLength: 64,
-            description: 'EdgeChat 用户名'
+            description: 'EdgeChat 用戶名'
           },
           password: {
             type: 'string',
             minLength: 1,
             writeOnly: true,
-            description: 'EdgeChat 密码，工具结果不会返回此字段'
+            description: 'EdgeChat 密碼，工具結果不會返回此字段'
           }
         },
         required: ['username', 'password'],
@@ -116,7 +116,7 @@ export function createEdgeChatWebMcpTools(
         });
         const session = getSession();
         if (!session) {
-          throw new Error('EdgeChat 登录未完成');
+          throw new Error('EdgeChat 登錄未完成');
         }
         return {
           session: {
@@ -130,7 +130,7 @@ export function createEdgeChatWebMcpTools(
     },
     {
       name: 'edgechat.list_channels',
-      description: '查询当前登录用户可见的 EdgeChat 公开群组和私有群组。',
+      description: '查詢當前登錄用戶可見的 EdgeChat 公開群組和私有群組。',
       inputSchema: {
         type: 'object',
         properties: {},
@@ -145,7 +145,7 @@ export function createEdgeChatWebMcpTools(
     },
     {
       name: 'edgechat.read_messages',
-      description: '读取指定 EdgeChat 会话最近的消息，不改变已读状态。',
+      description: '讀取指定 EdgeChat 會話最近的消息，不改變已讀狀態。',
       inputSchema: {
         type: 'object',
         properties: {
@@ -156,7 +156,7 @@ export function createEdgeChatWebMcpTools(
             minimum: 1,
             maximum: 100,
             default: 30,
-            description: '返回的最近消息数量'
+            description: '返回的最近消息數量'
           }
         },
         required: ['kind', 'roomId'],
@@ -172,7 +172,7 @@ export function createEdgeChatWebMcpTools(
     },
     {
       name: 'edgechat.send_message',
-      description: '向指定 EdgeChat 会话发送一条纯文字消息。此操作会立即产生外部可见消息。',
+      description: '向指定 EdgeChat 會話發送一條純文字消息。此操作會立即產生外部可見消息。',
       inputSchema: {
         type: 'object',
         properties: {
@@ -182,7 +182,7 @@ export function createEdgeChatWebMcpTools(
             type: 'string',
             minLength: 1,
             maxLength: 10000,
-            description: '要发送的消息正文'
+            description: '要發送的消息正文'
           }
         },
         required: ['kind', 'roomId', 'content'],
@@ -200,7 +200,7 @@ export function createEdgeChatWebMcpTools(
     },
     {
       name: 'edgechat.open_dm',
-      description: '按准确用户名找到用户，并幂等地找到或创建与该用户的 EdgeChat 私聊。',
+      description: '按準確用戶名找到用戶，並冪等地找到或創建與該用戶的 EdgeChat 私聊。',
       inputSchema: {
         type: 'object',
         properties: {
@@ -208,7 +208,7 @@ export function createEdgeChatWebMcpTools(
             type: 'string',
             minLength: 1,
             maxLength: 64,
-            description: '目标用户的准确用户名，不包含 @'
+            description: '目標用戶的準確用戶名，不包含 @'
           }
         },
         required: ['username'],
@@ -223,7 +223,7 @@ export function createEdgeChatWebMcpTools(
           (candidate) => String(candidate.username || '').toLowerCase() === username
         );
         if (!user) {
-          throw new Error(`找不到用户 @${username}`);
+          throw new Error(`找不到用戶 @${username}`);
         }
         return apiClient.openDm(Number(user.id));
       }
@@ -250,7 +250,7 @@ export function registerEdgeChatWebMcp(
     return Promise.resolve(false);
   }
 
-  // WebMCP 只是页面能力增强；注册失败不能改变 EdgeChat 原有启动与通信链路。
+  // WebMCP 只是頁面能力增強；註冊失敗不能改變 EdgeChat 原有啟動與通信鏈路。
   registrationPromise = (async () => {
     for (const tool of createEdgeChatWebMcpTools()) {
       await modelContext.registerTool(tool);

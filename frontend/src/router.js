@@ -150,7 +150,7 @@ router.beforeEach(async (to, from) => {
     !isDemoMode &&
     !isCapacitorAndroid
   ) {
-    // Cloudflare Access 按文档请求判定路径；跨入后台必须离开 SPA，才能让 /admin 经过边缘访问策略。
+    // Cloudflare Access 按文檔請求判定路徑；跨入後臺必須離開 SPA，才能讓 /admin 經過邊緣訪問策略。
     window.location.assign(router.resolve(to.fullPath).href);
     return false;
   }

@@ -38,13 +38,13 @@ const memberPanel = readFileSync(
 function getStyleRule(selector) {
 	const marker = `${selector} {`;
 	const start = messageRow.indexOf(marker);
-	assert.notEqual(start, -1, `聊天页缺少样式规则：${selector}`);
+	assert.notEqual(start, -1, `聊天頁缺少樣式規則：${selector}`);
 	const end = messageRow.indexOf("}", start + marker.length);
-	assert.notEqual(end, -1, `聊天页样式规则未闭合：${selector}`);
+	assert.notEqual(end, -1, `聊天頁樣式規則未閉合：${selector}`);
 	return messageRow.slice(start, end + 1);
 }
 
-test("短文本消息为右下角时间戳预留末行空间", () => {
+test("短文本消息為右下角時間戳預留末行空間", () => {
 	assert.match(
 		messageRow,
 		/'message-bubble--with-attachment': msg\.attachment/,
@@ -70,7 +70,7 @@ test("短文本消息为右下角时间戳预留末行空间", () => {
 	);
 });
 
-test("非本人消息在气泡前显示圆形发送者头像", () => {
+test("非本人消息在氣泡前顯示圓形發送者頭像", () => {
 	assert.match(messageRow, /<button\s+v-if="!own"/);
 	assert.match(messageRow, /class="profile-avatar-trigger message-avatar-trigger"/);
 	assert.match(messageRow, /<UiAvatar class="message-avatar"/);
@@ -87,13 +87,13 @@ test("非本人消息在气泡前显示圆形发送者头像", () => {
 	assert.match(avatar, /border-radius:\s*50%;/);
 });
 
-test("远程头像加载失败时显示姓名缩写", () => {
+test("遠程頭像加載失敗時顯示姓名縮寫", () => {
 	assert.match(avatarComponent, /const showImage = computed/);
 	assert.match(avatarComponent, /failedSrc\.value !== props\.src/);
 	assert.match(avatarComponent, /@error="handleImageError"/);
 });
 
-test("群聊姓名旁按禁言优先级显示 Telegram 式头衔", () => {
+test("群聊姓名旁按禁言優先級顯示 Telegram 式頭銜", () => {
 	assert.match(messageRow, /<SenderTitleBadge :identity="msg\.sender" \/>/);
 	assert.match(memberPanel, /<SenderTitleBadge :identity="member" \/>/);
 	assert.ok(senderTitle.indexOf("identity?.isDisabled") < senderTitle.indexOf("identity?.isAdmin"));
@@ -102,7 +102,7 @@ test("群聊姓名旁按禁言优先级显示 Telegram 式头衔", () => {
 	assert.match(senderTitle, /border-radius:\s*3px;/);
 });
 
-test("回复气泡显示引用预览并复用消息定位能力", () => {
+test("回覆氣泡顯示引用預覽並複用消息定位能力", () => {
 	assert.match(messageRow, /<MessageReplyPreview/);
 	assert.match(messageRow, /@reveal="emit\('reveal', msg\.replyToMessageId\)"/);
 	assert.match(chatPage, /@reveal="revealMessage"/);

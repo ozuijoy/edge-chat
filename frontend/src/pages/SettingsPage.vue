@@ -66,7 +66,7 @@ async function saveProfile() {
       bio: normalizeBio(submittedBio)
     });
     store.setSession(payload.session);
-    // 只规范化这次已保存的输入，头像更新与请求期间的新编辑不能重置草稿。
+    // 只規範化這次已保存的輸入，頭像更新與請求期間的新編輯不能重置草稿。
     if (profileForm.bio === submittedBio) profileForm.bio = payload.session.bio;
     if (profileForm.customBackground) {
       localStorage.setItem('customBackground', profileForm.customBackground);

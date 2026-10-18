@@ -75,7 +75,7 @@ function createRouteHarness(resultSets = []) {
 	};
 }
 
-test("general 辅助模块使用幂等 SQL 创建系统群并修复当前成员", async () => {
+test("general 輔助模塊使用冪等 SQL 創建系統群並修復當前成員", async () => {
 	const { db, statements } = createBatchDb();
 	await ensureGeneralChannelMembership(db, "7");
 
@@ -88,7 +88,7 @@ test("general 辅助模块使用幂等 SQL 创建系统群并修复当前成员"
 	await assert.rejects(() => ensureGeneralChannelMembership(db, 0), TypeError);
 });
 
-test("general 系统群识别与数据库保持精确一致", () => {
+test("general 系統群識別與數據庫保持精確一致", () => {
 	assert.equal(isGeneralChannel({ name: "general", kind: "public" }), true);
 	assert.equal(isGeneralChannel({ name: "GENERAL", kind: "private" }), false);
 	assert.equal(isGeneralChannel({ name: "general", kind: "dm" }), false);
@@ -97,7 +97,7 @@ test("general 系统群识别与数据库保持精确一致", () => {
 	assert.equal(isReservedGeneralChannelName("team"), false);
 });
 
-test("频道 API 拒绝创建 general 的大小写变体", async () => {
+test("頻道 API 拒絕創建 general 的大小寫變體", async () => {
 	const harness = createRouteHarness();
 	const response = await harness.request("/api/channels", {
 		method: "POST",
@@ -106,15 +106,15 @@ test("频道 API 拒绝创建 general 的大小写变体", async () => {
 	});
 
 	assert.equal(response.status, 400);
-	assert.deepEqual(await response.json(), { error: "general 是系统群组名称" });
+	assert.deepEqual(await response.json(), { error: "general 是系統群組名稱" });
 	assert.equal(harness.calls.length, 0);
 });
 
-test("成员管理与两个删除入口都会保护 general", async () => {
+test("成員管理與兩個刪除入口都會保護 general", async () => {
 	for (const [path, expectedError] of [
-		["/api/channels/1/members/2", "general 系统群组必须保留所有成员"],
-		["/api/channels/1", "general 系统群组不能删除"],
-		["/api/admin/channels/1", "general 系统群组不能删除"],
+		["/api/channels/1/members/2", "general 系統群組必須保留所有成員"],
+		["/api/channels/1", "general 系統群組不能刪除"],
+		["/api/admin/channels/1", "general 系統群組不能刪除"],
 	]) {
 			const harness = createRouteHarness([[{ id: 1, name: "general", kind: "public" }], [{ role: 'owner' }]]);
 		const response = await harness.request(path, { method: "DELETE" });
@@ -125,7 +125,7 @@ test("成员管理与两个删除入口都会保护 general", async () => {
 	}
 });
 
-test("general 允许更新头像但拒绝改名", async () => {
+test("general 允許更新頭像但拒絕改名", async () => {
 	const harness = createRouteHarness([[{ id: 1, name: "general", kind: "public" }], [{ role: 'owner' }]]);
 	const response = await harness.request("/api/channels/1", {
 		method: "PATCH",
@@ -134,6 +134,6 @@ test("general 允许更新头像但拒绝改名", async () => {
 	});
 
 	assert.equal(response.status, 400);
-	assert.deepEqual(await response.json(), { error: "general 系统群组不能改名" });
+	assert.deepEqual(await response.json(), { error: "general 系統群組不能改名" });
 	assert.equal(harness.calls.length, 2);
 });

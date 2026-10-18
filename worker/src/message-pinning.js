@@ -19,7 +19,7 @@ function normalizeMessageId(payload) {
 async function requirePinPermission(authorize, env, meta) {
 	const access = await authorize(env.DB, meta.principal, meta.room.id);
 	if (!access.ok) {
-		throw new MessagePinningError("无权管理置顶消息");
+		throw new MessagePinningError("無權管理置頂消息");
 	}
 	return access;
 }
@@ -38,12 +38,12 @@ export function createMessagePinning({
 			pinnedBy: access.identity.userId,
 		});
 		if (!pinned) {
-			throw new MessagePinningError("消息不存在或已被删除");
+			throw new MessagePinningError("消息不存在或已被刪除");
 		}
 
 		const message = await loadPinnedMessage(env, meta.room.id);
 		if (!message) {
-			throw new MessagePinningError("消息不存在或已被删除");
+			throw new MessagePinningError("消息不存在或已被刪除");
 		}
 		return {
 			message,
@@ -64,7 +64,7 @@ export function createMessageUnpinning({
 			messageId,
 		});
 		if (!unpinned) {
-			throw new MessagePinningError("该消息已不再置顶");
+			throw new MessagePinningError("該消息已不再置頂");
 		}
 		return {
 			messageId,

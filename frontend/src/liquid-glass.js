@@ -1,6 +1,6 @@
 // Liquid Glass Interactive Effects
 export function initLiquidGlass() {
-  // 为所有带有 liquid-glass 类的元素添加鼠标跟踪
+  // 為所有帶有 liquid-glass 類的元素添加鼠標跟蹤
   const liquidElements = document.querySelectorAll('.ui-surface, .chat-bubble, .liquid-glass-panel');
 
   liquidElements.forEach(element => {
@@ -20,11 +20,11 @@ export function initLiquidGlass() {
   });
 }
 
-// 在 DOM 加载完成后初始化
+// 在 DOM 加載完成後初始化
 if (typeof window !== 'undefined') {
   document.addEventListener('DOMContentLoaded', initLiquidGlass);
 
-  // 支持动态添加的元素
+  // 支持動態添加的元素
   const observer = new MutationObserver(() => {
     initLiquidGlass();
   });

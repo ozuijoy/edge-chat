@@ -13,7 +13,7 @@ export async function getPinnedMessage(env, channelId) {
 }
 
 export async function pinMessage(db, { channelId, messageId, pinnedBy }) {
-	// 用单条 INSERT SELECT 同时确认消息仍然存活，避免删除与置顶并发时留下失效引用。
+	// 用單條 INSERT SELECT 同時確認消息仍然存活，避免刪除與置頂併發時留下失效引用。
 	const result = await db
 		.prepare(
 			`INSERT INTO channel_pins (channel_id, message_id, pinned_by, pinned_at)

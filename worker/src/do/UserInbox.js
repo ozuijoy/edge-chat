@@ -15,7 +15,7 @@ export class UserInbox {
   }
 
   async broadcastCall(payload) {
-    // SDP 含网络候选地址；旧会话被撤销后不能继续从常驻 Inbox 获取通话信令。
+    // SDP 含網絡候選地址；舊會話被撤銷後不能繼續從常駐 Inbox 獲取通話信令。
     for (const socket of this.connections) {
       const meta = socket.deserializeAttachment();
       if (!meta?.token) continue;

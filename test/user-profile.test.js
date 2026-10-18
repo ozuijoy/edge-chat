@@ -41,7 +41,7 @@ async function harness() {
 	return { database, env, request };
 }
 
-test("简介纯文本规范化、Unicode code point 与 200/201 边界", () => {
+test("簡介純文本規範化、Unicode code point 與 200/201 邊界", () => {
 	for (const character of ["a", "中", "😀", "𠮷"]) {
 		assert.equal(validateBio(character.repeat(200)), character.repeat(200));
 		assert.equal(bioLength(character.repeat(200)), 200);
@@ -53,7 +53,7 @@ test("简介纯文本规范化、Unicode code point 与 200/201 边界", () => {
 	for (const value of [null, 1, false, {}, []]) assert.throws(() => validateBio(value), /文本/);
 });
 
-test("Web/v1 简介保存、清空、默认值、PATCH 隔离与 D1 重读", async () => {
+test("Web/v1 簡介保存、清空、默認值、PATCH 隔離與 D1 重讀", async () => {
 	const { request, database } = await harness();
 	for (const prefix of ["", "/v1"]) {
 		assert.equal((await request(`${prefix}/users/2/profile`)).payload.profile.bio, "");
@@ -70,7 +70,7 @@ test("Web/v1 简介保存、清空、默认值、PATCH 隔离与 D1 重读", asy
 		assert.equal(result.payload.session.displayName, "Alice Updated");
 		assert.equal((await request(`${prefix}/users/1/profile`)).payload.profile.bio, "中文\n😀");
 		assert.equal((await request(`${prefix}/users/2/profile`)).payload.profile.bio, "");
-		// KV 快照仍是旧值；会话恢复与 PATCH 必须以 D1 为准。
+		// KV 快照仍是舊值；會話恢復與 PATCH 必須以 D1 為準。
 		database.run("UPDATE users SET bio = 'from database', display_name = 'alice' WHERE id = 1");
 		assert.equal((await request(`${prefix}/auth/session`)).payload.session.bio, "from database");
 		result = await request(`${prefix}/me/profile`, { body: {} });
@@ -81,7 +81,7 @@ test("Web/v1 简介保存、清空、默认值、PATCH 隔离与 D1 重读", asy
 	}
 });
 
-test("简介保存后网页重新登录从 D1 读取；头像上传引用更新不覆盖简介", async () => {
+test("簡介保存後網頁重新登錄從 D1 讀取；頭像上傳引用更新不覆蓋簡介", async () => {
 	const { request, database } = await harness();
 	await request("/me/profile", { body: { bio: "saved bio" } });
 	database.run("INSERT INTO uploaded_files (object_key, owner_user_id, filename, content_type, size) VALUES ('1/avatar.png', 1, 'avatar.png', 'image/png', 1)");
@@ -94,7 +94,7 @@ test("简介保存后网页重新登录从 D1 读取；头像上传引用更新�
 	assert.equal(loggedIn.payload.session.bio, "saved bio");
 });
 
-test("Web/v1 验证、认证、统一不可用与公开字段白名单", async () => {
+test("Web/v1 驗證、認證、統一不可用與公開字段白名單", async () => {
 	const { request } = await harness();
 	for (const prefix of ["", "/v1"]) {
 		assert.equal((await request(`${prefix}/users/1/profile`, { token: "" })).status, 401);
@@ -104,7 +104,7 @@ test("Web/v1 验证、认证、统一不可用与公开字段白名单", async (
 		for (const id of [3, 4, 6, 999]) {
 			const result = await request(`${prefix}/users/${id}/profile`);
 			assert.equal(result.status, 404);
-			assert.equal(prefix ? result.payload.error.message : result.payload.error, "用户资料不可用");
+			assert.equal(prefix ? result.payload.error.message : result.payload.error, "用戶資料不可用");
 		}
 		assert.equal((await request(`${prefix}/users/5/profile`)).status, 200);
 		assert.deepEqual(Object.keys((await request(`${prefix}/users/1/profile`)).payload.profile).sort(),
@@ -120,7 +120,7 @@ test("Web/v1 验证、认证、统一不可用与公开字段白名单", async (
 	}
 });
 
-test("查看资料不创建私信、不向用户摘要与 bootstrap 投影简介", async () => {
+test("查看資料不創建私信、不向用戶摘要與 bootstrap 投影簡介", async () => {
 	const { request, database } = await harness();
 	await request("/me/profile", { body: { bio: "private to signed-in viewers" } });
 	await request("/users/2/profile");
@@ -129,7 +129,7 @@ test("查看资料不创建私信、不向用户摘要与 bootstrap 投影简介
 	assert.equal(payload.users.some((user) => "bio" in user), false);
 });
 
-test("资料写入内部异常在 Web/v1 均隐藏堆栈和 SQL 细节", async () => {
+test("資料寫入內部異常在 Web/v1 均隱藏堆棧和 SQL 細節", async () => {
 	const { request, env } = await harness();
 	const prepare = env.DB.prepare;
 	env.DB.prepare = (sql) => {
@@ -146,7 +146,7 @@ test("资料写入内部异常在 Web/v1 均隐藏堆栈和 SQL 细节", async (
 		for (const prefix of ["", "/v1"]) {
 			const result = await request(`${prefix}/me/profile`, { body: { bio: "test" } });
 			assert.equal(result.status, 500);
-			assert.equal(prefix ? result.payload.error.message : result.payload.error, "服务器开小差了");
+			assert.equal(prefix ? result.payload.error.message : result.payload.error, "服務器開小差了");
 			assert.doesNotMatch(JSON.stringify(result.payload), /internal_sql_detail|stack/);
 		}
 	} finally {
@@ -154,7 +154,7 @@ test("资料写入内部异常在 Web/v1 均隐藏堆栈和 SQL 细节", async (
 	}
 });
 
-test("用户简介新安装、旧库升级与重复迁移规划保持数据", async () => {
+test("用戶簡介新安裝、舊庫升級與重複遷移規劃保持數據", async () => {
 	const migration = D1_MIGRATIONS.find((item) => item.id === "2026-09-12-user-bio");
 	for (const fresh of [false, true]) {
 		const database = new SQL.Database();

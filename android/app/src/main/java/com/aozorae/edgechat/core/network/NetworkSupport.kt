@@ -26,10 +26,10 @@ import okhttp3.Route
 class EdgeChatApiException(val code: String, override val message: String, val status: Int) : IOException(message)
 
 fun <T> retrofit2.Response<T>.bodyOrThrow(json: Json): T {
-    if (isSuccessful) return body() ?: throw EdgeChatApiException("empty_response", "服务器返回空响应", code())
+    if (isSuccessful) return body() ?: throw EdgeChatApiException("empty_response", "服務器返回空響應", code())
     val raw = errorBody()?.string().orEmpty()
     val error = runCatching { json.decodeFromString<ApiErrorEnvelope>(raw).error }.getOrNull()
-    throw EdgeChatApiException(error?.code ?: "http_${code()}", error?.message ?: "请求失败", code())
+    throw EdgeChatApiException(error?.code ?: "http_${code()}", error?.message ?: "請求失敗", code())
 }
 
 @Singleton
@@ -38,7 +38,7 @@ class ServerUrlInterceptor @Inject constructor(private val serverStore: ServerSt
         val request = chain.request()
         if (request.url.host != PLACEHOLDER_HOST) return chain.proceed(request)
         val base = runBlocking { serverStore.baseUrl() }
-            ?: throw IOException("尚未配置 EdgeChat 服务器")
+            ?: throw IOException("尚未配置 EdgeChat 服務器")
         val target = request.url.newBuilder()
             .scheme(java.net.URI(base).scheme)
             .host(java.net.URI(base).host)

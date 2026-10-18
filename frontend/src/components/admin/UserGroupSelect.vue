@@ -3,8 +3,8 @@ import { computed, nextTick, onBeforeUnmount, ref } from 'vue';
 import { Check, ChevronDown, LoaderCircle, UsersRound } from '@lucide/vue';
 import { t } from '../../i18n.js';
 
-// 用户组选择按钮：替代原生 select，显示当前分组并在浮层中列出可选项。
-// 浮层 Teleport 到 body 并用 fixed 定位，因为用户表格外层会裁切溢出内容。
+// 用戶組選擇按鈕：替代原生 select，顯示當前分組並在浮層中列出可選項。
+// 浮層 Teleport 到 body 並用 fixed 定位，因為用戶表格外層會裁切溢出內容。
 const props = defineProps({ modelValue: Number, roles: Array, hasMore: Boolean, loading: Boolean, disabled: Boolean, currentName: String });
 const emit = defineEmits(['update:modelValue', 'more']);
 const trigger = ref(null);
@@ -19,7 +19,7 @@ const currentLabel = computed(() => {
 function place() {
   const rect = trigger.value.getBoundingClientRect();
   const width = Math.max(rect.width, 220);
-  // 下方空间不足时向上展开，避免浮层被视口底部截断。
+  // 下方空間不足時向上展開，避免浮層被視口底部截斷。
   const below = window.innerHeight - rect.bottom > 300;
   position.value = {
     left: `${Math.max(8, Math.min(rect.left, window.innerWidth - width - 8))}px`,
@@ -38,7 +38,7 @@ function outside(event) {
 }
 async function toggle() {
   if (open.value) return close();
-  // 首次打开时才拉取用户组，避免页面加载时为每一行都请求列表。
+  // 首次打開時才拉取用戶組，避免頁面加載時為每一行都請求列表。
   if (!props.roles.length && props.hasMore) emit('more');
   place();
   open.value = true;
@@ -74,7 +74,7 @@ onBeforeUnmount(close);
   </Teleport>
 </template>
 <style>
-/* 浮层被 Teleport 到 body，scoped 样式无法命中，因此这里使用带前缀的全局类名。 */
+/* 浮層被 Teleport 到 body，scoped 樣式無法命中，因此這裡使用帶前綴的全局類名。 */
 .group-picker {
   display: inline-flex; align-items: center; justify-self: start; gap: 8px; max-width: 220px; min-height: 36px; padding: 0 10px 0 12px;
   border: 1px solid var(--admin-border-strong); border-radius: var(--admin-radius-pill); background: var(--admin-panel);

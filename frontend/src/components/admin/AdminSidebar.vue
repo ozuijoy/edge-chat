@@ -13,7 +13,7 @@ const { locale, t } = useI18n();
 const query = ref('');
 const mobileOpen = ref(false);
 const mobileToggle = ref(null);
-// 页面导航与菜单展开分开操作；进入栏目也保持收起，避免挤占其它导航入口。
+// 頁面導航與菜單展開分開操作；進入欄目也保持收起，避免擠佔其它導航入口。
 const openGroups = ref(new Set());
 
 const localizedNavigation = computed(() =>
@@ -77,7 +77,7 @@ function toggleGroup(groupId) {
 function closeMobileNavigation() {
   if (!mobileOpen.value) return;
   mobileOpen.value = false;
-  // 收起后原导航项会隐藏，把焦点交还始终可见的开关，避免键盘位置丢失。
+  // 收起後原導航項會隱藏，把焦點交還始終可見的開關，避免鍵盤位置丟失。
   mobileToggle.value?.focus();
 }
 

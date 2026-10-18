@@ -19,14 +19,14 @@ const joinDialog = readFileSync(
   'utf8'
 );
 
-test('创建群聊弹窗提供公开和私有类型切换', () => {
+test('創建群聊彈窗提供公開和私有類型切換', () => {
   assert.match(createGroupDialog, /role="radiogroup"/);
   assert.match(createGroupDialog, /form\.kind === 'public'/);
   assert.match(createGroupDialog, /t\('chat\.publicGroup'\)/);
   assert.match(createGroupDialog, /t\('chat\.privateGroup'\)/);
 });
 
-test('未加入公开群位于侧栏底部折叠区并通过确认弹窗加入', () => {
+test('未加入公開群位於側欄底部摺疊區並通過確認彈窗加入', () => {
   assert.match(chatPage, /<PublicGroupDiscovery/);
   assert.match(chatPage, /publicGroupItems/);
   assert.match(chatPage, /<PublicGroupJoinDialog/);

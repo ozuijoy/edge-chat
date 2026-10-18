@@ -73,7 +73,7 @@ class EdgeChatNativePlugin : Plugin() {
 
         val metadata = readFileMetadata(uri)
         if (metadata.size > MAX_FILE_BYTES) {
-            call.reject("文件不能超过 20 MB")
+            call.reject("文件不能超過 20 MB")
             return
         }
 
@@ -87,7 +87,7 @@ class EdgeChatNativePlugin : Plugin() {
 
     @PluginMethod
     fun requestMicrophonePermission(call: PluginCall) {
-        // 先走应用权限，再让 WebView 获取音频流，网页才能明确区分拒绝授权与设备故障。
+        // 先走應用權限，再讓 WebView 獲取音頻流，網頁才能明確區分拒絕授權與設備故障。
         if (getPermissionState(MICROPHONE_PERMISSION_ALIAS) == PermissionState.GRANTED) {
             microphonePermissionResult(call)
         } else {
@@ -102,7 +102,7 @@ class EdgeChatNativePlugin : Plugin() {
 
     @PluginMethod
     fun openAppSettings(call: PluginCall) {
-        // 用户选择“不再询问”后系统不再弹窗，提供直达本应用权限页的恢复入口。
+        // 用戶選擇“不再詢問”後系統不再彈窗，提供直達本應用權限頁的恢復入口。
         activity.startActivity(
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}")),
         )
@@ -140,7 +140,7 @@ class EdgeChatNativePlugin : Plugin() {
             return
         }
 
-        val title = call.getString("title") ?: return call.reject("通知标题不能为空")
+        val title = call.getString("title") ?: return call.reject("通知標題不能為空")
         val body = call.getString("body") ?: ""
         val tag = call.getString("tag", "edgechat") ?: "edgechat"
         val roomKind = call.getString("roomKind")
@@ -174,10 +174,10 @@ class EdgeChatNativePlugin : Plugin() {
 
     @PluginMethod
     fun openExternal(call: PluginCall) {
-        val url = call.getString("url") ?: return call.reject("链接不能为空")
+        val url = call.getString("url") ?: return call.reject("鏈接不能為空")
         val uri = Uri.parse(url)
         if (uri.scheme !in setOf("http", "https", "mailto", "tel")) {
-            call.reject("不支持此链接类型")
+            call.reject("不支持此鏈接類型")
             return
         }
 
@@ -185,7 +185,7 @@ class EdgeChatNativePlugin : Plugin() {
             activity.startActivity(Intent(Intent.ACTION_VIEW, uri))
             call.resolve()
         } catch (_: ActivityNotFoundException) {
-            call.reject("没有可打开此链接的应用")
+            call.reject("沒有可打開此鏈接的應用")
         }
     }
 
@@ -220,7 +220,7 @@ class EdgeChatNativePlugin : Plugin() {
         val roomId = intent.getIntExtra(EXTRA_ROOM_ID, 0)
         if (roomId <= 0) return
 
-        // 保留事件直到网页监听器就绪，避免冷启动阶段丢失用户点击的会话目标。
+        // 保留事件直到網頁監聽器就緒，避免冷啟動階段丟失用戶點擊的會話目標。
         notifyListeners(
             "notificationOpened",
             JSObject().put("kind", roomKind).put("id", roomId),

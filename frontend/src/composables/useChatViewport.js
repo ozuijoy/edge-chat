@@ -19,7 +19,7 @@ export function useChatViewport({ activeRoom }) {
 	function syncViewportHeight() {
 		const visualViewport = window.visualViewport;
 		const viewportHeight = visualViewport?.height || window.innerHeight;
-		// 部分移动浏览器会在键盘弹出时平移视觉视口，只同步高度会让输入栏停在旧位置。
+		// 部分移動瀏覽器會在鍵盤彈出時平移視覺視口，只同步高度會讓輸入欄停在舊位置。
 		document.documentElement.style.setProperty(
 			"--chat-viewport-height",
 			`${Math.round(viewportHeight)}px`,

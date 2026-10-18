@@ -1,38 +1,38 @@
-# Edgechat Docker 一键部署
+# Edgechat Docker 一鍵部署
 
-## 🚀 一键启动（推荐）
+## 🚀 一鍵啟動（推薦）
 
 ```bash
-EDGECHAT_ADMIN_PASSWORD='请替换为强密码' ./docker-start.sh
+EDGECHAT_ADMIN_PASSWORD='請替換為強密碼' ./docker-start.sh
 ```
 
-这个脚本会自动：
-- ✅ 构建并启动 Docker 容器
-- ✅ 初始化数据库表
-- ✅ 使用与 GitHub Actions 相同的 PBKDF2 规则创建管理员账户
-- ✅ 显示访问信息
+這個腳本會自動：
+- ✅ 構建並啟動 Docker 容器
+- ✅ 初始化數據庫表
+- ✅ 使用與 GitHub Actions 相同的 PBKDF2 規則創建管理員賬戶
+- ✅ 顯示訪問信息
 
-## 📱 访问应用
+## 📱 訪問應用
 
-启动后访问：**http://localhost:8788**
+啟動後訪問：**http://localhost:8788**
 
-## 🔐 管理员账户
+## 🔐 管理員賬戶
 
-- **用户名**：读取 `EDGECHAT_ADMIN_USERNAME`，未设置时使用 `admin`
-- **密码**：必须通过 `EDGECHAT_ADMIN_PASSWORD` 显式传入
-- **显示名称**：读取 `EDGECHAT_ADMIN_DISPLAY_NAME`，未设置时使用 `Administrator`
+- **用戶名**：讀取 `EDGECHAT_ADMIN_USERNAME`，未設置時使用 `admin`
+- **密碼**：必須通過 `EDGECHAT_ADMIN_PASSWORD` 顯式傳入
+- **顯示名稱**：讀取 `EDGECHAT_ADMIN_DISPLAY_NAME`，未設置時使用 `Administrator`
 
-脚本不会把密码写入仓库或固定在启动文件中。重复运行会复用已有管理员，不会覆盖现有密码。
+腳本不會把密碼寫入倉庫或固定在啟動文件中。重複運行會複用已有管理員，不會覆蓋現有密碼。
 
-## 🛠️ 手动部署
+## 🛠️ 手動部署
 
-### 1. 启动容器
+### 1. 啟動容器
 
 ```bash
 docker compose up -d --build
 ```
 
-### 2. 初始化数据库
+### 2. 初始化數據庫
 
 ```bash
 docker compose exec edgechat wrangler d1 execute cfchat-db --local --file=./worker/schema.sql
@@ -40,12 +40,12 @@ docker compose exec edgechat wrangler d1 execute cfchat-db --local --file=./work
 
 `cfchat-db` is the retained legacy D1 database name. Keep using it unless you are doing a planned data migration.
 
-### 3. 创建管理员账户
+### 3. 創建管理員賬戶
 
 ```bash
 docker compose exec \
   -e EDGECHAT_ADMIN_USERNAME=admin \
-  -e EDGECHAT_ADMIN_PASSWORD='请替换为强密码' \
+  -e EDGECHAT_ADMIN_PASSWORD='請替換為強密碼' \
   -e EDGECHAT_ADMIN_DISPLAY_NAME=Administrator \
   edgechat node .github/scripts/generate-admin-bootstrap-sql.mjs
 docker compose exec edgechat wrangler d1 execute cfchat-db --local --file=.tmp/edgechat-admin-upsert.sql
@@ -54,62 +54,62 @@ docker compose exec edgechat wrangler d1 execute cfchat-db --local --file=.tmp/e
 ## 📊 常用命令
 
 ```bash
-# 查看容器状态
+# 查看容器狀態
 docker compose ps
 
-# 查看日志
+# 查看日誌
 docker compose logs -f
 
-# 重启服务
+# 重啟服務
 docker compose restart
 
-# 停止服务
+# 停止服務
 docker compose down
 
-# 完全清理（包括数据）
+# 完全清理（包括數據）
 docker compose down -v
 ```
 
 ## 🔧 故障排查
 
-### 问题：显示"服务器开小差了"
+### 問題：顯示"服務器開小差了"
 
-**原因**：数据库未初始化
+**原因**：數據庫未初始化
 
-**解决**：运行 `./docker-start.sh` 或手动执行步骤 2 和 3
+**解決**：運行 `./docker-start.sh` 或手動執行步驟 2 和 3
 
-### 问题：端口被占用
+### 問題：端口被佔用
 
-**解决**：修改 `docker-compose.yml` 中的端口映射
+**解決**：修改 `docker-compose.yml` 中的端口映射
 
 ```yaml
 ports:
-  - "8788:8787"  # 改为其他端口，如 "9000:8787"
+  - "8788:8787"  # 改為其他端口，如 "9000:8787"
 ```
 
-### 问题：容器一直重启
+### 問題：容器一直重啟
 
-**解决**：查看日志找出原因
+**解決**：查看日誌找出原因
 
 ```bash
 docker compose logs --tail=50
 ```
 
-## 🌐 生产部署
+## 🌐 生產部署
 
-Docker 仅用于本地开发和测试。
+Docker 僅用於本地開發和測試。
 
-生产环境请部署到 Cloudflare Workers：
+生產環境請部署到 Cloudflare Workers：
 
 ```bash
 # 配置 wrangler.toml
-# 然后部署
+# 然後部署
 npm run deploy
 ```
 
-## 📝 注意事项
+## 📝 注意事項
 
-- 本地开发使用 SQLite（D1 本地模式）
-- 数据存储在 `.wrangler/state/` 目录
-- 停止容器不会丢失数据
-- 使用 `docker compose down -v` 会清除所有数据
+- 本地開發使用 SQLite（D1 本地模式）
+- 數據存儲在 `.wrangler/state/` 目錄
+- 停止容器不會丟失數據
+- 使用 `docker compose down -v` 會清除所有數據

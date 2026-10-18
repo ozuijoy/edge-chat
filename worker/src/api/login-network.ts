@@ -8,14 +8,14 @@ export function registerLoginNetworkRoutes(app) {
     const session = c.get('session');
     const body = await parseJsonRequest(c.req.raw);
     if (!session.loginProbeId || body.probeId !== session.loginProbeId) {
-      return errorResponse('请求被拒绝', 403);
+      return errorResponse('請求被拒絕', 403);
     }
     if (!statuses.has(body.status) || !Array.isArray(body.ips) || body.ips.length > 4
       || body.ips.some((ip) => typeof ip !== 'string' || ip.length > 45 || !isIP(ip))
       || (['unsupported', 'failed'].includes(body.status) && body.ips.length)) {
-      return errorResponse('请求参数错误', 400);
+      return errorResponse('請求參數錯誤', 400);
     }
-    // 结果补到对应登录，不另占一条历史；一次消费且限时，迟到结果不会覆盖别次登录。
+    // 結果補到對應登錄，不另佔一條歷史；一次消費且限時，遲到結果不會覆蓋別次登錄。
     await c.env.DB.prepare(`UPDATE user_login_info
       SET webrtc_ips = ?, webrtc_status = ?, webrtc_checked_at = CURRENT_TIMESTAMP, login_probe_id = ''
       WHERE user_id = ? AND login_probe_id = ? AND login_at >= datetime('now', '-2 minutes')`)

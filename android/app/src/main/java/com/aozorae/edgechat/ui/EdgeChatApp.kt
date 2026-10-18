@@ -126,11 +126,11 @@ fun EdgeChatApp(
     if (failure != null) {
         AlertDialog(
             onDismissRequest = { appViewModel.clearError(); chatViewModel.clearError() },
-            title = { Text(if (appState.language == "zh-CN") "操作失败" else "Something went wrong") },
+            title = { Text(if (appState.language == "zh-TW") "操作失敗" else "Something went wrong") },
             text = { Text(failure) },
             confirmButton = {
                 TextButton(onClick = { appViewModel.clearError(); chatViewModel.clearError() }) {
-                    Text(if (appState.language == "zh-CN") "知道了" else "OK")
+                    Text(if (appState.language == "zh-TW") "知道了" else "OK")
                 }
             },
         )

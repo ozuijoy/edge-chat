@@ -91,7 +91,7 @@ function createLegacyReadDatabase() {
 	return db;
 }
 
-test("迁移清单覆盖全部 D1 SQL 且保持文件顺序", () => {
+test("遷移清單覆蓋全部 D1 SQL 且保持文件順序", () => {
 	const files = readdirSync(new URL("../worker/migrations/", import.meta.url))
 		.filter((file) => file.endsWith(".sql"))
 		.sort()
@@ -103,7 +103,7 @@ test("迁移清单覆盖全部 D1 SQL 且保持文件顺序", () => {
 	);
 });
 
-test("完整数据库只登记迁移基线，不重复执行历史 SQL", async () => {
+test("完整數據庫只登記遷移基線，不重複執行歷史 SQL", async () => {
 	const plan = await buildD1MigrationPlan({
 		migrations: D1_MIGRATIONS,
 		repairs: D1_REPAIRS,
@@ -117,7 +117,7 @@ test("完整数据库只登记迁移基线，不重复执行历史 SQL", async (
 	assert.match(plan.sql, /CREATE TABLE IF NOT EXISTS edgechat_schema_migrations/);
 });
 
-test("旧数据库只执行缺失的邀请次数迁移", async () => {
+test("舊數據庫只執行缺失的邀請次數遷移", async () => {
 	const inviteMigrationIndex = D1_MIGRATIONS.findIndex(
 		(migration) => migration.id === "2026-07-29-registration-invite-usage",
 	);
@@ -134,7 +134,7 @@ test("旧数据库只执行缺失的邀请次数迁移", async () => {
 	assert.doesNotMatch(plan.sql, /DROP TABLE channels/);
 });
 
-test("旧数据库会新增用户临时封禁截止时间字段", async () => {
+test("舊數據庫會新增用戶臨時封禁截止時間字段", async () => {
 	const migrationIndex = D1_MIGRATIONS.findIndex(
 		(migration) => migration.id === "2026-08-20-user-ban-expiry",
 	);
@@ -149,7 +149,7 @@ test("旧数据库会新增用户临时封禁截止时间字段", async () => {
 	assert.match(plan.sql, /ALTER TABLE users ADD COLUMN disabled_until TEXT/);
 });
 
-test("Telegram 迁移前会修复旧 channel_reads 外键并保留已读进度", async () => {
+test("Telegram 遷移前會修復舊 channel_reads 外鍵並保留已讀進度", async () => {
 	const telegramMigration = D1_MIGRATIONS.find(
 		(migration) => migration.id === "2026-08-12-telegram-bridge",
 	);
@@ -192,7 +192,7 @@ test("Telegram 迁移前会修复旧 channel_reads 外键并保留已读进度",
 	repairedDb.close();
 });
 
-test("部分迁移状态会阻断部署，避免继续发布不兼容代码", async () => {
+test("部分遷移狀態會阻斷部署，避免繼續發佈不兼容代碼", async () => {
 	const inviteMigrationIndex = D1_MIGRATIONS.findIndex(
 		(migration) => migration.id === "2026-07-29-registration-invite-usage",
 	);
@@ -207,11 +207,11 @@ test("部分迁移状态会阻断部署，避免继续发布不兼容代码", as
 				artifacts,
 				readSql: readMigration,
 			}),
-		/数据库结构只完成了一部分/,
+		/數據庫結構只完成了一部分/,
 	);
 });
 
-test("Windows CRLF 迁移校验值会在 Linux Actions 中自动归一化", async () => {
+test("Windows CRLF 遷移校驗值會在 Linux Actions 中自動歸一化", async () => {
 	const sql = "CREATE TABLE example (id INTEGER);\n";
 	const legacyChecksum = createHash("sha256")
 		.update(sql.replaceAll("\n", "\r\n"))
@@ -232,11 +232,11 @@ test("Windows CRLF 迁移校验值会在 Linux Actions 中自动归一化", asyn
 	});
 
 	assert.deepEqual(plan.decisions, [{ id: "cross-platform", action: "normalize" }]);
-	assert.match(plan.sql, /统一 cross-platform 的跨平台换行符校验值/);
+	assert.match(plan.sql, /統一 cross-platform 的跨平臺換行符校驗值/);
 	assert.match(plan.sql, /UPDATE edgechat_schema_migrations/);
 });
 
-test("R2 引用迁移会替换已发布触发器，升级库与新装库使用相同不变量", async () => {
+test("R2 引用遷移會替換已發佈觸發器，升級庫與新裝庫使用相同不變量", async () => {
 	const migrationIndex = D1_MIGRATIONS.findIndex(
 		(migration) => migration.id === "2026-09-12-r2-reference-invariants",
 	);
@@ -324,7 +324,7 @@ test("R2 引用迁移会替换已发布触发器，升级库与新装库使用�
 	fresh.close();
 });
 
-test("部署工作流每次发布都在 Worker 之前准备并执行 D1 迁移", () => {
+test("部署工作流每次發佈都在 Worker 之前準備並執行 D1 遷移", () => {
 	const workflow = readFileSync(
 		new URL("../.github/workflows/deploy-worker.yml", import.meta.url),
 		"utf8",
@@ -344,7 +344,7 @@ test("部署工作流每次发布都在 Worker 之前准备并执行 D1 迁移",
 	assert.match(workflow, /\.tmp\/edgechat-d1-migrations\.sql/);
 });
 
-test("CI Wrangler 配置保留收件箱 Durable Object 与管理员变量", () => {
+test("CI Wrangler 配置保留收件箱 Durable Object 與管理員變量", () => {
 	const config = readFileSync(new URL("../wrangler.example.toml", import.meta.url), "utf8");
 
 	assert.match(config, /ADMIN_USERNAMES = "admin"/);

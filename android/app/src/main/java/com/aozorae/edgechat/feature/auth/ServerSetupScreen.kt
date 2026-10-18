@@ -59,7 +59,7 @@ fun ServerSetupScreen(
                         IconButton(onClick = onBack) {
                             Icon(
                                 Icons.AutoMirrored.Outlined.ArrowBack,
-                                contentDescription = if (language == "zh-CN") "返回" else "Back",
+                                contentDescription = if (language == "zh-TW") "返回" else "Back",
                             )
                         }
                     }
@@ -91,15 +91,15 @@ fun ServerSetupScreen(
             }
             Spacer(Modifier.height(28.dp))
             Text(
-                text = if (language == "zh-CN") "选择你的服务器" else "Choose your server",
+                text = if (language == "zh-TW") "選擇你的服務器" else "Choose your server",
                 style = MaterialTheme.typography.headlineSmall,
                 color = colors.textPrimary,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = if (language == "zh-CN") {
-                    "输入 EdgeChat 服务地址以验证连接"
+                text = if (language == "zh-TW") {
+                    "輸入 EdgeChat 服務地址以驗證連接"
                 } else {
                     "Enter your EdgeChat server address to verify the connection."
                 },
@@ -114,7 +114,7 @@ fun ServerSetupScreen(
                 onValueChange = { server = it },
                 modifier = Modifier.widthIn(max = 520.dp).fillMaxWidth(),
                 singleLine = true,
-                label = { Text(if (language == "zh-CN") "服务器地址" else "Server address") },
+                label = { Text(if (language == "zh-TW") "服務器地址" else "Server address") },
                 placeholder = { Text("https://chat.example.com") },
                 leadingIcon = { Icon(Icons.Outlined.Link, contentDescription = null) },
                 shape = MaterialTheme.shapes.large,
@@ -129,7 +129,7 @@ fun ServerSetupScreen(
                 if (loading) {
                     CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
                 } else {
-                    Text(if (language == "zh-CN") "验证并继续" else "Verify and continue")
+                    Text(if (language == "zh-TW") "驗證並繼續" else "Verify and continue")
                 }
             }
         }

@@ -21,7 +21,7 @@ export async function generateBootstrapSql({ username, password, displayName = u
   const safeHash = escapeSql(hashed.hash);
   const safeSalt = escapeSql(hashed.salt);
 
-  // 初始化只负责新账号，不能借重复部署覆盖已有账号的密码、权限或封禁状态。
+  // 初始化只負責新賬號，不能借重複部署覆蓋已有賬號的密碼、權限或封禁狀態。
   return `
 INSERT INTO users (
   username,

@@ -52,7 +52,7 @@ function enqueue(env, senderId, userId, id, kind = 'dm', channel = 17) {
   return enqueueTelegramNotification(env, { userId, senderId, room: { id: channel, name: 'Private room' }, message: { id }, kind });
 }
 
-test('通知：增量迁移保留旧绑定、偏好与投递记录并回填预算时间', t => {
+test('通知：增量遷移保留舊綁定、偏好與投遞記錄並回填預算時間', t => {
   const db = new SQL.Database();
   t.after(() => db.close());
   db.exec('CREATE TABLE users (id INTEGER PRIMARY KEY); INSERT INTO users VALUES (1)');
@@ -65,7 +65,7 @@ test('通知：增量迁移保留旧绑定、偏好与投递记录并回填预�
   assert.equal(db.exec('SELECT COUNT(*) FROM telegram_notification_gate')[0].values[0][0], 1);
 });
 
-test('通知：并发私信受收件人预算限制，延迟合并，重放不触发新请求', async t => {
+test('通知：併發私信受收件人預算限制，延遲合併，重放不觸發新請求', async t => {
   const f = await fixture(t);
   await Promise.all(Array.from({ length: 50 }, (_, i) => enqueue(f.env, 1, 2, i + 1)));
   assert.equal(f.count(), 5);
@@ -81,7 +81,7 @@ test('通知：并发私信受收件人预算限制，延迟合并，重放不�
   assert.equal(f.deleted(), 1);
 });
 
-test('通知：跨房间并发发送者预算和每消息群提及扇出均不可绕过', async t => {
+test('通知：跨房間併發發送者預算和每消息群提及扇出均不可繞過', async t => {
   const f = await fixture(t);
   await Promise.all(Array.from({ length: 25 }, (_, i) => enqueue(f.env, 1, i + 2, i + 1, 'mention', i + 10)));
   assert.equal(f.count(), 20);
@@ -90,7 +90,7 @@ test('通知：跨房间并发发送者预算和每消息群提及扇出均不�
   assert.equal(f.count('message_id = 99'), 10);
 });
 
-test('通知：全站入队预算和积压上限限制队列增长', async t => {
+test('通知：全站入隊預算和積壓上限限制隊列增長', async t => {
   const f = await fixture(t);
   for (let i = 0; i < 120; i++) await enqueue(f.env, Math.floor(i / 20) + 1, (i % 24) + 2, i + 1);
   assert.equal(f.count(), 100);
@@ -101,7 +101,7 @@ test('通知：全站入队预算和积压上限限制队列增长', async t => 
   assert.equal(f.count(), 500);
 });
 
-test('通知：发送和重试共享 Bot 闸门，收件人一分钟内不重复打扰', async t => {
+test('通知：發送和重試共享 Bot 閘門，收件人一分鐘內不重複打擾', async t => {
   const f = await fixture(t);
   await enqueue(f.env, 1, 2, 1);
   await enqueue(f.env, 3, 4, 2);
@@ -120,7 +120,7 @@ test('通知：发送和重试共享 Bot 闸门，收件人一分钟内不重复
   assert.ok(await nextTelegramNotificationAt(f.env) > Date.now());
 });
 
-test('通知：429 的 retry_after 暂停全站，其他发送者不消耗尝试次数', async t => {
+test('通知：429 的 retry_after 暫停全站，其他發送者不消耗嘗試次數', async t => {
   const f = await fixture(t);
   await enqueue(f.env, 1, 2, 1);
   await enqueue(f.env, 3, 4, 2);
@@ -134,13 +134,13 @@ test('通知：429 的 retry_after 暂停全站，其他发送者不消耗尝试
   assert.ok(await nextTelegramNotificationAt(f.env) >= Date.now() + 118_000);
   f.response(() => Response.json({ ok: true, result: { message_id: 2 } }));
   f.clearGates();
-  // 429 行仍在未来，健康发送者的到期提醒应当先获得服务。
+  // 429 行仍在未來，健康發送者的到期提醒應當先獲得服務。
   await f.scheduler.alarm();
   assert.equal(f.requests.length, 2);
   assert.equal(f.requests[1].body.chat_id, '1004');
 });
 
-test('通知：有限重试、最后租约中断恢复、关闭偏好及 DO 内部门禁', async t => {
+test('通知：有限重試、最後租約中斷恢復、關閉偏好及 DO 內部門禁', async t => {
   const f = await fixture(t);
   await enqueue(f.env, 1, 2, 1);
   f.response(() => Response.json({ ok: false, description: 'temporary' }, { status: 503 }));
@@ -161,7 +161,7 @@ test('通知：有限重试、最后租约中断恢复、关闭偏好及 DO 内�
   assert.equal(f.alarms.length, alarmCount);
 });
 
-test('通知：真实 HTTP→ChannelRoom→SQL 投影队列限制 distinct DM，429 不拖垮他人的重试', async t => {
+test('通知：真實 HTTP→ChannelRoom→SQL 投影隊列限制 distinct DM，429 不拖垮他人的重試', async t => {
   const f = await fixture(t);
   f.db.run("INSERT INTO channels (id, kind, name, dm_key) VALUES (17, 'dm', 'DM', '1:2'), (18, 'dm', 'DM2', '3:4')");
   f.db.run('INSERT INTO channel_members (channel_id, user_id) VALUES (17, 1), (17, 2), (18, 3), (18, 4)');

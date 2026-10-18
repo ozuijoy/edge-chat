@@ -24,13 +24,13 @@ test('call state defaults to P2P and only the callee can accept once', () => {
   assert.equal(ringing().mode, 'auto');
   assert.equal(accepted().calleeClient, calleeClient);
   assert.equal(accepted().revision, 1);
-  assert.throws(() => nextCallState(ringing(), { type: 'accept', callId, clientId: callerClient, mode: 'auto' }, 1, 2, 4, 200), /处理/);
-  assert.throws(() => nextCallState(accepted(), { type: 'accept', callId, clientId: calleeClient, mode: 'auto' }, 2, 1, 4, 200), /处理/);
+  assert.throws(() => nextCallState(ringing(), { type: 'accept', callId, clientId: callerClient, mode: 'auto' }, 1, 2, 4, 200), /處理/);
+  assert.throws(() => nextCallState(accepted(), { type: 'accept', callId, clientId: calleeClient, mode: 'auto' }, 2, 1, 4, 200), /處理/);
 });
 
 test('busy calls, outsiders, and other tabs cannot take over a call', () => {
-  assert.throws(() => nextCallState(ringing(), start, 1, 2, 4, 200), /正在通话/);
-  assert.throws(() => nextCallState(accepted(), { type: 'hangup', callId, clientId: callerClient }, 3, 1, 4, 200), /双方/);
+  assert.throws(() => nextCallState(ringing(), start, 1, 2, 4, 200), /正在通話/);
+  assert.throws(() => nextCallState(accepted(), { type: 'hangup', callId, clientId: callerClient }, 3, 1, 4, 200), /雙方/);
   assert.throws(() => nextCallState(accepted(), { type: 'hangup', callId, clientId: callerClient }, 2, 1, 4, 200), /其他窗口/);
 });
 
@@ -48,7 +48,7 @@ test('relay switches advance negotiation revision and stale actions cannot end a
   assert.equal(next.revision, 2);
   assert.equal(nextCallState(next, { type: 'restart', callId, clientId: callerClient, mode: 'relay' }, 1, 2, 4, 200), next);
   assert.equal(nextCallState(accepted(), { type: 'hangup', callId, clientId: calleeClient }, 2, 1, 4, 200), null);
-  assert.throws(() => nextCallState(accepted(), { type: 'hangup', callId: callerClient, clientId: calleeClient }, 2, 1, 4, 200), /结束/);
+  assert.throws(() => nextCallState(accepted(), { type: 'hangup', callId: callerClient, clientId: calleeClient }, 2, 1, 4, 200), /結束/);
 });
 
 test('call timeouts cover ringing, missing heartbeats, and maximum duration', () => {
@@ -70,7 +70,7 @@ test('TURN keys stay server-side and issued credentials exclude browser-blocked 
   assert.equal(result.iceServers[0].urls.length, 1);
   assert.equal(JSON.stringify(result).includes('secret'), false);
   await assert.rejects(generateCallIceServers({}), /尚未配置/);
-  await assert.rejects(generateCallIceServers({ EDGECHAT_TURN_KEY_ID: 'k', EDGECHAT_TURN_API_TOKEN: 's' }, async () => Response.json({ error: 'internal secret' }, { status: 500 })), /暂时不可用/);
+  await assert.rejects(generateCallIceServers({ EDGECHAT_TURN_KEY_ID: 'k', EDGECHAT_TURN_API_TOKEN: 's' }, async () => Response.json({ error: 'internal secret' }, { status: 500 })), /暫時不可用/);
 });
 
 test('call authorization excludes groups, nonparticipants, disabled peers, and either block direction', async () => {
@@ -82,8 +82,8 @@ test('call authorization excludes groups, nonparticipants, disabled peers, and e
   database.run('INSERT INTO channel_members(channel_id,user_id) VALUES(10,1),(10,2)');
   const db = createD1Adapter(database);
   assert.equal((await authorizeVoiceCall(db, 10, 1)).peerId, 2);
-  await assert.rejects(authorizeVoiceCall(db, 10, 3), /双方/);
-  await assert.rejects(authorizeVoiceCall(db, 1, 1), /双方/);
+  await assert.rejects(authorizeVoiceCall(db, 10, 3), /雙方/);
+  await assert.rejects(authorizeVoiceCall(db, 1, 1), /雙方/);
   database.run('INSERT INTO user_blocks(blocker_id,blocked_id) VALUES(2,1)');
   await assert.rejects(authorizeVoiceCall(db, 10, 1), /拉黑/);
   await assert.rejects(authorizeVoiceCall(db, 10, 2), /拉黑/);

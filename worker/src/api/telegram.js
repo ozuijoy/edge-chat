@@ -51,7 +51,7 @@ function avatarCacheKey(request, userId) {
 }
 
 function missingAvatarResponse() {
-	const response = errorResponse("头像不存在", 404);
+	const response = errorResponse("頭像不存在", 404);
 	response.headers.set("Cache-Control", MISSING_AVATAR_CACHE_CONTROL);
 	return response;
 }
@@ -96,7 +96,7 @@ export function registerTelegramPublicRoutes(app) {
 			await cache.put(cacheKey, response.clone());
 			return response;
 		} catch {
-			return errorResponse("Telegram 头像暂时不可用", 502);
+			return errorResponse("Telegram 頭像暫時不可用", 502);
 		}
 	});
 
@@ -108,7 +108,7 @@ export function registerTelegramPublicRoutes(app) {
 		if (
 			c.req.header("X-Telegram-Bot-Api-Secret-Token") !== credentials.webhookSecret
 		) {
-			return errorResponse("Webhook 验证失败", 401);
+			return errorResponse("Webhook 驗證失敗", 401);
 		}
 
 		const update = await parseJsonRequest(c.req.raw);
@@ -116,7 +116,7 @@ export function registerTelegramPublicRoutes(app) {
 			c.executionCtx.waitUntil(
 				sendTelegramText(credentials.botToken, {
 					chatId: update.message.chat.id,
-					text: "EdgeChat 通知已绑定。你可以在 EdgeChat 的设置中管理提醒。",
+					text: "EdgeChat 通知已綁定。你可以在 EdgeChat 的設置中管理提醒。",
 					parseMode: null,
 					timeoutMs: 5000,
 				}).catch(() => {}),
@@ -150,12 +150,12 @@ export function registerTelegramNotificationRoutes(app) {
 	);
 	app.post("/api/me/telegram-notifications/link", async (c) => {
 		const url = await createTelegramNotificationLink(c.env, c.get("session").userId);
-		return url ? c.json({ url }) : errorResponse("管理员尚未配置 Telegram Bot", 503);
+		return url ? c.json({ url }) : errorResponse("管理員尚未配置 Telegram Bot", 503);
 	});
 	app.put("/api/me/telegram-notifications", async (c) => {
 		const payload = await parseJsonRequest(c.req.raw);
 		if (typeof payload.dmEnabled !== "boolean" || typeof payload.mentionEnabled !== "boolean") {
-			return errorResponse("通知设置无效");
+			return errorResponse("通知設置無效");
 		}
 		const userId = c.get("session").userId;
 		await updateTelegramNotificationPreferences(c.env.DB, userId, payload);
@@ -176,7 +176,7 @@ export function registerTelegramAdminRoutes(app) {
 		const payload = await parseJsonRequest(c.req.raw);
 		const botToken = String(payload.botToken || "").trim();
 		if (!botToken) {
-			return errorResponse("Telegram Bot Token 不能为空");
+			return errorResponse("Telegram Bot Token 不能為空");
 		}
 
 		try {
@@ -193,7 +193,7 @@ export function registerTelegramAdminRoutes(app) {
 			});
 			return c.json(await listTelegramBridgeAdminState(c.env, c.get('session')));
 		} catch (error) {
-			return telegramApiError(error) || errorResponse("Telegram 配置保存失败", 500);
+			return telegramApiError(error) || errorResponse("Telegram 配置保存失敗", 500);
 		}
 	});
 
@@ -202,17 +202,17 @@ export function registerTelegramAdminRoutes(app) {
 		const channelId = Number(payload.channelId);
 		const telegramChatId = String(payload.telegramChatId || "").trim();
 		if (!Number.isInteger(channelId) || channelId <= 0 || !/^-\d+$/.test(telegramChatId)) {
-			return errorResponse("请选择群组并填写有效的 Telegram 群 ID");
+			return errorResponse("請選擇群組並填寫有效的 Telegram 群 ID");
 		}
 
 		try {
 			const credentials = await getTelegramCredentials(c.env);
 			if (!credentials) {
-				return errorResponse("请先连接 Telegram Bot");
+				return errorResponse("請先連接 Telegram Bot");
 				}
 				const telegramChat = await getTelegramChat(credentials.botToken, telegramChatId);
 				if (!["group", "supergroup"].includes(telegramChat.type)) {
-					return errorResponse("目标必须是 Telegram 群组或超级群组");
+					return errorResponse("目標必須是 Telegram 群組或超級群組");
 				}
 				const mappingId = await createTelegramMapping(c.env.DB, {
 				channelId,
@@ -222,7 +222,7 @@ export function registerTelegramAdminRoutes(app) {
 				createdBy: c.get("session").userId,
 			});
 			if (!mappingId) {
-				return errorResponse("群组不存在", 404);
+				return errorResponse("群組不存在", 404);
 			}
 			return c.json(await listTelegramBridgeAdminState(c.env, c.get('session')));
 		} catch (error) {
@@ -231,7 +231,7 @@ export function registerTelegramAdminRoutes(app) {
 				return telegramError;
 			}
 			if (String(error?.message || error).includes("UNIQUE")) {
-				return errorResponse("这个 EdgeChat 群组或 Telegram 群已经绑定");
+				return errorResponse("這個 EdgeChat 群組或 Telegram 群已經綁定");
 			}
 			throw error;
 		}

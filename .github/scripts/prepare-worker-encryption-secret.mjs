@@ -101,7 +101,7 @@ export async function prepareWorkerEncryptionSecret({
   }
 
   if (applySuppliedKeyring || (!encryptionConfigured && suppliedKeyring)) {
-    // 手动更新必须提交完整密钥环；旧 key ID 留在 keys 中，历史密文才能继续解密。
+    // 手動更新必須提交完整密鑰環；舊 key ID 留在 keys 中，歷史密文才能繼續解密。
     const keyring = loadEncryptionKeyring(suppliedKeyring);
     writeSecretsFile(secretsFile, {
       [KEYRING_SECRET_NAME]: suppliedKeyring,

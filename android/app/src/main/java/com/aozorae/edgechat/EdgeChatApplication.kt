@@ -18,7 +18,7 @@ class EdgeChatApplication : Application(), Configuration.Provider, ImageLoaderFa
         get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
 
     override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this)
-        // 消息图片受移动端会话保护，复用网络层客户端才能统一附加令牌并完成过期刷新。
+        // 消息圖片受移動端會話保護，複用網絡層客戶端才能統一附加令牌並完成過期刷新。
         .okHttpClient(okHttpClient)
         .crossfade(true)
         .build()

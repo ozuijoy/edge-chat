@@ -30,7 +30,7 @@ function createSocket(params, handlers) {
 	};
 }
 
-test("快速切换房间时丢弃旧历史响应和旧连接消息", async () => {
+test("快速切換房間時丟棄舊歷史響應和舊連接消息", async () => {
 	const activeRoom = ref({ id: 1, kind: "public" });
 	const requests = new Map();
 	const sockets = [];
@@ -71,7 +71,7 @@ test("快速切换房间时丢弃旧历史响应和旧连接消息", async () =>
 	assert.deepEqual(room.messages.value, [{ id: 2, content: "current history" }]);
 });
 
-test("房间置顶状态从历史与实时事件同步，并发送管理动作", async () => {
+test("房間置頂狀態從歷史與實時事件同步，併發送管理動作", async () => {
 	const activeRoom = ref({ id: 2, kind: "private" });
 	const sockets = [];
 	const room = useChatRoom({
@@ -119,7 +119,7 @@ test("房间置顶状态从历史与实时事件同步，并发送管理动作",
 	assert.equal(room.pinnedMessage.value, null);
 });
 
-test("网页发送回复字段，并在原消息删除后保留已删除引用状态", async () => {
+test("網頁發送回覆字段，並在原消息刪除後保留已刪除引用狀態", async () => {
 	const activeRoom = ref({ id: 2, kind: "private" });
 	const sockets = [];
 	const room = useChatRoom({
@@ -152,11 +152,11 @@ test("网页发送回复字段，并在原消息删除后保留已删除引用�
 	});
 
 	await room.activateRoom();
-	room.composerText.value = "回复正文";
+	room.composerText.value = "回覆正文";
 	assert.equal(await room.sendMessage([], 10), true);
 	assert.deepEqual(sockets[0].sentFrames.at(-1), {
 		type: "send",
-		content: "回复正文",
+		content: "回覆正文",
 		attachment: null,
 		mentionUserIds: [],
 		replyMessageId: 10,

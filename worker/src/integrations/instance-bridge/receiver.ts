@@ -49,7 +49,7 @@ export async function receiveBridgeRequest(env: BridgeEnv, request: Request) {
         const room = await first<{ id: number; kind: string; name: string }>(
           env.DB, "SELECT id, kind, name FROM channels WHERE id = ? AND deleted_at IS NULL", binding.channel_id);
         if (!room) throw bridgeError("binding_revoked", 410);
-        // 只注入协议允许的字段；不接受附件、回复、提及或任何本地用户 ID。
+        // 只注入協議允許的字段；不接受附件、回覆、提及或任何本地用戶 ID。
         const response = await submitExternalRoomMessage(env, {
           room,
           source: "instance-bridge", sourceMessageId: `${binding.id}:${eventId}`,

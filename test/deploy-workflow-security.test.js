@@ -10,12 +10,12 @@ const workflow = readFileSync(
 function getStep(name) {
 	const marker = `      - name: ${name}\n`;
 	const start = workflow.indexOf(marker);
-	assert.notEqual(start, -1, `部署工作流缺少步骤：${name}`);
+	assert.notEqual(start, -1, `部署工作流缺少步驟：${name}`);
 	const next = workflow.indexOf("      - name: ", start + marker.length);
 	return workflow.slice(start, next === -1 ? undefined : next);
 }
 
-test("Cloudflare 生产凭据只注入实际调用 Cloudflare 的步骤", () => {
+test("Cloudflare 生產憑據只注入實際調用 Cloudflare 的步驟", () => {
 	const deployJobStart = workflow.indexOf("  deploy:\n");
 	const stepsStart = workflow.indexOf("    steps:\n", deployJobStart);
 	assert.notEqual(deployJobStart, -1);
@@ -53,7 +53,7 @@ test("Cloudflare 生产凭据只注入实际调用 Cloudflare 的步骤", () => 
 	}
 });
 
-test("Actions 在管理员初始化后、发布前验证可登录超管，并拒绝只填一项凭据", () => {
+test("Actions 在管理員初始化後、發佈前驗證可登錄超管，並拒絕只填一項憑據", () => {
 	const generation = getStep("Generate admin bootstrap SQL (optional)");
 	assert.match(generation, /elif \[\[ -n "\$EDGECHAT_ADMIN_USERNAME" \|\| -n "\$EDGECHAT_ADMIN_PASSWORD" \]\]/);
 	assert.match(generation, /exit 1/);
@@ -63,7 +63,7 @@ test("Actions 在管理员初始化后、发布前验证可登录超管，并拒
 	assert.ok(workflow.indexOf("      - name: Verify login administrator") < workflow.indexOf("      - name: Deploy worker"));
 });
 
-test("生产部署在创建或修改云资源前运行完整测试", () => {
+test("生產部署在創建或修改雲資源前運行完整測試", () => {
 	const testsStart = workflow.indexOf("      - name: Run tests\n");
 	const resourcesStart = workflow.indexOf("      - name: Ensure Cloudflare resources\n");
 	assert.notEqual(testsStart, -1);
@@ -71,7 +71,7 @@ test("生产部署在创建或修改云资源前运行完整测试", () => {
 	assert.match(getStep("Run tests"), /run: npm test/);
 });
 
-test("Actions 通过仓库变量配置保留天数，并在云资源操作前拒绝非法值", () => {
+test("Actions 通過倉庫變量配置保留天數，並在雲資源操作前拒絕非法值", () => {
 	const validation = getStep("Validate message retention");
 	assert.match(validation, /MESSAGE_RETENTION_DAYS: \$\{\{ vars.MESSAGE_RETENTION_DAYS \|\| '7' \}\}/);
 	assert.match(validation, /\^\[1-9\]\[0-9\]\*\$/);
@@ -82,7 +82,7 @@ test("Actions 通过仓库变量配置保留天数，并在云资源操作前拒
 	assert.ok(config.includes('MESSAGE_RETENTION_DAYS = \\"${MESSAGE_RETENTION_DAYS}\\"'));
 });
 
-test("首次部署自动创建密钥，普通部署保留密钥，手动轮换才允许更新", () => {
+test("首次部署自動創建密鑰，普通部署保留密鑰，手動輪換才允許更新", () => {
 	const prepareStep = getStep("Prepare Worker encryption secret");
 	assert.match(prepareStep, /prepare-worker-encryption-secret\.mjs/);
 	assert.match(
@@ -100,7 +100,7 @@ test("首次部署自动创建密钥，普通部署保留密钥，手动轮换�
 	assert.match(deployStep, /wrangler deploy --config wrangler\.ci\.toml/);
 });
 
-test("资源确认脚本仅复用配置的 KV 标题，避免隐式共享会话存储", () => {
+test("資源確認腳本僅複用配置的 KV 標題，避免隱式共享會話存儲", () => {
 	const script = readFileSync(
 		new URL("../.github/scripts/ensure-cloudflare-resources.mjs", import.meta.url),
 		"utf8",
@@ -120,7 +120,7 @@ test("资源确认脚本仅复用配置的 KV 标题，避免隐式共享会话�
 	);
 });
 
-test("R2 未开通时工作流移除 FILES binding，已开通时保留目标 bucket", () => {
+test("R2 未開通時工作流移除 FILES binding，已開通時保留目標 bucket", () => {
 	const configStep = getStep("Generate wrangler config for CI");
 	assert.match(
 		configStep,

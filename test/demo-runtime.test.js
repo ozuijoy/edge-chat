@@ -11,14 +11,14 @@ import { demoState, resetDemoState } from '../frontend/src/demo/state.js';
 test('demo sample conversations follow the visitor language', () => {
   const english = createDemoFixtures('en-US');
   const traditional = createDemoFixtures('zh-TW');
-  const simplified = createDemoFixtures('zh-CN');
+  const legacyChinese = createDemoFixtures('zh-Hans');
 
   assert.equal(english.session.displayName, 'Demo Admin');
   assert.equal(english.channels[2].name, 'Telegram Bridge');
   assert.doesNotMatch(JSON.stringify(english.messages), /[\u4e00-\u9fff]/);
   assert.equal(traditional.channels[1].name, '產品協作');
-  assert.equal(simplified.channels[1].name, '产品协作');
-  assert.equal(simplified.messages['private:2'][1].mentions[0].displayName, '演示管理员');
+  assert.equal(legacyChinese.channels[1].name, '產品協作');
+  assert.equal(legacyChinese.messages['private:2'][1].mentions[0].displayName, '演示管理員');
 });
 
 test.beforeEach(() => {
@@ -60,7 +60,7 @@ test('demo backend exposes chat, contacts, admin, storage and Telegram fixture d
 test('demo backend keeps group and admin mutations in browser memory', async () => {
   const created = await requestDemo('/channels', {
     method: 'POST',
-    body: { name: '演示项目组', kind: 'private', memberUserIds: [2] }
+    body: { name: '演示項目組', kind: 'private', memberUserIds: [2] }
   });
   const invited = await requestDemo(`/channels/${created.channel.id}/invite`, {
     method: 'POST',
@@ -72,7 +72,7 @@ test('demo backend keeps group and admin mutations in browser memory', async () 
   });
   const invite = await requestDemo('/admin/register-links', {
     method: 'POST',
-    body: { note: '自动化测试', maxUses: 2 }
+    body: { note: '自動化測試', maxUses: 2 }
   });
 
   assert.equal(created.channel.kind, 'private');
@@ -112,7 +112,7 @@ test('demo groups use the signed-in user as their owner', async () => {
   });
   const created = await requestDemo('/channels', {
     method: 'POST',
-    body: { name: 'Alice 的项目组', kind: 'private', memberUserIds: [3] }
+    body: { name: 'Alice 的項目組', kind: 'private', memberUserIds: [3] }
   });
   const members = await requestDemo(`/channels/${created.channel.id}/members`);
 
@@ -124,7 +124,7 @@ test('demo groups use the signed-in user as their owner', async () => {
 test('demo public groups can be created, discovered and joined', async () => {
   const created = await requestDemo('/channels', {
     method: 'POST',
-    body: { name: '公开演示群', kind: 'public', memberUserIds: [] }
+    body: { name: '公開演示群', kind: 'public', memberUserIds: [] }
   });
   const beforeJoin = await requestDemo('/bootstrap');
   const discoverable = beforeJoin.channels.find((channel) => channel.id === 4);
@@ -137,7 +137,7 @@ test('demo public groups can be created, discovered and joined', async () => {
 
   await assert.rejects(
     requestDemo('/channels/2/join', { method: 'POST' }),
-    /公开群组不存在/
+    /公開群組不存在/
   );
 });
 
@@ -166,19 +166,19 @@ test('demo room socket echoes sent messages through the real-time contract', asy
 
 	  socket.send(JSON.stringify({
 	    type: 'send',
-	    content: '@alice 浏览器本地消息',
+	    content: '@alice 瀏覽器本地消息',
 	    attachment: null,
 	    mentionUserIds: [2]
 	  }));
 
   assert.equal(frames.length, 1);
   assert.equal(frames[0].type, 'message');
-	  assert.equal(frames[0].message.content, '@alice 浏览器本地消息');
+	  assert.equal(frames[0].message.content, '@alice 瀏覽器本地消息');
 	  assert.equal(frames[0].message.sender.id, 1);
 	  assert.deepEqual(frames[0].message.mentionUserIds, [2]);
 
   const history = await requestDemo('/messages?kind=public&roomId=1');
-	  assert.equal(history.messages.at(-1).content, '@alice 浏览器本地消息');
+	  assert.equal(history.messages.at(-1).content, '@alice 瀏覽器本地消息');
 	  assert.equal(history.messages.at(-1).mentions[0].username, 'alice');
   assert.deepEqual(inboxFrames, []);
   socket.close();
@@ -196,7 +196,7 @@ test('demo direct messages honor blocking and resume after unblocking', async ()
 		method: 'POST',
 		body: { username: 'alice', password: 'demo' }
 	});
-	assert.deepEqual((await requestDemo('/users/blocked')).users, [], '反向拉黑不属于本人的列表');
+	assert.deepEqual((await requestDemo('/users/blocked')).users, [], '反向拉黑不屬於本人的列表');
 	const frames = [];
 	let socket;
 	await new Promise((resolve) => {
@@ -215,7 +215,7 @@ test('demo direct messages honor blocking and resume after unblocking', async ()
 	socket.send(JSON.stringify({ type: 'send', content: 'blocked message' }));
 	assert.deepEqual(frames.at(-1), {
 		type: 'error',
-		error: '发送被拒，你已经被拉黑'
+		error: '發送被拒，你已經被拉黑'
 	});
 	assert.equal((await requestDemo('/messages?kind=dm&roomId=10')).messages.length, before);
 
@@ -290,7 +290,7 @@ test('Telegram replies increment the inbox unread projection', async () => {
     });
   });
 
-  roomSocket.send(JSON.stringify({ type: 'send', content: 'Telegram 未读测试' }));
+  roomSocket.send(JSON.stringify({ type: 'send', content: 'Telegram 未讀測試' }));
   await new Promise((resolve) => setTimeout(resolve, 720));
 
 	  assert.equal(inboxFrames.at(-1).unreadCount, 1);
@@ -324,7 +324,7 @@ test('demo Telegram bridge accepts a private group mapping', async () => {
     });
   });
 
-  roomSocket.send(JSON.stringify({ type: 'send', content: '私有群桥接测试' }));
+  roomSocket.send(JSON.stringify({ type: 'send', content: '私有群橋接測試' }));
   await new Promise((resolve) => setTimeout(resolve, 720));
 
   assert.equal(

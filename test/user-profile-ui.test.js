@@ -34,7 +34,7 @@ function harness(overrides = {}) {
 	return { card, requests, dmCalls, get navigated() { return navigated; } };
 }
 
-test("资料只在打开时读取、同一未完成请求去重、A/B 迟到与关闭竞态隔离", async () => {
+test("資料只在打開時讀取、同一未完成請求去重、A/B 遲到與關閉競態隔離", async () => {
 	const { card, requests, dmCalls } = harness();
 	assert.equal(requests.length, 0);
 	card.openUserProfile(local(2));
@@ -55,11 +55,11 @@ test("资料只在打开时读取、同一未完成请求去重、A/B 迟到与�
 	assert.equal(card.show.value, false);
 	assert.equal(card.profile.value, null);
 	card.openUserProfile(local(3));
-	assert.equal(requests.length, 4, "下次打开读取当前资料，不缓存旧简介");
+	assert.equal(requests.length, 4, "下次打開讀取當前資料，不緩存舊簡介");
 	card.close();
 });
 
-test("外部数字 ID 与本地 ID 不混淆，不请求详情、不允许私信", async () => {
+test("外部數字 ID 與本地 ID 不混淆，不請求詳情、不允許私信", async () => {
 	const { card, requests, dmCalls } = harness();
 	card.openUserProfile({ kind: "external", source: "telegram", id: "2", displayName: "External", avatarUrl: "" });
 	assert.equal(requests.length, 0);
@@ -76,7 +76,7 @@ test("外部数字 ID 与本地 ID 不混淆，不请求详情、不允许私信
 	card.close();
 });
 
-test("读取失败可重试，404 不可用，自己不能发私信", async () => {
+test("讀取失敗可重試，404 不可用，自己不能發私信", async () => {
 	const { card, requests, dmCalls } = harness();
 	card.openUserProfile(local(2));
 	requests[0].reject(new Error("offline"));
@@ -99,7 +99,7 @@ test("读取失败可重试，404 不可用，自己不能发私信", async () =
 	card.close();
 });
 
-test("私信重复点击保护、失败保留资料卡、成功关闭并转移焦点", async () => {
+test("私信重複點擊保護、失敗保留資料卡、成功關閉並轉移焦點", async () => {
 	const dmTask = deferred();
 	let calls = 0;
 	const h = harness({ openDm: () => { calls += 1; return dmTask.promise; } });
@@ -125,7 +125,7 @@ test("私信重复点击保护、失败保留资料卡、成功关闭并转移�
 	assert.equal(successful.navigated, 1);
 });
 
-test("私信迟到结果不能关闭后来打开的资料卡", async () => {
+test("私信遲到結果不能關閉後來打開的資料卡", async () => {
 	const dmTask = deferred();
 	const h = harness({ openDm: () => dmTask.promise });
 	h.card.openUserProfile(local(2));
@@ -142,7 +142,7 @@ test("私信迟到结果不能关闭后来打开的资料卡", async () => {
 	h.card.close();
 });
 
-test("Demo 简介规范化、清空、会话恢复与已有/新建私信复用拉黑状态", async () => {
+test("Demo 簡介規範化、清空、會話恢復與已有/新建私信複用拉黑狀態", async () => {
 	resetDemoState();
 	try {
 		const patch = (body) => requestDemo("/me/profile", { method: "PATCH", body });
@@ -180,7 +180,7 @@ test("Demo 简介规范化、清空、会话恢复与已有/新建私信复用�
 	} finally { resetDemoState(); }
 });
 
-test("资料入口与纯文本模板不改变消息菜单，设置头像请求不带未保存简介", () => {
+test("資料入口與純文本模板不改變消息菜單，設置頭像請求不帶未保存簡介", () => {
 	const read = (path) => readFileSync(new URL(`../frontend/src/${path}`, import.meta.url), "utf8");
 	const dialog = read("components/chat/UserProfileDialog.vue");
 	assert.doesNotMatch(dialog, /v-html|MentionText|wsStatus/);

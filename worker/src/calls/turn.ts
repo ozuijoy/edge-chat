@@ -12,14 +12,14 @@ export async function generateCallIceServers(env, fetcher = fetch) {
     body: JSON.stringify({ ttl: 3600 }),
     signal: AbortSignal.timeout(10_000)
   });
-  if (!response.ok) throw new ApiError('TURN 暂时不可用', 503);
+  if (!response.ok) throw new ApiError('TURN 暫時不可用', 503);
   const payload = await response.json();
-  if (!Array.isArray(payload.iceServers)) throw new ApiError('TURN 暂时不可用', 503);
-  // 浏览器阻止端口 53，移除它可以避免无意义的候选连接超时。
+  if (!Array.isArray(payload.iceServers)) throw new ApiError('TURN 暫時不可用', 503);
+  // 瀏覽器阻止端口 53，移除它可以避免無意義的候選連接超時。
   const iceServers = payload.iceServers.map(server => ({
     urls: (Array.isArray(server.urls) ? server.urls : [server.urls]).filter(url => typeof url === 'string' && !/:53(?:\?|$)/.test(url)),
     ...(server.username ? { username: server.username, credential: server.credential } : {})
   })).filter(server => server.urls.length);
-  if (!iceServers.some(server => server.urls.some(url => /^turns?:/.test(url)))) throw new ApiError('TURN 暂时不可用', 503);
+  if (!iceServers.some(server => server.urls.some(url => /^turns?:/.test(url)))) throw new ApiError('TURN 暫時不可用', 503);
   return { iceServers };
 }

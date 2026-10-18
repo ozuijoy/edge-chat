@@ -37,7 +37,7 @@ function createHarness(overrides = {}) {
 	return { creation, users, error, calls };
 }
 
-test("添加人员入口同时保留新私聊和创建群聊动作", () => {
+test("添加人員入口同時保留新私聊和創建群聊動作", () => {
 	const { creation, users, calls } = createHarness();
 	assert.deepEqual(
 		creation.usersWithoutDm.value.map((user) => user.id),
@@ -57,7 +57,7 @@ test("添加人员入口同时保留新私聊和创建群聊动作", () => {
 	);
 });
 
-test("发起新私聊后刷新侧栏并自动打开对应会话", async () => {
+test("發起新私聊後刷新側欄並自動打開對應會話", async () => {
 	const { creation, users, calls } = createHarness();
 	creation.open();
 	assert.deepEqual(await creation.openDm(users.value[0]), { ok: true });
@@ -82,25 +82,25 @@ test("发起新私聊后刷新侧栏并自动打开对应会话", async () => {
 	assert.equal(creation.openingDmUserId.value, null);
 });
 
-test("私聊创建失败时保留弹窗并向用户显示错误", async () => {
+test("私聊創建失敗時保留彈窗並向用戶顯示錯誤", async () => {
 	const { creation, users, error, calls } = createHarness({
 		conversationApi: {
 			async openDm(userId) {
 				calls.push(["openDm", userId]);
-				throw new Error("暂时无法发起对话");
+				throw new Error("暫時無法發起對話");
 			},
 		},
 	});
 	creation.open();
-	assert.deepEqual(await creation.openDm(users.value[2]), { ok: false, error: "暂时无法发起对话" });
+	assert.deepEqual(await creation.openDm(users.value[2]), { ok: false, error: "暫時無法發起對話" });
 
 	assert.equal(creation.show.value, true);
 	assert.equal(creation.openingDmUserId.value, null);
-	assert.equal(error.value, "暂时无法发起对话");
+	assert.equal(error.value, "暫時無法發起對話");
 	assert.deepEqual(calls, [["openDm", 3]]);
 });
 
-test("创建私信接口成功但未能进入会话时，明确返回失败并保留弹窗", async () => {
+test("創建私信接口成功但未能進入會話時，明確返回失敗並保留彈窗", async () => {
 	const { creation, users } = createHarness({ refreshAndOpen: async () => false });
 	creation.open();
 	const result = await creation.openDm(users.value[0]);

@@ -31,7 +31,7 @@ class ServerStore @Inject constructor(private val dataStore: DataStore<Preferenc
         }
     }
 
-    val language: Flow<String> = dataStore.data.map { it[languageKey] ?: defaultLanguage() }
+    val language: Flow<String> = dataStore.data.map { normalizeLanguage(it[languageKey] ?: defaultLanguage()) }
 
     suspend fun saveServer(profile: ServerProfile) {
         dataStore.edit {
@@ -60,7 +60,7 @@ class ServerStore @Inject constructor(private val dataStore: DataStore<Preferenc
     }
 
     suspend fun setLanguage(language: String) {
-        dataStore.edit { it[languageKey] = language }
+        dataStore.edit { it[languageKey] = normalizeLanguage(language) }
     }
 
     fun deviceName(): String = "${Build.MANUFACTURER} ${Build.MODEL}".trim()
@@ -70,24 +70,26 @@ class ServerStore @Inject constructor(private val dataStore: DataStore<Preferenc
             val candidate = raw.trim().trimEnd('/')
             val withScheme = if (candidate.contains("://")) candidate else "https://$candidate"
             val uri = URI(withScheme)
-            val host = uri.host ?: throw IllegalArgumentException("服务器地址无效")
+            val host = uri.host ?: throw IllegalArgumentException("服務器地址無效")
             if (uri.userInfo != null || uri.query != null || uri.fragment != null) {
-                throw IllegalArgumentException("服务器地址不能包含账号、查询参数或片段")
+                throw IllegalArgumentException("服務器地址不能包含賬號、查詢參數或片段")
             }
             val scheme = uri.scheme?.lowercase(Locale.ROOT)
             val debugHttp = BuildConfig.DEBUG && scheme == "http" &&
                 (host == "localhost" || host == "10.0.2.2" || host == "127.0.0.1")
             if (scheme != "https" && !debugHttp) {
-                throw IllegalArgumentException("正式客户端只连接 HTTPS 服务器")
+                throw IllegalArgumentException("正式客戶端只連接 HTTPS 服務器")
             }
             if (!uri.path.isNullOrBlank() && uri.path != "/") {
-                throw IllegalArgumentException("请输入服务器根地址，不要包含路径")
+                throw IllegalArgumentException("請輸入服務器根地址，不要包含路徑")
             }
             val port = if (uri.port > 0) ":${uri.port}" else ""
             return "$scheme://$host$port/"
         }
 
-        private fun defaultLanguage(): String =
-            if (Locale.getDefault().language.startsWith("zh")) "zh-CN" else "en-US"
+        private fun defaultLanguage(): String = normalizeLanguage(Locale.getDefault().language)
+
+        private fun normalizeLanguage(language: String): String =
+            if (language.startsWith("zh")) "zh-TW" else "en-US"
     }
 }

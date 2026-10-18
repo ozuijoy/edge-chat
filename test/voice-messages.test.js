@@ -8,7 +8,7 @@ import {
 	normalizeVoiceWaveform,
 } from "../frontend/src/voice-message.js";
 
-test("语音附件只保留受控时长和短波形", () => {
+test("語音附件只保留受控時長和短波形", () => {
 	assert.deepEqual(
 		pickAttachment({
 			key: "7/voice.ogg",
@@ -32,7 +32,7 @@ test("语音附件只保留受控时长和短波形", () => {
 	);
 });
 
-test("普通音频附件不会被伪造成语音便笺", () => {
+test("普通音頻附件不會被偽造成語音便箋", () => {
 	const attachment = pickAttachment({
 		key: "7/song.mp3",
 		name: "song.mp3",
@@ -47,7 +47,7 @@ test("普通音频附件不会被伪造成语音便笺", () => {
 	assert.equal(attachment.waveform, undefined);
 });
 
-test("普通音频可保留时长但不会获得语音波形", () => {
+test("普通音頻可保留時長但不會獲得語音波形", () => {
 	const attachment = pickAttachment({
 		key: "7/song.mp3",
 		name: "song.mp3",
@@ -62,7 +62,7 @@ test("普通音频可保留时长但不会获得语音波形", () => {
 	assert.equal(attachment.waveform, undefined);
 });
 
-test("网页语音时长和波形 helper 保持紧凑稳定", () => {
+test("網頁語音時長和波形 helper 保持緊湊穩定", () => {
 	assert.equal(formatVoiceDuration(65_400), "1:05");
 	assert.deepEqual(normalizeVoiceWaveform([5, 30, 10, 90], 2), [30, 90]);
 	assert.deepEqual(fallbackVoiceWaveform("same", 8), fallbackVoiceWaveform("same", 8));

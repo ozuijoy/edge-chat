@@ -42,7 +42,7 @@ async function probe(id: string, operation: () => Promise<Partial<Check>>, timeo
     ]);
     return { id, status: 'ok', code: 'reachable', ...result, durationMs: Date.now() - started };
   } catch {
-    // 上游异常可能包含请求地址或凭据；只返回稳定诊断码，不透传 exception。
+    // 上游異常可能包含請求地址或憑據；只返回穩定診斷碼，不透傳 exception。
     return { id, status: 'error', code: 'request_failed', durationMs: Date.now() - started };
   } finally {
     clearTimeout(timer);
@@ -67,7 +67,7 @@ export function inspectEnvironment(env: MaintenanceEnv) {
 async function checkObject(id: string, namespace: Namespace | undefined, service: string, timeoutMs: number) {
   if (!namespace) return absent(id);
   return probe(id, async () => {
-    // 固定探针地址复用同一对象，不创建随机业务房间，也不触发任何持久化写入。
+    // 固定探針地址複用同一對象，不創建隨機業務房間，也不觸發任何持久化寫入。
     const stub = namespace.get(namespace.idFromName('__edgechat_health__'));
     const response = await stub.fetch(new Request('https://internal/health', { headers: createInternalHeaders() }));
     const body = await response.json() as { ok?: boolean; service?: string };

@@ -8,9 +8,9 @@ import { errorResponse, parseJsonRequest } from "../utils.js";
 export function registerUserProfileRoutes(app: Hono) {
 	app.get("/api/users/:id/profile", async (c) => {
 		const id = parseLocalUserId(c.req.param("id"));
-		if (id === null) return errorResponse("用户 ID 无效", 400);
+		if (id === null) return errorResponse("用戶 ID 無效", 400);
 		const profile = await getUserProfile(c.env.DB, id);
-		if (!profile) return errorResponse("用户资料不可用", 404);
+		if (!profile) return errorResponse("用戶資料不可用", 404);
 		return c.json({ profile });
 	});
 
@@ -18,14 +18,14 @@ export function registerUserProfileRoutes(app: Hono) {
 		const session = c.get("session");
 		const payload = await parseJsonRequest(c.req.raw);
 		if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
-			return errorResponse("参数无效");
+			return errorResponse("參數無效");
 		}
 		const updates: string[] = [];
-      if (Object.keys(payload).some((key) => !['displayName', 'bio', 'avatarKey'].includes(key))) return errorResponse('请求包含不允许修改的字段');
+      if (Object.keys(payload).some((key) => !['displayName', 'bio', 'avatarKey'].includes(key))) return errorResponse('請求包含不允許修改的字段');
 		const binds: (string | null)[] = [];
 		if (Object.hasOwn(payload, "displayName")) {
 			if (typeof payload.displayName !== "string" || !payload.displayName.trim()) {
-				return errorResponse("显示名称不能为空");
+				return errorResponse("顯示名稱不能為空");
 			}
 			updates.push("display_name = ?");
 			binds.push(payload.displayName.trim());
@@ -53,14 +53,14 @@ export function registerUserProfileRoutes(app: Hono) {
 				).bind(...binds, session.userId).run();
 			} catch (error) {
 				if (isR2ObjectUnavailableError(error)) {
-					return errorResponse("头像文件不存在或正在清理，请重新上传");
+					return errorResponse("頭像文件不存在或正在清理，請重新上傳");
 				}
 				throw error;
 			}
 		}
-		// 从 D1 重读完整资料，不能用可能过期的 KV 快照补齐未提交字段。
+		// 從 D1 重讀完整資料，不能用可能過期的 KV 快照補齊未提交字段。
 		const profile = await getUserProfile(c.env.DB, session.userId);
-		if (!profile) return errorResponse("用户资料不可用", 404);
+		if (!profile) return errorResponse("用戶資料不可用", 404);
 		const { id: _id, ...fields } = profile;
 		const merged = { ...session, ...fields };
 		await putSession(c.env, merged);

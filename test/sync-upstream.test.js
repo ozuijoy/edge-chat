@@ -84,7 +84,7 @@ function fixture(t, { customized = false, conflict = false } = {}) {
 					try {
 						return command(checkout, localArgs);
 					} catch (error) {
-						// execFile 的异步错误用 code，同步 Git 测试用 status。
+						// execFile 的異步錯誤用 code，同步 Git 測試用 status。
 						error.code = error.status;
 						throw error;
 					}
@@ -106,7 +106,7 @@ function fixture(t, { customized = false, conflict = false } = {}) {
 	};
 }
 
-test("上游主仓不同步自身也不派发部署", async () => {
+test("上游主倉不同步自身也不派發部署", async () => {
 	const result = await syncUpstream({
 		repository: "aozorae/Edgechat",
 		branch: "master",
@@ -116,7 +116,7 @@ test("上游主仓不同步自身也不派发部署", async () => {
 	assert.deepEqual(result, { updated: false, dispatched: false });
 });
 
-test("没有发布 trailer 的提交不会自动同步", async (t) => {
+test("沒有發佈 trailer 的提交不會自動同步", async (t) => {
 	const f = fixture(t);
 	f.commit("Mention EdgeChat-Update: stable in subject", "development.txt");
 	f.commit("Unknown\n\nEdgeChat-Update: beta", "beta.txt");
@@ -125,7 +125,7 @@ test("没有发布 trailer 的提交不会自动同步", async (t) => {
 	assert.equal(f.requests.length, 1);
 });
 
-test("stable 一次合并之前的所有提交与版本，但不包含之后的开发提交", async (t) => {
+test("stable 一次合併之前的所有提交與版本，但不包含之後的開發提交", async (t) => {
 	const f = fixture(t);
 	f.commit("Earlier feature", "feature.txt");
 	const release = f.commit(
@@ -150,7 +150,7 @@ test("stable 一次合并之前的所有提交与版本，但不包含之后的�
 	);
 });
 
-test("security 优先跟进最新标记并保留 fork 自定义提交", async (t) => {
+test("security 優先跟進最新標記並保留 fork 自定義提交", async (t) => {
 	const f = fixture(t, { customized: true });
 	f.commit("Stable\n\nEdgeChat-Update: stable", "stable.txt");
 	const security = f.commit("Fix\n\nEdgeChat-Update: security", "security.txt");
@@ -162,7 +162,7 @@ test("security 优先跟进最新标记并保留 fork 自定义提交", async (t
 	assert.equal(f.originHead(), result.commit);
 });
 
-test("合并冲突不推送、不派发、不覆盖自定义版本", async (t) => {
+test("合併衝突不推送、不派發、不覆蓋自定義版本", async (t) => {
 	const f = fixture(t, { conflict: true });
 	const before = f.originHead();
 	f.commit(
@@ -175,7 +175,7 @@ test("合并冲突不推送、不派发、不覆盖自定义版本", async (t) =
 	assert.equal(f.requests.length, 1);
 });
 
-test("分支保护拒绝推送时不派发部署", async (t) => {
+test("分支保護拒絕推送時不派發部署", async (t) => {
 	const f = fixture(t);
 	f.commit("Release\n\nEdgeChat-Update: stable", "release.txt");
 	f.rejectPush();
@@ -184,7 +184,7 @@ test("分支保护拒绝推送时不派发部署", async (t) => {
 	assert.equal(f.requests.length, 1);
 });
 
-test("工作流更新必须显式提供同步令牌，未配置时远端保持原样", async (t) => {
+test("工作流更新必須顯式提供同步令牌，未配置時遠端保持原樣", async (t) => {
 	const f = fixture(t);
 	f.commit(
 		"CI update\n\nEdgeChat-Update: stable",
@@ -196,7 +196,7 @@ test("工作流更新必须显式提供同步令牌，未配置时远端保持�
 	assert.equal((await f.sync(true)).dispatched, true);
 });
 
-test("推送后派发失败，下次检查对当前 SHA 补派部署", async (t) => {
+test("推送後派發失敗，下次檢查對當前 SHA 補派部署", async (t) => {
 	const f = fixture(t);
 	f.commit("Fix\n\nEdgeChat-Update: security", "fix.txt");
 	f.failDispatch(true);
@@ -212,7 +212,7 @@ test("推送后派发失败，下次检查对当前 SHA 补派部署", async (t)
 	assert.equal((await f.sync()).dispatched, true);
 });
 
-test("当前 SHA 已部署或部署中时不重复派发", async (t) => {
+test("當前 SHA 已部署或部署中時不重複派發", async (t) => {
 	const f = fixture(t);
 	f.commit("Release\n\nEdgeChat-Update: stable", "release.txt");
 	await f.sync();
@@ -233,7 +233,7 @@ test("当前 SHA 已部署或部署中时不重复派发", async (t) => {
 	}
 });
 
-test("标记选择仅接受两个约定值并选择最新提交", () => {
+test("標記選擇僅接受兩個約定值並選擇最新提交", () => {
 	assert.equal(findUpdateCommit(""), undefined);
 	assert.deepEqual(
 		findUpdateCommit("new\0beta\0\nsecurity\0security\n\0\nstable\0stable\n\0"),
@@ -241,7 +241,7 @@ test("标记选择仅接受两个约定值并选择最新提交", () => {
 	);
 });
 
-test("每天两次检查，机器人推送后显式 dispatch，检查阶段不读取云凭据", () => {
+test("每天兩次檢查，機器人推送後顯式 dispatch，檢查階段不讀取雲憑據", () => {
 	const workflow = readFileSync(
 		new URL("../.github/workflows/sync-upstream.yml", import.meta.url),
 		"utf8",

@@ -98,13 +98,13 @@ const sendDisabled = computed(
 		(!props.modelValue.trim() && !props.pendingAttachments.length),
 );
 const uploading = computed(() => props.pendingAttachments.some((entry) => entry.status === "uploading"));
-// 房间切换或连接失效时不允许继续采集上一段语音。
+// 房間切換或連接失效時不允許繼續採集上一段語音。
 watch(() => props.disabled, (disabled) => {
 	if (disabled) void cancel();
 });
 
 function handleKeydown(event) {
-	// 输入法的 Enter 用来确认候选，不应触发发送或选择 @成员。
+	// 輸入法的 Enter 用來確認候選，不應觸發發送或選擇 @成員。
 	if (composing.value || event.isComposing || event.keyCode === 229) return;
 	if (mentionMenuOpen.value) {
 		if (event.key === "ArrowDown" || event.key === "ArrowUp") {
@@ -752,7 +752,7 @@ onBeforeUnmount(() => {
 	box-shadow: var(--chat-shadow);
 }
 
-/* 整体焦点边框让输入位置清楚可见，不改变面板大小。 */
+/* 整體焦點邊框讓輸入位置清楚可見，不改變面板大小。 */
 .composer-row:focus-within {
 	border-color: var(--chat-accent);
 }
@@ -1020,7 +1020,7 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 480px) {
-	/* 窄屏输入单独占一行，防止四个工具按钮把 320px 的文字区挤到不可用。 */
+	/* 窄屏輸入單獨佔一行，防止四個工具按鈕把 320px 的文字區擠到不可用。 */
 	.composer-row {
 		display: grid;
 		grid-template-columns: 44px 44px minmax(0, 1fr) auto;

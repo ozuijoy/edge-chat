@@ -39,7 +39,7 @@ class AttachmentRepository @Inject constructor(
         val directory = File(context.filesDir, "pending").apply { mkdirs() }
         val target = File(directory, UUID.randomUUID().toString())
         resolver.openInputStream(uri).use { input ->
-            requireNotNull(input) { "无法读取所选文件" }
+            requireNotNull(input) { "無法讀取所選文件" }
             target.outputStream().use(input::copyTo)
         }
         PendingAttachment(target.absolutePath, name, type, target.length())
@@ -52,7 +52,7 @@ class AttachmentRepository @Inject constructor(
         val safeName = filename.replace(Regex("[\\\\/:*?\"<>|]"), "_")
         val target = File(directory, safeName)
         client.newCall(Request.Builder().url(url).build()).execute().use { response ->
-            if (!response.isSuccessful) error("附件下载失败")
+            if (!response.isSuccessful) error("附件下載失敗")
             response.body?.byteStream()?.use { input -> target.outputStream().use(input::copyTo) }
         }
         FileProvider.getUriForFile(context, "${context.packageName}.files", target)

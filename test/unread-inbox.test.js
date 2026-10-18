@@ -58,7 +58,7 @@ function createInboxHarness({ activeRoom, pageActive }) {
 
 const messagePayload = {
 	type: "room_message",
-	room: { kind: "private", id: 2, name: "产品协作" },
+	room: { kind: "private", id: 2, name: "產品協作" },
 	messageId: 18,
 	createdAt: "2026-08-16T10:00:00.000Z",
 	unreadCount: 3,
@@ -66,7 +66,7 @@ const messagePayload = {
 	mentionsMe: true,
 };
 
-test("前台当前会话的普通消息直接标记已读且不提示", () => {
+test("前臺當前會話的普通消息直接標記已讀且不提示", () => {
 	const harness = createInboxHarness({
 		activeRoom: ref({ kind: "private", id: "2" }),
 		pageActive: true,
@@ -82,7 +82,7 @@ test("前台当前会话的普通消息直接标记已读且不提示", () => {
 	assert.deepEqual(harness.systemNotifications, []);
 });
 
-test("前台当前会话的提及和回复仍显示应用内通知", () => {
+test("前臺當前會話的提及和回覆仍顯示應用內通知", () => {
 	const harness = createInboxHarness({
 		activeRoom: ref({ kind: "private", id: 2 }),
 		pageActive: true,
@@ -98,7 +98,7 @@ test("前台当前会话的提及和回复仍显示应用内通知", () => {
 	assert.deepEqual(harness.systemNotifications, []);
 });
 
-test("前台其他会话保留未读并显示应用内通知", () => {
+test("前臺其他會話保留未讀並顯示應用內通知", () => {
 	const harness = createInboxHarness({
 		activeRoom: ref({ kind: "dm", id: 9 }),
 		pageActive: true,
@@ -112,7 +112,7 @@ test("前台其他会话保留未读并显示应用内通知", () => {
 	assert.deepEqual(harness.read, []);
 });
 
-test("通讯录隐藏原会话后只累计未读而不提交已读", () => {
+test("通訊錄隱藏原會話後只累計未讀而不提交已讀", () => {
 	const activeRoom = ref({ kind: "private", id: 2 });
 	const harness = createInboxHarness({ activeRoom, pageActive: true });
 	activeRoom.value = null;
@@ -126,7 +126,7 @@ test("通讯录隐藏原会话后只累计未读而不提交已读", () => {
 	]);
 });
 
-test("页面失焦时保留未读并只触发系统通知", () => {
+test("頁面失焦時保留未讀並只觸發系統通知", () => {
 	const hiddenActiveRoom = createInboxHarness({
 		activeRoom: ref({ kind: "private", id: 2 }),
 		pageActive: false,

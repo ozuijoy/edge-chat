@@ -1,6 +1,6 @@
 import type { MessageMention } from "../../mentions.ts";
 
-// 只描述消息展示需要的字段；传输、发送和已读状态仍由房间 composable 负责。
+// 只描述消息展示需要的字段；傳輸、發送和已讀狀態仍由房間 composable 負責。
 export type MessageSender = {
 	id: number | string;
 	kind?: string;

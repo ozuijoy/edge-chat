@@ -73,7 +73,7 @@ export const adminNavigation: NavigationSection[] = [
   }
 ];
 
-// 顶栏与侧栏共用图标来源，避免新增页面后两处图标不一致。
+// 頂欄與側欄共用圖標來源，避免新增頁面後兩處圖標不一致。
 export const adminRouteIcons = Object.fromEntries(
   adminNavigation.flatMap((section) => section.items.map((item) => [item.id, item.icon]))
 );

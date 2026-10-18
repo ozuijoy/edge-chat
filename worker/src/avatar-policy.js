@@ -18,10 +18,10 @@ export async function resolveAvatarKeyUpdate(db, userId, payload) {
 
 	const file = await getOwnedUploadedFileMetadata(db, key, userId);
 	if (!file) {
-		throw new ApiError("头像只能使用当前账号上传的图片");
+		throw new ApiError("頭像只能使用當前賬號上傳的圖片");
 	}
 	if (!String(file.contentType || "").startsWith("image/")) {
-		throw new ApiError("头像文件必须是图片");
+		throw new ApiError("頭像文件必須是圖片");
 	}
 
 	return { provided: true, key };

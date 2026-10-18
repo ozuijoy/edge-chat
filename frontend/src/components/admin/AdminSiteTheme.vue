@@ -19,7 +19,7 @@ async function selectTheme(colorTheme) {
   error.value = '';
   saved.value = false;
   try {
-    // 只提交配色，避免一键切换顺带保存尚未确认的名称或图标草稿。
+    // 只提交配色，避免一鍵切換順帶保存尚未確認的名稱或圖標草稿。
     const payload = await api.updateAdminSiteSettings({ colorTheme });
     store.setSite(payload.site);
     saved.value = true;

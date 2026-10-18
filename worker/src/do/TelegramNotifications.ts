@@ -33,7 +33,7 @@ export class TelegramNotifications {
 
   async alarm() {
     return this.serial(async () => {
-      // 提前持久化救援闹钟，网络请求或 Worker 中断不会让队列失去调度。
+      // 提前持久化救援鬧鐘，網絡請求或 Worker 中斷不會讓隊列失去調度。
       await this.state.storage.setAlarm(Date.now() + 60_000);
       await deliverTelegramNotification(this.env);
       await this.schedule();

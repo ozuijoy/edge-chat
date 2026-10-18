@@ -43,7 +43,7 @@ async function harness() {
 	return { database, admin, member, request };
 }
 
-test("通讯录仅向已登录用户返回全部有效本地账号摘要", async () => {
+test("通訊錄僅向已登錄用戶返回全部有效本地賬號摘要", async () => {
 	const { admin, member, request } = await harness();
 	assert.equal((await request("/contacts", { token: "" })).status, 401);
 
@@ -54,16 +54,16 @@ test("通讯录仅向已登录用户返回全部有效本地账号摘要", async
 	assert.equal(memberResult.status, 200);
 	assert.deepEqual(adminResult.payload.users.map((user) => user.id), [7, 1, 2, 5]);
 	assert.equal(adminResult.payload.users.some((user) => user.id === 1), true, "包含本人");
-	assert.equal(adminResult.payload.users.some((user) => user.id === 2), true, "包含已有私信的用户");
-	assert.equal(adminResult.payload.users.some((user) => user.id === 7), true, "拉黑关系不影响目录可见性");
-	assert.equal(memberResult.payload.users.some((user) => user.id === 2), true, "普通用户同样包含本人");
+	assert.equal(adminResult.payload.users.some((user) => user.id === 2), true, "包含已有私信的用戶");
+	assert.equal(adminResult.payload.users.some((user) => user.id === 7), true, "拉黑關係不影響目錄可見性");
+	assert.equal(memberResult.payload.users.some((user) => user.id === 2), true, "普通用戶同樣包含本人");
 	for (const user of adminResult.payload.users) {
 		assert.deepEqual(Object.keys(user).sort(), ["avatarUrl", "displayName", "id", "username"]);
 	}
 	assert.equal(adminResult.payload.users.some((user) => [3, 4, 6].includes(user.id)), false);
 });
 
-test("通讯录不改变旧 users 与 bootstrap 排除本人的语义", async () => {
+test("通訊錄不改變舊 users 與 bootstrap 排除本人的語義", async () => {
 	const { admin, request } = await harness();
 	const contacts = await request("/contacts", { token: admin.token });
 	const users = await request("/users", { token: admin.token });
@@ -74,7 +74,7 @@ test("通讯录不改变旧 users 与 bootstrap 排除本人的语义", async ()
 	assert.equal(contacts.payload.users.some((user) => "bio" in user), false);
 });
 
-test("拉黑列表只返回本人主动拉黑的摘要，封禁与软删除账号仍可移除", async () => {
+test("拉黑列表只返回本人主動拉黑的摘要，封禁與軟刪除賬號仍可移除", async () => {
 	const { database, admin, member, request } = await harness();
 	database.run("INSERT INTO user_blocks (blocker_id, blocked_id) VALUES (1, 3), (1, 4), (2, 1)");
 	database.run("INSERT INTO uploaded_files (object_key, owner_user_id) VALUES ('avatars/test.png', 3)");
@@ -94,8 +94,8 @@ test("拉黑列表只返回本人主动拉黑的摘要，封禁与软删除账�
 		});
 	}
 	assert.deepEqual((await request("/users/blocked")).payload.users, []);
-	assert.equal((await request("/users/4/block", { method: "PUT" })).status, 404, "已删除账号不可重新拉黑");
+	assert.equal((await request("/users/4/block", { method: "PUT" })).status, 404, "已刪除賬號不可重新拉黑");
 	assert.equal((await request("/users/1/block", { method: "DELETE" })).status, 400);
 	assert.equal((await request("/users/999/block", { method: "DELETE" })).status, 404);
-	assert.deepEqual((await request("/users/blocked", { token: member.token })).payload.users.map((user) => user.id), [1], "不修改反向关系");
+	assert.deepEqual((await request("/users/blocked", { token: member.token })).payload.users.map((user) => user.id), [1], "不修改反向關係");
 });

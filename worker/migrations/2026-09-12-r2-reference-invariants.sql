@@ -8,7 +8,7 @@ DROP TRIGGER IF EXISTS prevent_pending_site_icon_insert;
 DROP TRIGGER IF EXISTS prevent_pending_site_icon_update;
 DROP TRIGGER IF EXISTS prevent_general_member_removal;
 
--- general 继续保护活跃成员；已软删用户必须允许由 GC 清掉成员关系和最终账号记录。
+-- general 繼續保護活躍成員；已軟刪用戶必須允許由 GC 清掉成員關係和最終賬號記錄。
 CREATE TRIGGER prevent_general_member_removal
 BEFORE DELETE ON channel_members
 WHEN EXISTS (
@@ -27,7 +27,7 @@ BEGIN
   SELECT RAISE(ABORT, 'GENERAL_MEMBERSHIP_REQUIRED');
 END;
 
--- 本地消息在同一条 INSERT/UPDATE 中确认上传登记、归属和清理状态，删除完成后也不会重新接受旧 key。
+-- 本地消息在同一條 INSERT/UPDATE 中確認上傳登記、歸屬和清理狀態，刪除完成後也不會重新接受舊 key。
 CREATE TRIGGER prevent_pending_message_attachment_insert
 BEFORE INSERT ON messages
 WHEN NEW.attachment_key IS NOT NULL
@@ -86,7 +86,7 @@ BEGIN
   SELECT RAISE(ABORT, 'r2_local_object_unavailable');
 END;
 
--- 用户头像继续要求本人上传；群头像的管理权限仍由 API 决定，数据库只仲裁文件生命周期。
+-- 用戶頭像繼續要求本人上傳；群頭像的管理權限仍由 API 決定，數據庫只仲裁文件生命週期。
 CREATE TRIGGER prevent_pending_user_avatar_insert
 BEFORE INSERT ON users
 WHEN NEW.avatar_key IS NOT NULL
@@ -153,7 +153,7 @@ BEGIN
   SELECT RAISE(ABORT, 'r2_local_object_unavailable');
 END;
 
--- r2: 前缀是站点图标在 D1 中的明确本地 key 语义；外部 URL 不经过本地文件约束。
+-- r2: 前綴是站點圖標在 D1 中的明確本地 key 語義；外部 URL 不經過本地文件約束。
 CREATE TRIGGER prevent_pending_site_icon_insert
 BEFORE INSERT ON site_settings
 WHEN NEW.setting_key = 'site_icon_url'

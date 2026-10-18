@@ -1,35 +1,35 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apple Liquid Glass 全生态视觉重构与全栈实现</title>
+    <title>Apple Liquid Glass 全生態視覺重構與全棧實現</title>
     <style>
         /* 
          ==========================================================================
-         1. 核心架构与设计系统级 Token (Design Tokens)
-         定义了跨越不同变体的共享光学物理参数与环境光反馈
+         1. 核心架構與設計系統級 Token (Design Tokens)
+         定義了跨越不同變體的共享光學物理參數與環境光反饋
          ==========================================================================
         */
         :root {
-            /* 玻璃体本色，保证在无背景时的最低限度遮蔽 */
+            /* 玻璃體本色，保證在無背景時的最低限度遮蔽 */
             --lg-base-tint: rgba(255, 255, 255, 0.08); 
-            /* 边缘环境光高亮，模拟几何倒角的反光切割 */
+            /* 邊緣環境光高亮，模擬幾何倒角的反光切割 */
             --lg-rim-light: rgba(255, 255, 255, 0.45); 
-            /* 多层次内阴影，构建玻璃内部的厚度感与体积感 */
+            /* 多層次內陰影，構建玻璃內部的厚度感與體積感 */
             --lg-internal-volume: inset 0 3px 15px rgba(255, 255, 255, 0.4), 
                                   inset 0 -3px 12px rgba(255, 255, 255, 0.1),
                                   inset 1px 0 2px rgba(255, 255, 255, 0.5);
-            /* 环境投射阴影，脱离底层平面 */
+            /* 環境投射陰影，脫離底層平面 */
             --lg-drop-shadow: 0 24px 50px rgba(0, 0, 0, 0.2); 
             
-            /* 复合滤镜：在 SVG 光学管道之上，增加原生亮度与饱和度补偿，防止画面因折射而显灰 */
+            /* 複合濾鏡：在 SVG 光學管道之上，增加原生亮度與飽和度補償，防止畫面因折射而顯灰 */
             --liquid-glass-optical-pipeline: url(#liquid-glass-engine) brightness(115%) saturate(120%);
         }
 
         /* 
          ==========================================================================
-         2. 全局环境构建：用于凸显折射效能的动态底层背景
+         2. 全局環境構建：用於凸顯折射效能的動態底層背景
          ==========================================================================
         */
         @keyframes fluidEnvironment {
@@ -43,7 +43,7 @@
             padding: 50px 20px;
             min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
-            /* 构建一个极具色彩张力的动态背景，能够最大限度触发 SVG 色散与光线偏折 */
+            /* 構建一個極具色彩張力的動態背景，能夠最大限度觸發 SVG 色散與光線偏折 */
             background: linear-gradient(-45deg, #FF2A54, #833AB4, #12C2E9, #C471ED);
             background-size: 300% 300%;
             animation: fluidEnvironment 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
@@ -68,18 +68,18 @@
 
         /* 
          ==========================================================================
-         3. Liquid Glass 物理承载容器抽象类
-         实施内容层与光学层深度隔离，确保前景 UI 组件的独立渲染
+         3. Liquid Glass 物理承載容器抽象類
+         實施內容層與光學層深度隔離，確保前景 UI 組件的獨立渲染
          ==========================================================================
         */
        .liquid-glass-panel {
             position: relative;
-            isolation: isolate; /* 建立新的堆叠上下文，防止混合模式穿透 */
+            isolation: isolate; /* 建立新的堆疊上下文，防止混合模式穿透 */
             box-shadow: var(--lg-drop-shadow);
             /* 
-               优雅降级机制 (Graceful Degradation):
-               优先宣告标准 backdrop-filter，针对 Safari 的 WebKit Bug (Bug #127102) 进行防护。
-               若浏览器支持 URL 滤镜，则后续的 pseudo-element 将覆盖此层光学表现。
+               優雅降級機制 (Graceful Degradation):
+               優先宣告標準 backdrop-filter，針對 Safari 的 WebKit Bug (Bug #127102) 進行防護。
+               若瀏覽器支持 URL 濾鏡，則後續的 pseudo-element 將覆蓋此層光學表現。
             */
             -webkit-backdrop-filter: blur(25px) saturate(200%);
             backdrop-filter: blur(25px) saturate(200%);
@@ -87,24 +87,24 @@
             transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* 光学透镜层伪元素：专职负责渲染由 SVG 定义的复杂光线追踪路径 */
+        /* 光學透鏡層偽元素：專職負責渲染由 SVG 定義的複雜光線追蹤路徑 */
        .liquid-glass-panel::before {
             content: "";
             position: absolute;
             inset: 0;
             border-radius: inherit;
             background: var(--lg-base-tint);
-            /* 引入内含色散与折射的核心管道 */
+            /* 引入內含色散與折射的核心管道 */
             -webkit-backdrop-filter: var(--liquid-glass-optical-pipeline);
             backdrop-filter: var(--liquid-glass-optical-pipeline);
             box-shadow: var(--lg-internal-volume);
             z-index: -1; 
-            pointer-events: none; /* 穿透鼠标事件，保障底层控件交互 */
+            pointer-events: none; /* 穿透鼠標事件，保障底層控件交互 */
         }
 
         /* 
          ==========================================================================
-         变体应用 A：Spotlight 级别高通透搜索框 (The Command Palette)
+         變體應用 A：Spotlight 級別高通透搜索框 (The Command Palette)
          ==========================================================================
         */
        .variant-search {
@@ -113,7 +113,7 @@
             width: 480px;
             max-width: 90vw;
             padding: 18px 24px;
-            border-radius: 60px; /* 极致的圆角曲线 */
+            border-radius: 60px; /* 極致的圓角曲線 */
             gap: 16px;
         }
        .variant-search input {
@@ -124,7 +124,7 @@
             font-size: 20px;
             color: #FFFFFF;
             font-weight: 500;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 提升输入文本在强透光环境下的对比度 */
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 提升輸入文本在強透光環境下的對比度 */
         }
        .variant-search input::placeholder {
             color: rgba(255, 255, 255, 0.7);
@@ -141,7 +141,7 @@
 
         /* 
          ==========================================================================
-         变体应用 B：Apple Music 风格沉浸式底座控制台
+         變體應用 B：Apple Music 風格沉浸式底座控制台
          ==========================================================================
         */
        .variant-media-player {
@@ -193,7 +193,7 @@
 
         /* 
          ==========================================================================
-         变体应用 C：macOS Tahoe 流体动态 Dock 导航栏
+         變體應用 C：macOS Tahoe 流體動態 Dock 導航欄
          ==========================================================================
         */
        .variant-dock {
@@ -203,7 +203,7 @@
             border-radius: 48px;
             gap: 20px;
         }
-        /* 针对鼠标响应触发极致的物理外扩形变 (Morphing) */
+        /* 針對鼠標響應觸發極致的物理外擴形變 (Morphing) */
        .variant-dock:hover {
             padding: 20px 32px;
             border-radius: 56px;
@@ -219,7 +219,7 @@
             justify-content: center;
             font-size: 30px;
             cursor: pointer;
-            /* 弹性交互反馈 */
+            /* 彈性交互反饋 */
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1), inset 0 2px 5px rgba(255,255,255,0.5);
             border: 1px solid rgba(255,255,255,0.3);
@@ -232,12 +232,12 @@
 
         /* 
          ==========================================================================
-         无障碍响应体系 (Accessibility Media Queries)
+         無障礙響應體系 (Accessibility Media Queries)
          ==========================================================================
         */
         @media (prefers-reduced-transparency: reduce) {
            .liquid-glass-panel::before {
-                /* 降级为近乎实体的色彩面板，切断深层 SVG 光线追踪，保障对比度 */
+                /* 降級為近乎實體的色彩面板，切斷深層 SVG 光線追蹤，保障對比度 */
                 backdrop-filter: none;
                 -webkit-backdrop-filter: none;
                 background: rgba(30, 30, 30, 0.95);
@@ -245,7 +245,7 @@
         }
         @media (prefers-reduced-motion: reduce) {
            .variant-dock,.dock-app {
-                transition: none; /* 移除引发生理不适的果冻回弹动效 */
+                transition: none; /* 移除引發生理不適的果凍回彈動效 */
             }
            .variant-dock:hover { transform: none; padding: 16px 24px; }
            .dock-app:hover { transform: scale(1.1); }

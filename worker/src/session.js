@@ -10,7 +10,7 @@ function toNumber(value, fallback = 0) {
 export async function validateSession(env, token, { management = false } = {}) {
   const session = await getSession(env, token);
   if (!session) {
-    return { ok: false, status: 401, message: '请先登录' };
+    return { ok: false, status: 401, message: '請先登錄' };
   }
 
   const { results } = await env.DB.prepare(
@@ -26,7 +26,7 @@ export async function validateSession(env, token, { management = false } = {}) {
   const user = results[0];
   if (!user || user.deleted_at || isUserDisabled(user)) {
     await deleteSession(env, token);
-    return { ok: false, status: 401, message: '账号已不可用' };
+    return { ok: false, status: 401, message: '賬號已不可用' };
   }
 
   if (session.deviceSessionId) {
@@ -44,7 +44,7 @@ export async function validateSession(env, token, { management = false } = {}) {
     const deviceSession = device.results[0];
     if (!deviceSession || toNumber(deviceSession.session_version) !== toNumber(user.session_version)) {
       await deleteSession(env, token);
-      return { ok: false, status: 401, message: '设备登录已失效，请重新登录' };
+      return { ok: false, status: 401, message: '設備登錄已失效，請重新登錄' };
     }
   }
 
@@ -52,7 +52,7 @@ export async function validateSession(env, token, { management = false } = {}) {
   const sessionVersion = toNumber(session.sessionVersion);
   if (sessionVersion !== dbVersion) {
     await deleteSession(env, token);
-    return { ok: false, status: 401, message: '登录已过期，请重新登录' };
+    return { ok: false, status: 401, message: '登錄已過期，請重新登錄' };
   }
 
   const refreshed = {

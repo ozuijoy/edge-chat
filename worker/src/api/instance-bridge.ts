@@ -21,7 +21,7 @@ export function registerInstanceBridgePublicRoutes(app: Hono<AppEnv>) {
     catch (error) {
       if (error instanceof ApiError) return c.json({ error: { code: error.code, message: error.message } }, error.status);
       console.error(JSON.stringify({ event: "instance_bridge_receive_failed" }));
-      return c.json({ error: { code: "internal_error", message: "跨实例消息暂时无法接收" } }, 500);
+      return c.json({ error: { code: "internal_error", message: "跨實例消息暫時無法接收" } }, 500);
     }
   });
 }
@@ -34,7 +34,7 @@ export function registerInstanceBridgeRoutes(app: Hono<AppEnv>) {
       throw bridgeError("group_unavailable", 403);
     }
     const binding = await first<Binding>(c.env.DB, "SELECT * FROM instance_bindings WHERE channel_id = ? AND status != 'revoked'", group.id);
-    // 群成员仅获知已认领的关系，不暴露邀请凭据或对方任何成员资料。
+    // 群成員僅獲知已認領的關係，不暴露邀請憑據或對方任何成員資料。
     return c.json({ binding: binding?.peer_origin ? publicBinding(binding) : null });
   });
   app.use("/api/admin/instance-bridge/*", async (c: Context<AppEnv>, next: () => Promise<void>) => {

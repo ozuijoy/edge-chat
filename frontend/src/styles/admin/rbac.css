@@ -2,15 +2,15 @@
 .rbac-page h3 { margin: 0; font-size: 17px; }
 .rbac-page .inline-actions { flex-wrap: wrap; }
 .rbac-description { max-width: 320px; white-space: normal; overflow-wrap: anywhere; margin: 4px 0; }
-/* 当前正在编辑或查看成员的用户组在表格中高亮，便于对应下方面板。 */
+/* 當前正在編輯或查看成員的用戶組在表格中高亮，便於對應下方面板。 */
 .rbac-row--active td { background: var(--admin-green-bg); }
 .rbac-row--active td:first-child { box-shadow: inset 3px 0 0 var(--admin-green); }
 .rbac-pager { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 .rbac-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* 管理工具统一为卡片面板：标题栏 + 内容 + 底部操作，替代原先用分隔线堆叠的散乱区块。 */
+/* 管理工具統一為卡片面板：標題欄 + 內容 + 底部操作，替代原先用分隔線堆疊的散亂區塊。 */
 .rbac-workspace { scroll-margin-top: calc(var(--admin-topbar-height) + 16px); }
-.rbac-panel { margin-top: 24px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-panel); background: var(--admin-panel); box-shadow: var(--admin-shadow); overflow: clip; } /* clip 不创建滚动容器，底部操作栏的 sticky 才能相对视口生效 */
+.rbac-panel { margin-top: 24px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-panel); background: var(--admin-panel); box-shadow: var(--admin-shadow); overflow: clip; } /* clip 不創建滾動容器，底部操作欄的 sticky 才能相對視口生效 */
 .rbac-panel__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--admin-border); background: var(--admin-subtle); }
 .rbac-panel__header p { margin: 2px 0 0; font-size: 13px; }
 .rbac-panel__body { display: grid; gap: 18px; padding: 18px; }

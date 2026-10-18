@@ -45,7 +45,7 @@ async function harness() {
   return { database, db: env.DB, request };
 }
 
-test('配色白名单与旧站点回退：只接受预设，不把任意值带进 DOM', () => {
+test('配色白名單與舊站點回退：只接受預設，不把任意值帶進 DOM', () => {
   const root = { dataset: {} };
   for (const value of [undefined, null, '', 'pink', {}, ['cream-sakura'], '<style>']) {
     assert.equal(isSiteColorTheme(value), false);
@@ -59,7 +59,7 @@ test('配色白名单与旧站点回退：只接受预设，不把任意值带�
   assert.equal(root.dataset.colorTheme, 'default');
 });
 
-test('真实 D1：旧库默认不写入，主题持久化、恢复与名称/图标部分更新相互独立', async () => {
+test('真實 D1：舊庫默認不寫入，主題持久化、恢復與名稱/圖標部分更新相互獨立', async () => {
   const h = await harness();
   assert.equal((await getSiteSettings(h.db)).colorTheme, 'default');
   assert.equal(h.database.exec("SELECT * FROM site_settings WHERE setting_key = 'site_color_theme'").length, 0);
@@ -77,13 +77,13 @@ test('真实 D1：旧库默认不写入，主题持久化、恢复与名称/图�
   assert.ok(h.database.exec("SELECT * FROM admin_audit_log WHERE action = 'site.update'")[0].values.length >= 3);
 });
 
-test('配色 API：拒绝非法值、匿名、普通用户、只读管理员与额外字段，失败无部分写入', async () => {
+test('配色 API：拒絕非法值、匿名、普通用戶、只讀管理員與額外字段，失敗無部分寫入', async () => {
   const h = await harness();
   const initial = await getSiteSettings(h.db);
   for (const colorTheme of [null, '', 'pink', {}, ['cream-sakura']]) {
     const result = await h.request({ siteName: 'Must not save', colorTheme });
     assert.equal(result.status, 400);
-    assert.deepEqual(result.body, { error: '不支持的站点配色' });
+    assert.deepEqual(result.body, { error: '不支持的站點配色' });
   }
   for (const name of ['', 'regular', 'reader']) {
     const result = await h.request({ colorTheme: 'cream-sakura' }, name);
@@ -94,13 +94,13 @@ test('配色 API：拒绝非法值、匿名、普通用户、只读管理员与�
   assert.deepEqual(await getSiteSettings(h.db), initial);
 });
 
-test('demo 配色遵循相同部分更新与白名单，重置仅恢复演示状态', async () => {
+test('demo 配色遵循相同部分更新與白名單，重置僅恢復演示狀態', async () => {
   resetDemoState();
   const initial = (await requestDemo('/site')).site;
   const patch = body => requestDemo('/admin/site-settings', { method: 'PATCH', body });
   assert.deepEqual((await patch({ colorTheme: 'cream-sakura' })).site, { ...initial, colorTheme: 'cream-sakura' });
   assert.equal((await patch({ siteName: 'Preview' })).site.colorTheme, 'cream-sakura');
-  await assert.rejects(patch({ colorTheme: 'invalid' }), /不支持的站点配色/);
+  await assert.rejects(patch({ colorTheme: 'invalid' }), /不支持的站點配色/);
   resetDemoState();
   assert.deepEqual((await requestDemo('/site')).site, initial);
 });
@@ -122,7 +122,7 @@ function themeControl({ update, allowed = true } = {}) {
   return { ...control, requests, store };
 }
 
-test('真实 Vue 配色逻辑：一次点击只提交配色，成功后应用，重复点击不提交', async () => {
+test('真實 Vue 配色邏輯：一次點擊只提交配色，成功後應用，重複點擊不提交', async () => {
   const c = themeControl();
   await c.selectTheme('cream-sakura');
   assert.deepEqual(c.requests, [{ colorTheme: 'cream-sakura' }]);
@@ -136,7 +136,7 @@ test('真实 Vue 配色逻辑：一次点击只提交配色，成功后应用，
   assert.match(descriptor.template.content, /role="status"/);
 });
 
-test('真实 Vue 配色逻辑：保存中锁定、失败保留原主题，允许重试；只读不能提交', async () => {
+test('真實 Vue 配色邏輯：保存中鎖定、失敗保留原主題，允許重試；只讀不能提交', async () => {
   let reject;
   const c = themeControl({ update: () => new Promise((_resolve, fail) => { reject = fail; }) });
   const pending = c.selectTheme('cream-sakura');

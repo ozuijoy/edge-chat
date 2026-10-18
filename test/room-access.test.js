@@ -34,7 +34,7 @@ function createQueryQueue(resultSets = []) {
 	};
 }
 
-test("room kind 与基础查询拒绝无效身份参数", async () => {
+test("room kind 與基礎查詢拒絕無效身份參數", async () => {
 	assert.equal(isRoomKind("public"), true);
 	assert.equal(isRoomKind("private"), true);
 	assert.equal(isRoomKind("dm"), true);
@@ -47,7 +47,7 @@ test("room kind 与基础查询拒绝无效身份参数", async () => {
 	assert.equal(harness.calls.length, 0);
 });
 
-test("普通成员与管理员走稳定的 authorizeRoom decision surface", async () => {
+test("普通成員與管理員走穩定的 authorizeRoom decision surface", async () => {
 	const member = createQueryQueue([[{ id: 5, kind: "private" }]]);
 	const memberAccess = await authorizeRoom(member.db, { userId: "7" }, "private", "5");
 	assert.equal(memberAccess.ok, true);
@@ -61,7 +61,7 @@ test("普通成员与管理员走稳定的 authorizeRoom decision surface", asyn
 	assert.deepEqual(adminAccess.identity, { userId: 7 });
 });
 
-test("authorizeRoom 对非法、未找到与无成员资格返回稳定失败原因", async () => {
+test("authorizeRoom 對非法、未找到與無成員資格返回穩定失敗原因", async () => {
 	assert.deepEqual(await authorizeRoom({}, null, "private", 1), {
 		ok: false,
 		reason: ROOM_ACCESS_FAILURE.INVALID_ROOM,
@@ -86,7 +86,7 @@ test("authorizeRoom 对非法、未找到与无成员资格返回稳定失败原
 	});
 });
 
-test("频道管理只允许管理员或 owner，并拒绝 DM", async () => {
+test("頻道管理只允許管理員或 owner，並拒絕 DM", async () => {
 	const owner = createQueryQueue([
 		[{ id: 5, kind: "private" }],
 		[{ channel_id: 5, user_id: 7, role: "owner" }],
@@ -112,7 +112,7 @@ test("频道管理只允许管理员或 owner，并拒绝 DM", async () => {
 	});
 });
 
-test("后台身份不授予消息管理权限，私信不可删除且群消息仍须群主", async () => {
+test("後臺身份不授予消息管理權限，私信不可刪除且群消息仍須群主", async () => {
 	const adminDm = createQueryQueue([[{ id: 8, kind: "dm" }]]);
 	const adminAccess = await authorizeMessageModeration(
 		adminDm.db,

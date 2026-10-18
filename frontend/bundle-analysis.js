@@ -1,6 +1,6 @@
 import { gzipSync } from 'node:zlib';
 
-// 首屏只遍历静态依赖，动态页面、弹窗与语言包应在实际使用时下载。
+// 首屏只遍歷靜態依賴，動態頁面、彈窗與語言包應在實際使用時下載。
 export function analyzeFrontendBundle(output) {
   const files = new Map(output.map((file) => [file.fileName, file]));
   const entry = output.find((file) => file.type === 'chunk' && file.isEntry);
@@ -44,10 +44,10 @@ export function analyzeFrontendBundle(output) {
     return [...names].flatMap((name) => Object.keys(files.get(name).modules || {}));
   }
 
-  const localeSources = ['/src/locales/zh-CN.js', '/src/locales/zh-TW.js', '/src/locales/en-US.js'];
+  const localeSources = ['/src/locales/zh-TW.js', '/src/locales/en-US.js'];
   function pageFiles(page, locale) {
     const roots = [entry.fileName, 'index.html', chunkFor(`/src/pages/${page}.vue`), chunkFor(locale)];
-    // 后台子路由还会加载外壳；一起计量，防止公共后台样式逃出首屏预算。
+    // 後臺子路由還會加載外殼；一起計量，防止公共後臺樣式逃出首屏預算。
     if (page.startsWith('Admin')) roots.push(chunkFor('/src/pages/AdminPage.vue'));
     return closure(roots);
   }
@@ -56,6 +56,6 @@ export function analyzeFrontendBundle(output) {
     Object.fromEntries(localeSources.map((locale) => [locale.split('/').at(-1).slice(0, -3), size(pageFiles(page, locale))]))
   ]));
   const all = new Set(files.keys());
-  // 编译产物包含全部语言和编辑器分包；public 内的自托管 Lute 由 CLI 单独报告，避免混淆预算。
+  // 編譯產物包含全部語言和編輯器分包；public 內的自託管 Lute 由 CLI 單獨報告，避免混淆預算。
   return { pages, compiled: size(all), closure, chunkFor, pageFiles, modules, size, files };
 }

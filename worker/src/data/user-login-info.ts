@@ -1,4 +1,4 @@
-// 每次成功登录插入一条，数据库触发器同步淘汰第四条，保留成本不随登录次数增长。
+// 每次成功登錄插入一條，數據庫觸發器同步淘汰第四條，保留成本不隨登錄次數增長。
 export async function recordLoginInfo(db, userId: number, request: Request, loginProbeId = '') {
   const ip = (request.headers.get('CF-Connecting-IP') || '').slice(0, 64);
   const userAgent = (request.headers.get('User-Agent') || '').slice(0, 1024);
@@ -6,7 +6,7 @@ export async function recordLoginInfo(db, userId: number, request: Request, logi
     await db.prepare(`INSERT INTO user_login_info (user_id, ip, user_agent, login_probe_id)
       VALUES (?, ?, ?, ?)`).bind(userId, ip, userAgent, loginProbeId).run();
   } catch {
-    // 登录信息是辅助管理数据，暂时写入失败不能使已验证的用户无法登录；日志不含 IP 或 UA。
+    // 登錄信息是輔助管理數據，暫時寫入失敗不能使已驗證的用戶無法登錄；日誌不含 IP 或 UA。
     console.error('user_login_info_write_failed');
   }
 }

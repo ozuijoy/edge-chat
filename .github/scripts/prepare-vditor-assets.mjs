@@ -14,7 +14,7 @@ const runtimeFiles = [
 	"dist/js/lute/lute.min.js",
 ];
 
-// 只发布聊天编辑器真正会请求的运行时，避免把公式、图表和全量高亮包带进站点。
+// 只發布聊天編輯器真正會請求的運行時，避免把公式、圖表和全量高亮包帶進站點。
 await rm(targetRoot, { recursive: true, force: true });
 for (const relativePath of runtimeFiles) {
 	const targetPath = resolve(targetRoot, relativePath);

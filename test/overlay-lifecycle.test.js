@@ -3,7 +3,7 @@ import test from "node:test";
 import { createRenderer, nextTick, ref, shallowRef } from "vue";
 import { useOverlayLifecycle } from "../frontend/src/composables/useOverlayLifecycle.js";
 
-test("弹层堆叠仅顶层响应 Esc/Tab，滚动锁计数与焦点恢复正确", async () => {
+test("彈層堆疊僅頂層響應 Esc/Tab，滾動鎖計數與焦點恢復正確", async () => {
 	const original = { window: globalThis.window, document: globalThis.document, HTMLElement: globalThis.HTMLElement };
 	const handlers = new Map();
 	const document = { body: { style: { overflow: "auto" } }, activeElement: null };

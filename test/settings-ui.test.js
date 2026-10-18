@@ -2,13 +2,12 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import enUS from '../frontend/src/locales/en-US.js';
-import zhCN from '../frontend/src/locales/zh-CN.js';
 import zhTW from '../frontend/src/locales/zh-TW.js';
 
 const readFrontend = (path) =>
   readFileSync(new URL(`../frontend/src/${path}`, import.meta.url), 'utf8');
 
-test('个人设置页将 Telegram 通知交给独立组件维护', () => {
+test('個人設置頁將 Telegram 通知交給獨立組件維護', () => {
   const page = readFrontend('pages/SettingsPage.vue');
 
   assert.match(page, /import TelegramNotificationSettings from/);
@@ -16,7 +15,7 @@ test('个人设置页将 Telegram 通知交给独立组件维护', () => {
   assert.doesNotMatch(page, /telegramNotifications|createTelegramNotificationLink|isDemoMode/);
 });
 
-test('Telegram 通知设置覆盖加载、未绑定、等待与已绑定状态', () => {
+test('Telegram 通知設置覆蓋加載、未綁定、等待與已綁定狀態', () => {
   const component = readFrontend('components/settings/TelegramNotificationSettings.vue');
 
   for (const method of [
@@ -41,7 +40,7 @@ test('Telegram 通知设置覆盖加载、未绑定、等待与已绑定状态',
   assert.match(component, /if \(telegramPoll\) clearInterval\(telegramPoll\)/);
 });
 
-test('Telegram 通知控件复用项目按钮并在窄屏纵向排列', () => {
+test('Telegram 通知控件複用項目按鈕並在窄屏縱向排列', () => {
   const component = readFrontend('components/settings/TelegramNotificationSettings.vue');
 
   assert.match(component, /<UiButton/);
@@ -53,8 +52,8 @@ test('Telegram 通知控件复用项目按钮并在窄屏纵向排列', () => {
   assert.doesNotMatch(component, /<button(?:\s|>)/);
 });
 
-test('Telegram 状态文案在三种语言中完整且操作名称保持简洁', () => {
-  for (const locale of [zhCN, zhTW, enUS]) {
+test('Telegram 狀態文案在兩種語言中完整且操作名稱保持簡潔', () => {
+  for (const locale of [zhTW, enUS]) {
     for (const key of [
       'settings.telegramStatusLoading',
       'settings.telegramStatusUnavailable',
@@ -68,7 +67,6 @@ test('Telegram 状态文案在三种语言中完整且操作名称保持简洁',
     }
   }
 
-  assert.equal(zhCN['settings.telegramOpen'], '打开 Telegram');
   assert.equal(zhTW['settings.telegramOpen'], '開啟 Telegram');
   assert.equal(enUS['settings.telegramOpen'], 'Open Telegram');
 });

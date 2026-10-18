@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS bridge_receipts (
 );
 CREATE INDEX IF NOT EXISTS idx_bridge_receipts_expiry ON bridge_receipts(expires_at);
 
--- 在真实 INSERT 事务内登记，HTTP/WS/移动 API 都不会遗漏，也不会把旧历史补入队列。
+-- 在真實 INSERT 事務內登記，HTTP/WS/移動 API 都不會遺漏，也不會把舊歷史補入隊列。
 CREATE TRIGGER IF NOT EXISTS enqueue_instance_bridge_message
 AFTER INSERT ON messages
 WHEN NEW.sender_kind = 'local' AND NEW.source = 'edgechat'
@@ -91,7 +91,7 @@ BEGIN
     AND (SELECT COUNT(*) FROM bridge_outbox WHERE binding_id = b.id) < 1000;
 END;
 
--- 接收资格与 receipt 在消息事务中确认，封堵暂停/解绑/重复请求的先查后写竞态。
+-- 接收資格與 receipt 在消息事務中確認，封堵暫停/解綁/重複請求的先查後寫競態。
 CREATE TRIGGER IF NOT EXISTS validate_instance_bridge_message
 BEFORE INSERT ON messages WHEN NEW.source = 'instance-bridge'
 BEGIN
@@ -109,7 +109,7 @@ BEGIN
   VALUES (NEW.bridge_binding_id, NEW.bridge_event_id, NEW.bridge_sent_at + 172800000);
 END;
 
--- generation 变更与清空积压同事务；并发重复控制不能再清掉之后产生的新消息。
+-- generation 變更與清空積壓同事務；併發重複控制不能再清掉之後產生的新消息。
 CREATE TRIGGER IF NOT EXISTS cancel_instance_bridge_generation
 AFTER UPDATE OF revision, peer_revision, status ON instance_bindings
 WHEN NEW.revision != OLD.revision OR NEW.peer_revision != OLD.peer_revision OR NEW.status = 'revoked'

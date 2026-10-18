@@ -9,11 +9,11 @@ export function registerStorageRoutes(app) {
     return c.json(row ? JSON.parse(row.setting_value) : { items: [], users: [], scannedAt: null });
   });
   app.post('/api/admin/storage/scan', async (c) => {
-    if (!c.env.FILES) throw new ApiError('当前部署没有绑定 R2，无法统计存储空间', 503);
+    if (!c.env.FILES) throw new ApiError('當前部署沒有綁定 R2，無法統計存儲空間', 503);
     const cursor = c.req.query('cursor') || '';
     const key = `storage-scan:${c.get('session').userId}`;
     let state = cursor ? JSON.parse(await c.env.SESSIONS.get(key) || 'null') : null;
-    if (cursor && (!state || state.cursor !== cursor || state.pages >= 100)) throw new ApiError('扫描游标无效或超过单次扫描范围', 400);
+    if (cursor && (!state || state.cursor !== cursor || state.pages >= 100)) throw new ApiError('掃描游標無效或超過單次掃描範圍', 400);
     const db = c.get('authorizationDatabase');
     if (!cursor) {
       await runAuthorizedBatch(db, c.get('authorizationContext'), [], {

@@ -5,5 +5,5 @@
     <string name="package_name">com.aozorae.edgechat.web</string>
     <string name="custom_url_scheme">com.aozorae.edgechat.web</string>
     <string name="notification_channel_name">聊天消息</string>
-    <string name="notification_channel_description">EdgeChat 新消息与提及通知</string>
+    <string name="notification_channel_description">EdgeChat 新消息與提及通知</string>
 </resources>

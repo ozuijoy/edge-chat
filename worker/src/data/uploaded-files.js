@@ -123,7 +123,7 @@ export async function canAccessFile(db, key, userId = null, trustedOrigins = [])
 	const cleanKey = String(key || "");
 	if (!cleanKey) return false;
 
-	// 头像与当前站点图标是公开资料；未保存的上传仍需上传者认证才能预览。
+	// 頭像與當前站點圖標是公開資料；未保存的上傳仍需上傳者認證才能預覽。
 	const publicRefs = await db
 		.prepare(
 			`SELECT (
@@ -145,7 +145,7 @@ export async function canAccessFile(db, key, userId = null, trustedOrigins = [])
 		iconContentType.startsWith('image/') && iconContentType !== 'image/svg+xml') return true;
 	if (!Number.isFinite(Number(userId))) return false;
 
-	// 发送前允许上传者预览；发送后则按消息所在公开群组或成员关系授权。
+	// 發送前允許上傳者預覽；發送後則按消息所在公開群組或成員關係授權。
 	const { results } = await db
 		.prepare(
 			`SELECT 1 AS found

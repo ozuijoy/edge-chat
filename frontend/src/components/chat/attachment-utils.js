@@ -37,7 +37,7 @@ export function isPreviewableImageAttachment(attachment) {
     return true;
   }
 
-  // 旧消息或异常浏览器可能缺少 MIME，保留扩展名兜底以免历史图片只能显示成下载链接。
+  // 舊消息或異常瀏覽器可能缺少 MIME，保留擴展名兜底以免歷史圖片只能顯示成下載鏈接。
   const extension = extensionFrom(attachment.name) || extensionFrom(attachment.url);
   return PREVIEWABLE_IMAGE_EXTENSIONS.has(extension);
 }

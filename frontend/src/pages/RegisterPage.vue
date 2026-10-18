@@ -68,7 +68,7 @@ async function submit() {
   loading.value = true;
   error.value = '';
   try {
-    // 确认密码只用于本地一致性校验，不能作为注册字段发送给后端。
+    // 確認密碼只用於本地一致性校驗，不能作為註冊字段發送給後端。
     await api.registerWithInvite(token.value, {
       username: form.username,
       displayName: form.displayName,

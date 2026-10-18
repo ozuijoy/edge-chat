@@ -83,7 +83,7 @@ async function loadLanguage(language: VditorLanguage) {
 }
 
 export async function loadVditorRuntime(locale: string): Promise<EdgeChatVditorRuntime> {
-	// Vditor 暂无繁中语言包，两种中文界面共用中文编辑器，避免繁中用户退回英文工具栏。
+	// Vditor 暫無繁中語言包，兩種中文界面共用中文編輯器，避免繁中用戶退回英文工具欄。
 	const language: VditorLanguage = locale.startsWith("zh-") ? "zh_CN" : "en_US";
 	const [, i18n] = await Promise.all([loadSharedRuntime(), loadLanguage(language)]);
 	return { Vditor, cdn, i18n };

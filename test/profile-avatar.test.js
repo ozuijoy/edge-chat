@@ -3,7 +3,7 @@ import test from "node:test";
 
 import worker from "../worker/src/index.js";
 
-test("个人资料接口清除头像时同步数据库与会话", async () => {
+test("個人資料接口清除頭像時同步數據庫與會話", async () => {
 	let storedSession = {
 		token: "session-token",
 		userId: 7,

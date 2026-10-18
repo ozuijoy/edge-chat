@@ -70,7 +70,7 @@ async function main() {
     console.log(`D1 schema verified: ${result.expectedMigration}`);
     return;
   }
-  // D1 的内部表可出现在 sqlite_master，但不允许读取列；只查询应用 manifest 中的表。
+  // D1 的內部表可出現在 sqlite_master，但不允許讀取列；只查詢應用 manifest 中的表。
   const artifacts = await collectSchemaArtifacts(queryD1, schemaTables(manifest));
   const appliedMigrations = await collectAppliedMigrations(queryD1, artifacts);
   const plan = await buildD1MigrationPlan({

@@ -24,7 +24,7 @@ const emit = defineEmits<{
 	"cancel-press": [];
 }>();
 
-// 每行依赖自身消息，而不是整个列表；追加消息时旧行无需重新生成气泡。
+// 每行依賴自身消息，而不是整個列表；追加消息時舊行無需重新生成氣泡。
 const own = computed(() => props.msg.sender.kind !== "external"
 	&& Number(props.msg.sender.id) === Number(props.currentUserId));
 const time = computed(() => props.msg.createdAt ? formatTime(props.msg.createdAt) : "");
@@ -89,7 +89,7 @@ const time = computed(() => props.msg.createdAt ? formatTime(props.msg.createdAt
   min-width: 34px;
   min-height: 34px;
 }
-/* 扩大触摸命中区域，但保留原有 34px 头像与气泡排版。 */
+/* 擴大觸摸命中區域，但保留原有 34px 頭像與氣泡排版。 */
 .message-avatar-trigger::before {
   content: "";
   position: absolute;

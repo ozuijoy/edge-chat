@@ -3,10 +3,10 @@ cf key.txt
 wrangler.toml
 
 # Project documentation (not for GitHub)
-项目文档.md
-本地部署说明.md
+項目文檔.md
+本地部署說明.md
 TECHNICAL.md
-导览.md
+導覽.md
 
 # Dependencies
 node_modules/

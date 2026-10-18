@@ -35,7 +35,7 @@ export async function loadTelegramUserAvatar(botToken, userId) {
 	const photo = largestPhotoSize(photoSizes);
 	const telegramFile = await getTelegramFile(botToken, photo.file_id);
 	if (Number(telegramFile.file_size || 0) > TELEGRAM_AVATAR_MAX_BYTES) {
-		throw new TelegramApiError("Telegram 头像超过大小限制");
+		throw new TelegramApiError("Telegram 頭像超過大小限制");
 	}
 	const bytes = await downloadTelegramFile(
 		botToken,

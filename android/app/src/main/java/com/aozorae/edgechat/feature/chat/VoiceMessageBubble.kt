@@ -64,7 +64,7 @@ fun VoiceMessageBubble(
             IconButton(onClick = onFallback, modifier = Modifier.size(42.dp)) {
                 Icon(
                     Icons.Outlined.Download,
-                    contentDescription = if (language == "zh-CN") "下载语音" else "Download voice message",
+                    contentDescription = if (language == "zh-TW") "下載語音" else "Download voice message",
                     tint = colors.accent,
                 )
             }
@@ -76,9 +76,9 @@ fun VoiceMessageBubble(
                 Icon(
                     if (active && playback.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                     contentDescription = if (active && playback.playing) {
-                        if (language == "zh-CN") "暂停语音" else "Pause voice message"
+                        if (language == "zh-TW") "暫停語音" else "Pause voice message"
                     } else {
-                        if (language == "zh-CN") "播放语音" else "Play voice message"
+                        if (language == "zh-TW") "播放語音" else "Play voice message"
                     },
                     tint = colors.accent,
                 )

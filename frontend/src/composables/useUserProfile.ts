@@ -57,7 +57,7 @@ export function useUserProfile({ currentUserId, getProfile, openDm, onNavigate }
 	}
 
 	function openUserProfile(target: ProfileIdentity) {
-		// 外部 ID 即使是数字也只保留外部身份，不参与本地 ID 解析。
+		// 外部 ID 即使是數字也只保留外部身份，不參與本地 ID 解析。
 		if (target.kind === "local" && parseLocalUserId(target.id) === null) return;
 		if (loading.value && identity.value?.kind === target.kind &&
 			identity.value.id === target.id &&

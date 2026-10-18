@@ -5,7 +5,7 @@ import { useContacts } from "../frontend/src/composables/useContacts.ts";
 
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 
-test("通讯录摘要按名称稳定排序并同时搜索显示名与用户名", async () => {
+test("通訊錄摘要按名稱穩定排序並同時搜索顯示名與用戶名", async () => {
 	let calls = 0;
 	const contacts = useContacts({
 		async getContacts() {
@@ -19,7 +19,7 @@ test("通讯录摘要按名称稳定排序并同时搜索显示名与用户名",
 	});
 	await contacts.load();
 	await contacts.load();
-	assert.equal(calls, 1, "首次加载后不重复读取目录");
+	assert.equal(calls, 1, "首次加載後不重複讀取目錄");
 	assert.deepEqual(contacts.filteredUsers.value.map((user) => user.id), [3, 2, 4]);
 	contacts.query.value = "NEEDLE";
 	assert.deepEqual(contacts.filteredUsers.value.map((user) => user.id), [3]);
@@ -29,7 +29,7 @@ test("通讯录摘要按名称稳定排序并同时搜索显示名与用户名",
 	assert.equal(contacts.filteredUsers.value.length, 3);
 });
 
-test("通讯录失败状态可重试且不会把失败投影为空列表", async () => {
+test("通訊錄失敗狀態可重試且不會把失敗投影為空列表", async () => {
 	let calls = 0;
 	const contacts = useContacts({
 		async getContacts() {
@@ -48,7 +48,7 @@ test("通讯录失败状态可重试且不会把失败投影为空列表", async
 	await flush();
 });
 
-test("通讯录页面只渲染头像和一个名字并复用资料卡与工作区生命周期", () => {
+test("通訊錄頁面只渲染頭像和一個名字並複用資料卡與工作區生命週期", () => {
 	const read = (path) => readFileSync(new URL(`../frontend/src/${path}`, import.meta.url), "utf8");
 	const page = read("pages/ContactsPage.vue");
 	const chat = read("pages/ChatPage.vue");
@@ -74,7 +74,7 @@ test("通讯录页面只渲染头像和一个名字并复用资料卡与工作�
 	assert.match(chat, /@unblocked="applyBlockState\(\$event, false\)"/);
 });
 
-test("拉黑视图按需读取、搜索并在成功后移除，失败保留且可重试", async () => {
+test("拉黑視圖按需讀取、搜索並在成功後移除，失敗保留且可重試", async () => {
 	const calls = [];
 	let fail = true;
 	const blocked = [{ id: 2, username: "alice", displayName: "Alice", avatarUrl: "" }];
@@ -101,11 +101,11 @@ test("拉黑视图按需读取、搜索并在成功后移除，失败保留且�
 	assert.equal(contacts.actionError.value, "");
 	assert.equal(contacts.filteredUsers.value.length, 0);
 	await contacts.selectView("all");
-	assert.equal(contacts.filteredUsers.value.length, 1, "解除不移除全体用户目录");
+	assert.equal(contacts.filteredUsers.value.length, 1, "解除不移除全體用戶目錄");
 	contacts.dispose();
 });
 
-test("切换通讯录视图丢弃迟到响应，解除操作不重复提交", async () => {
+test("切換通訊錄視圖丟棄遲到響應，解除操作不重複提交", async () => {
 	let resolveAll;
 	let resolveUnblock;
 	let writes = 0;

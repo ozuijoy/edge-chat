@@ -29,7 +29,7 @@ function createDemoVoiceDataUrl() {
   writeText(36, 'data');
   view.setUint32(40, sampleCount, true);
 
-  // 生成轻柔且有起伏的短音频，便于在 demo 中真实验证播放、暂停与进度交互。
+  // 生成輕柔且有起伏的短音頻，便於在 demo 中真實驗證播放、暫停與進度交互。
   for (let index = 0; index < sampleCount; index += 1) {
     const time = index / sampleRate;
     const envelope = Math.sin(Math.PI * Math.min(time / 0.12, 1, (durationSeconds - time) / 0.18));
@@ -60,7 +60,7 @@ function internalSender(user) {
   };
 }
 
-// 默认读取当前界面语言；测试可显式传入语言，验证不同访客看到的预置内容。
+// 默認讀取當前界面語言；測試可顯式傳入語言，驗證不同訪客看到的預置內容。
 export function createDemoFixtures(locale = getLocale()) {
   const copy = getDemoFixtureCopy(locale);
   const users = [
@@ -448,7 +448,7 @@ export function createDemoFixtures(locale = getLocale()) {
     nextInviteId: 3,
     nextMappingId: 2,
     fixtureTime: FIXTURE_TIME,
-    // realtime/api 模拟 Telegram 回流等动态文案时复用同一语言的示例文本。
+    // realtime/api 模擬 Telegram 迴流等動態文案時複用同一語言的示例文本。
     copy
   };
 }

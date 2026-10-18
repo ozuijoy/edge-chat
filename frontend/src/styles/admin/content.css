@@ -60,7 +60,7 @@
   color: var(--admin-muted);
 }
 
-/* 内容页只共享版式骨架，具体业务继续由各自组件负责。 */
+/* 內容頁只共享版式骨架，具體業務繼續由各自組件負責。 */
 .admin-page .admin-section {
   min-width: 0;
   display: flex;

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS channel_pins (
   FOREIGN KEY (pinned_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- 软删除后立即移除置顶引用；消息保留期仍由 GC 独立决定，不因置顶而延长。
+-- 軟刪除後立即移除置頂引用；消息保留期仍由 GC 獨立決定，不因置頂而延長。
 CREATE TRIGGER IF NOT EXISTS clear_pin_after_message_soft_delete
 AFTER UPDATE OF deleted_at ON messages
 WHEN OLD.deleted_at IS NULL AND NEW.deleted_at IS NOT NULL

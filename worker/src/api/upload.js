@@ -53,12 +53,12 @@ function contentDispositionValue(kind, filename) {
 function validateUpload(env, file) {
   const maxFileSize = Number(env.MAX_FILE_SIZE || 20971520);
   if (file.size > maxFileSize) {
-    throw new Error(`文件大小不能超过 ${Math.round(maxFileSize / 1024 / 1024)}MB`);
+    throw new Error(`文件大小不能超過 ${Math.round(maxFileSize / 1024 / 1024)}MB`);
   }
 
   const contentType = normalizeContentType(file.type);
   if (BLOCKED_MIME_TYPES.has(contentType)) {
-    throw new Error('该文件类型不允许上传');
+    throw new Error('該文件類型不允許上傳');
   }
 
   const allowed = String(env.ALLOWED_FILE_TYPES || '')
@@ -67,25 +67,25 @@ function validateUpload(env, file) {
     .filter(Boolean);
 
   if (allowed.length && !allowed.some((prefix) => contentType.startsWith(prefix))) {
-    throw new Error('该文件类型不允许上传');
+    throw new Error('該文件類型不允許上傳');
   }
 }
 
 export function registerUploadRoutes(app) {
   app.post('/api/upload', async (c) => {
     if (!c.env.FILES) {
-      return errorResponse('当前部署没有绑定 R2，无法上传附件', 503);
+      return errorResponse('當前部署沒有綁定 R2，無法上傳附件', 503);
     }
 
     const session = c.get('session');
     const maxFileSize = Number(c.env.MAX_FILE_SIZE || 20971520);
     if (requestBodyTooLarge(c.req.raw, maxFileSize + UPLOAD_BODY_OVERHEAD_BYTES)) {
-      return errorResponse(`文件大小不能超过 ${Math.round(maxFileSize / 1024 / 1024)}MB`, 413);
+      return errorResponse(`文件大小不能超過 ${Math.round(maxFileSize / 1024 / 1024)}MB`, 413);
     }
     const formData = await c.req.formData();
     const file = formData.get('file');
     if (!(file instanceof File)) {
-      return errorResponse('请选择文件');
+      return errorResponse('請選擇文件');
     }
 
     try {
@@ -93,7 +93,7 @@ export function registerUploadRoutes(app) {
       return c.json({ file: result.file });
     } catch (error) {
       const message = String(error?.message || '');
-      if (message.startsWith('文件大小不能超过') || message === '该文件类型不允许上传') {
+      if (message.startsWith('文件大小不能超過') || message === '該文件類型不允許上傳') {
         return errorResponse(message);
       }
       throw error;
@@ -112,7 +112,7 @@ export function registerUploadRoutes(app) {
       return new Response('Forbidden', { status: 403 });
     }
     if (!c.env.FILES) {
-      return errorResponse('当前部署没有绑定 R2，无法读取附件', 503);
+      return errorResponse('當前部署沒有綁定 R2，無法讀取附件', 503);
     }
 
     const [object, fileMetadata] = await Promise.all([
@@ -188,7 +188,7 @@ export async function saveUploadedFile(env, session, file, { clientUploadId = nu
       clientUploadId
     });
   } catch (error) {
-    // 元数据失败或幂等键竞争时移除本次新对象，避免 R2 留下没有稳定引用的副本。
+    // 元數據失敗或冪等鍵競爭時移除本次新對象，避免 R2 留下沒有穩定引用的副本。
     try {
       await env.FILES.delete(key);
     } catch (deleteError) {

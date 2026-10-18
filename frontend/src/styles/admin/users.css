@@ -34,7 +34,7 @@
 .admin-user-identity > strong { font-weight: 650; }
 .admin-user-identity > .muted { margin-block-start: var(--admin-space-3xs); }
 .admin-user-actions { min-width: 320px; }
-/* 分组与行操作并排靠右，避免姓名列额外增高；只调整此列表，不影响用户组成员面板。 */
+/* 分組與行操作並排靠右，避免姓名列額外增高；只調整此列表，不影響用戶組成員面板。 */
 .admin-user-actions .group-assignment { margin: 0; margin-inline-start: auto; max-width: 100%; }
 .user-details-trigger { width: 44px; min-height: 44px; padding: 0; }
 .admin-users-empty { height: 144px; text-align: center; }
@@ -43,7 +43,7 @@
   .admin-user-search { width: 100%; min-height: 44px; }
   .admin-user-search input { font-size: 1rem; }
 
-  /* 小屏按账号分块，而不是让操作按钮藏在横向滚动区域外；保留原生表格语义。 */
+  /* 小屏按賬號分塊，而不是讓操作按鈕藏在橫向滾動區域外；保留原生表格語義。 */
   .admin-users .admin-table-wrap { border: 0; overflow: visible; }
   .admin-users .list-table { min-width: 0; }
   .admin-users thead {

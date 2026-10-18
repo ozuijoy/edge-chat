@@ -22,7 +22,7 @@ test("verified principal headers 可以完整 roundtrip", () => {
 	assert.equal(headers.get("content-type"), "application/json");
 });
 
-test("只有内部标记但没有 principal 字段时拒绝解析身份", () => {
+test("只有內部標記但沒有 principal 字段時拒絕解析身份", () => {
 	const request = new Request("https://cfchat.internal/notify", {
 		headers: createInternalHeaders(),
 	});
@@ -31,7 +31,7 @@ test("只有内部标记但没有 principal 字段时拒绝解析身份", () => 
 	assert.equal(parseVerifiedPrincipal(request), null);
 });
 
-test("外部请求不能伪装为已验证身份", () => {
+test("外部請求不能偽裝為已驗證身份", () => {
 	const request = new Request("https://example.com/connect", {
 		headers: {
 			"x-cfchat-verified-user-id": "42",

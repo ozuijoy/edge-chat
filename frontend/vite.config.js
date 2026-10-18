@@ -34,7 +34,7 @@ export default defineConfig({
       output: {
         codeSplitting: {
           groups: [
-            // 共用摇树后的图标集合，避免每个小图标都产生独立请求。
+            // 共用搖樹後的圖標集合，避免每個小圖標都產生獨立請求。
             { name: 'icons', test: /node_modules[\\/]@lucide[\\/]vue[\\/]/ }
           ]
         }

@@ -28,7 +28,7 @@ function createTelegramDatabase() {
 	return createD1Adapter(database);
 }
 
-test("Telegram 后台列出公开与私有群，但不把私信当作群聊", async () => {
+test("Telegram 後臺列出公開與私有群，但不把私信當作群聊", async () => {
 	const DB = createTelegramDatabase();
 	const state = await listTelegramBridgeAdminState({ DB });
 
@@ -44,7 +44,7 @@ test("Telegram 后台列出公开与私有群，但不把私信当作群聊", as
 	assert.equal(isGroupChannelKind("dm"), false);
 });
 
-test("Telegram 私有群映射可供双向桥接查询，私信映射继续拒绝", async () => {
+test("Telegram 私有群映射可供雙向橋接查詢，私信映射繼續拒絕", async () => {
 	const DB = createTelegramDatabase();
 	const mappingId = await createTelegramMapping(DB, {
 		channelId: 2,

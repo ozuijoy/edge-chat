@@ -118,7 +118,7 @@ class OutboxRepository @Inject constructor(
         } catch (error: CancellationException) {
             throw error
         } catch (error: Exception) {
-            database.outbox().markFailed(item.clientMessageId, error.message ?: "发送失败")
+            database.outbox().markFailed(item.clientMessageId, error.message ?: "發送失敗")
             false
         }
     }

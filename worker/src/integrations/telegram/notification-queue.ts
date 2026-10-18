@@ -33,7 +33,7 @@ export async function enqueueTelegramNotification(env: NotificationEnv, {
   room: { id: number; name?: string }; message: { id: number }; kind: string;
 }) {
   if (kind !== "dm" && kind !== "mention") return;
-  // 预算与插入在同一条 SQL 内完成，跨房间并发也不能超额；被抑制的只是提醒，不是聊天消息。
+  // 預算與插入在同一條 SQL 內完成，跨房間併發也不能超額；被抑制的只是提醒，不是聊天消息。
   const result = await env.DB.prepare(`INSERT OR IGNORE INTO telegram_notification_outbox
     (user_id, sender_id, channel_id, message_id, kind, room_name, next_attempt_at, created_at)
     SELECT n.user_id, ?, ?, ?, ?, ?, datetime('now', '+10 seconds'), CURRENT_TIMESTAMP
@@ -61,7 +61,7 @@ export async function nextTelegramNotificationAt(env: NotificationEnv): Promise<
 }
 
 export async function deliverTelegramNotification(env: NotificationEnv) {
-  // 租约耗尽后也要收尾，避免最后一次网络请求中断留下永久 sending 行。
+  // 租約耗盡後也要收尾，避免最後一次網絡請求中斷留下永久 sending 行。
   await env.DB.prepare(`UPDATE telegram_notification_outbox SET status = 'failed', updated_at = CURRENT_TIMESTAMP
     WHERE status = 'sending' AND attempts >= ? AND next_attempt_at <= CURRENT_TIMESTAMP`).bind(MAX_ATTEMPTS).run();
   await env.DB.prepare(`UPDATE telegram_notification_outbox SET status = 'failed', updated_at = CURRENT_TIMESTAMP
@@ -78,7 +78,7 @@ export async function deliverTelegramNotification(env: NotificationEnv) {
     ORDER BY o.next_attempt_at, o.id LIMIT 1`).bind(MAX_ATTEMPTS)
     .first<{ user_id: number; kind: string; telegram_chat_id: string }>();
   if (!candidate) return;
-  // D1 全站闸门也保护救援或重入调用；失败和重试同样占用发送预算。
+  // D1 全站閘門也保護救援或重入調用；失敗和重試同樣佔用發送預算。
   const slot = await env.DB.prepare(`UPDATE telegram_notification_gate SET next_send_at = datetime('now', '+1 second')
     WHERE id = 1 AND next_send_at <= CURRENT_TIMESTAMP RETURNING id`).first();
   if (!slot) return;
@@ -98,9 +98,9 @@ export async function deliverTelegramNotification(env: NotificationEnv) {
     if (!credentials) throw new Error("Telegram bot unavailable");
     const label = candidate.kind === "dm" ? "你收到 EdgeChat 私信提醒" : "你在 EdgeChat 群聊中被 @ 了";
     const rooms = new Set(claimed.map(row => row.room_name));
-    const summary = rooms.size === 1 ? claimed[0].room_name : `${rooms.size} 个会话`;
+    const summary = rooms.size === 1 ? claimed[0].room_name : `${rooms.size} 個會話`;
     await sendTelegramText(credentials.botToken, {
-      chatId: candidate.telegram_chat_id, text: `${label}\n${summary}\n打开 EdgeChat 查看`, parseMode: null, timeoutMs: 5000,
+      chatId: candidate.telegram_chat_id, text: `${label}\n${summary}\n打開 EdgeChat 查看`, parseMode: null, timeoutMs: 5000,
     });
     await env.DB.prepare(`UPDATE telegram_notification_outbox SET status = 'sent', updated_at = CURRENT_TIMESTAMP
       WHERE id IN (${placeholders}) AND status = 'sending'`).bind(...ids).run();
@@ -108,7 +108,7 @@ export async function deliverTelegramNotification(env: NotificationEnv) {
     const throttled = error instanceof TelegramApiError && error.status === 429;
     const delay = throttled ? Math.max(1, Math.ceil(error.retryAfter || 60)) : Math.max(...claimed.map(row => row.attempts)) * 300;
     if (throttled) {
-      // Telegram 的限额由共享 Bot 承担，不能只推迟触发 429 的那一位收件人。
+      // Telegram 的限額由共享 Bot 承擔，不能只推遲觸發 429 的那一位收件人。
       await env.DB.prepare(`UPDATE telegram_notification_gate SET next_send_at = MAX(next_send_at, datetime('now', '+' || ? || ' seconds'))
         WHERE id = 1`).bind(delay).run();
     }

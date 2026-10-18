@@ -64,7 +64,7 @@ fun LoginScreen(
             EdgeChatBrandMark(size = 80.dp)
             Spacer(Modifier.height(24.dp))
             Text(
-                text = if (language == "zh-CN") "登录 ${server.siteName}" else "Sign in to ${server.siteName}",
+                text = if (language == "zh-TW") "登錄 ${server.siteName}" else "Sign in to ${server.siteName}",
                 style = MaterialTheme.typography.headlineSmall,
                 color = colors.textPrimary,
                 textAlign = TextAlign.Center,
@@ -72,7 +72,7 @@ fun LoginScreen(
             Spacer(Modifier.height(8.dp))
             Text(server.baseUrl, style = MaterialTheme.typography.bodyMedium, color = colors.textSecondary)
             TextButton(onClick = onChangeServer) {
-                Text(if (language == "zh-CN") "更换服务器" else "Change server")
+                Text(if (language == "zh-TW") "更換服務器" else "Change server")
             }
             Spacer(Modifier.height(24.dp))
             Column(modifier = Modifier.fillMaxWidth().widthIn(max = 520.dp)) {
@@ -81,7 +81,7 @@ fun LoginScreen(
                     onValueChange = { username = it },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    label = { Text(if (language == "zh-CN") "用户名" else "Username") },
+                    label = { Text(if (language == "zh-TW") "用戶名" else "Username") },
                     leadingIcon = { Icon(Icons.Outlined.AccountCircle, contentDescription = null) },
                     shape = MaterialTheme.shapes.large,
                 )
@@ -92,13 +92,13 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    label = { Text(if (language == "zh-CN") "密码" else "Password") },
+                    label = { Text(if (language == "zh-TW") "密碼" else "Password") },
                     leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
                                 if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
-                                contentDescription = if (language == "zh-CN") "切换密码可见性" else "Toggle password visibility",
+                                contentDescription = if (language == "zh-TW") "切換密碼可見性" else "Toggle password visibility",
                             )
                         }
                     },
@@ -115,7 +115,7 @@ fun LoginScreen(
                 if (loading) {
                     CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
                 } else {
-                    Text(if (language == "zh-CN") "登录" else "Sign in")
+                    Text(if (language == "zh-TW") "登錄" else "Sign in")
                 }
             }
         }

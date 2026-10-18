@@ -40,7 +40,7 @@ function createStatementDb(handlers = {}) {
 	return { db, calls };
 }
 
-test("管理端邀请列表返回已用、总量和剩余次数", async () => {
+test("管理端邀請列表返回已用、總量和剩餘次數", async () => {
 	const { db, calls } = createStatementDb({
 		all() {
 			return {
@@ -48,7 +48,7 @@ test("管理端邀请列表返回已用、总量和剩余次数", async () => {
 					{
 						id: 7,
 						token: "token",
-						note: "测试邀请",
+						note: "測試邀請",
 						max_uses: 5,
 						used_count: 2,
 						created_at: "2026-07-29 00:00:00",
@@ -72,7 +72,7 @@ test("管理端邀请列表返回已用、总量和剩余次数", async () => {
 	assert.match(calls[0].sql, /ri\.used_count < ri\.max_uses/);
 });
 
-test("创建邀请时保存管理员设置的最大使用次数", async () => {
+test("創建邀請時保存管理員設置的最大使用次數", async () => {
 	const { db, calls } = createStatementDb({
 		run() {
 			return { meta: { last_row_id: 18 } };
@@ -94,7 +94,7 @@ test("创建邀请时保存管理员设置的最大使用次数", async () => {
 	assert.equal(invite.remainingUses, 5);
 });
 
-test("公开邀请只返回仍有剩余次数的链接", async () => {
+test("公開邀請只返回仍有剩餘次數的鏈接", async () => {
 	const { db, calls } = createStatementDb({
 		first() {
 			return {
@@ -115,7 +115,7 @@ test("公开邀请只返回仍有剩余次数的链接", async () => {
 	assert.match(calls[0].sql, /used_count < max_uses/);
 });
 
-test("邀请注册通过原子批处理同时创建用户和登记使用记录", async () => {
+test("邀請註冊通過原子批處理同時創建用戶和登記使用記錄", async () => {
 	const { db, calls } = createStatementDb({
 		batch(statements) {
 			assert.equal(statements.length, 2);
@@ -137,10 +137,10 @@ test("邀请注册通过原子批处理同时创建用户和登记使用记录",
 	assert.deepEqual(calls[1].binds, [4, "new-user"]);
 });
 
-test("邀请额度耗尽和用户名重复返回稳定的公开错误", async () => {
+test("邀請額度耗盡和用戶名重複返回穩定的公開錯誤", async () => {
 	for (const [databaseMessage, publicMessage] of [
-		["REGISTRATION_INVITE_UNAVAILABLE", "注册链接已失效"],
-		["UNIQUE constraint failed: users.username", "用户名已存在"],
+		["REGISTRATION_INVITE_UNAVAILABLE", "註冊鏈接已失效"],
+		["UNIQUE constraint failed: users.username", "用戶名已存在"],
 	]) {
 		const { db } = createStatementDb({
 			batch() {
@@ -162,7 +162,7 @@ test("邀请额度耗尽和用户名重复返回稳定的公开错误", async ()
 	}
 });
 
-test("数据库与后台界面完整声明可使用次数能力", () => {
+test("數據庫與後臺界面完整聲明可使用次數能力", () => {
 	const schema = readFileSync(new URL("../worker/schema.sql", import.meta.url), "utf8");
 	const migration = readFileSync(
 		new URL("../worker/migrations/2026-07-29-registration-invite-usage.sql", import.meta.url),
@@ -199,8 +199,8 @@ test("数据库与后台界面完整声明可使用次数能力", () => {
 		assert.match(inviteManager, /admin-invite-card__status/);
 		assert.match(adminInvitesPage, /import RegistrationInviteManager/);
 	assert.match(adminInvitesPage, /<RegistrationInviteManager \/>/);
-	assert.doesNotMatch(adminSitePage, /RegistrationInviteManager|注册链接/);
-	assert.doesNotMatch(adminUsersPage, /RegistrationInviteManager|注册链接|创建用户/);
-	assert.doesNotMatch(adminInvitesPage, /创建一次性注册链接|限 1 人注册/);
-	assert.match(adminApi, /可使用次数必须是 1 到 \$\{MAX_INVITE_USES\} 之间的整数/);
+	assert.doesNotMatch(adminSitePage, /RegistrationInviteManager|註冊鏈接/);
+	assert.doesNotMatch(adminUsersPage, /RegistrationInviteManager|註冊鏈接|創建用戶/);
+	assert.doesNotMatch(adminInvitesPage, /創建一次性註冊鏈接|限 1 人註冊/);
+	assert.match(adminApi, /可使用次數必須是 1 到 \$\{MAX_INVITE_USES\} 之間的整數/);
 });

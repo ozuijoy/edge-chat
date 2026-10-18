@@ -1,7 +1,7 @@
 ALTER TABLE users ADD COLUMN is_super_admin INTEGER NOT NULL DEFAULT 0 CHECK(is_super_admin IN (0, 1));
 ALTER TABLE users ADD COLUMN management_protected INTEGER NOT NULL DEFAULT 0 CHECK(management_protected IN (0, 1));
 ALTER TABLE users ADD COLUMN authz_version INTEGER NOT NULL DEFAULT 0;
--- 旧 is_admin 只代表历史全权账号；此回填仅由迁移清单执行一次，后续部署不重复授予身份。
+-- 舊 is_admin 只代表歷史全權賬號；此回填僅由遷移清單執行一次，後續部署不重複授予身份。
 UPDATE users SET is_super_admin = is_admin, management_protected = is_admin;
 
 CREATE TABLE rbac_roles (
@@ -14,7 +14,7 @@ CREATE TABLE rbac_roles (
   updated_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-INSERT INTO rbac_roles (id, key, name) VALUES (1, 'ordinary', '普通用户');
+INSERT INTO rbac_roles (id, key, name) VALUES (1, 'ordinary', '普通用戶');
 CREATE TABLE rbac_role_permissions (
   role_id INTEGER NOT NULL REFERENCES rbac_roles(id) ON DELETE CASCADE,
   permission_key TEXT NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE admin_audit_log (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX idx_admin_audit_time ON admin_audit_log(created_at, id);
--- 每次写入最多清理 100 条，避免审计无限增长，也不在后台请求内执行全表清理。
+-- 每次寫入最多清理 100 條，避免審計無限增長，也不在後臺請求內執行全表清理。
 CREATE TRIGGER limit_admin_audit AFTER INSERT ON admin_audit_log BEGIN
   DELETE FROM admin_audit_log WHERE id IN (SELECT id FROM admin_audit_log
     WHERE created_at < datetime('now', '-90 days') OR id <= NEW.id - 10000 ORDER BY id LIMIT 100);

@@ -70,7 +70,7 @@ test("migration plan handles CRLF checksums and rejects changed or partial migra
   const readSql = async () => sql;
   const normalized = await buildD1MigrationPlan({ migrations: [base], appliedMigrations: new Map([["m", [...checksums.compatible][0]]]), artifacts: new Set(), readSql });
   assert.equal(normalized.decisions[0].action, "normalize");
-  await assert.rejects(() => buildD1MigrationPlan({ migrations: [base], appliedMigrations: new Map([["m", "wrong"]]), artifacts: new Set(), readSql }), /校验值发生变化/);
+  await assert.rejects(() => buildD1MigrationPlan({ migrations: [base], appliedMigrations: new Map([["m", "wrong"]]), artifacts: new Set(), readSql }), /校驗值發生變化/);
   await assert.rejects(() => buildD1MigrationPlan({ migrations: [base], appliedMigrations: new Map(), artifacts: new Set(["table:x"]), readSql: async () => sql }), /只完成了一部分/);
 });
 
